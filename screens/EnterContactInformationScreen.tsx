@@ -7,57 +7,61 @@ import BoldText from "../components/BoldText";
 import RegularText from "../components/RegularText";
 import RoundedButton from "../components/RoundedButton";
 import RoundedInput from "../components/RoundedInput";
+import RoundedInputButton from "../components/RoundedInputButton";
 import ScreenHeader from "../components/ScreenHeader";
 import appConstants from "../constants/appConstants";
 
 import colors from "../constants/colors";
 
-const LoginScreen = (props: any) => {
+const EnterContactInformation = (props: any) => {
     const { navigation } = props
+
     const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [phone, setPhone] = useState('')
+    const [dob, setDob] = useState('')
+    const [address, setAddress] = useState('')
 
+    const phoneRef = useRef<TextInput>(null)
     const emailRef = useRef<TextInput>(null)
-    const passwordRef = useRef<TextInput>(null)
+    const addressRef = useRef<TextInput>(null)
 
-    const onForgotPasswordPress = useCallback(() => {
-        console.log('forgot password')
-    }, [])
-
-    const signInHandler = useCallback(async () => {
-        try {
-
-        } catch (err) {
-            console.log('[signInHandler] Error : ', err)
-        }
-    }, [])
-
-    const onClaimPressHandler = useCallback(() => {
-        navigation.navigate("selectRegion")
+    const nextPressHandler = useCallback(() => {
+        navigation.navigate("otpScreen")
     }, [navigation])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
-            case appConstants.EMAIL:
-                setEmail(value);
+            case appConstants.PHONE:
+                setPhone(value);
                 break
-            case appConstants.PASSWORD:
-                setPassword(value)
+            case appConstants.EMAIL:
+                setEmail(value)
+                break
+            case appConstants.DOB:
+                setDob(value)
+                break
+            case appConstants.ADDRESS:
+                setAddress(value)
                 break
         }
     }, [])
 
     const onSubmitEditingHandler = useCallback((key: any) => {
         switch (key) {
-            case appConstants.EMAIL:
-                passwordRef.current?.focus()
+            case appConstants.PHONE:
+                emailRef.current?.focus()
                 break
-            case appConstants.PASSWORD:
+            case appConstants.EMAIL:
+                //  show date picker 
+                break
+            case appConstants.DOB: // on date select
+                addressRef.current?.focus()
+                break
+            case appConstants.ADDRESS:
                 Keyboard.dismiss()
-                signInHandler()
                 break
         }
-    }, [signInHandler])
+    }, [])
 
     return (
         <View style={styles.root}>
@@ -67,49 +71,47 @@ const LoginScreen = (props: any) => {
                 logoStyle={styles.logoStyle}
             />
             <View style={styles.detailsContainer}>
-                <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, paddingHorizontal: 35 }}>
                     <BoldText style={{ fontSize: 22, alignSelf: 'center' }}>
-                        {"Sign-in Now!"}
+                        {"Hey, you are almost done!"}
                     </BoldText>
+                    <RegularText style={{ textAlign: 'center', marginVertical: 10 }}>
+                        {"To complete your account setup, please\ncreate your username and password"}
+                    </RegularText>
                     <RoundedInput
-                        placeholder="email or username"
+                        placeholder="Username"
+                        value={phone}
+                        onChangeText={onChangeTextHandler.bind(null, appConstants.USERNAME)}
+                        onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.USERNAME)}
+                        maxLength={15}
+                        ref={phoneRef}
+                    />
+                    <RoundedInput
+                        placeholder="Email Address"
                         value={email}
                         onChangeText={onChangeTextHandler.bind(null, appConstants.EMAIL)}
                         onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.EMAIL)}
                         maxLength={50}
                         ref={emailRef}
                     />
-                    <RoundedInput
-                        placeholder="password"
-                        value={password}
-                        onChangeText={onChangeTextHandler.bind(null, appConstants.PASSWORD)}
-                        onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.PASSWORD)}
-                        blurOnSubmit={true}
-                        secureTextEntry={true}
-                        returnKeyType="done"
-                        maxLength={15}
-                        ref={passwordRef}
-                    />
-                    <RegularText
-                        onPress={onForgotPasswordPress}
-                        style={{
-                            alignSelf: 'flex-end',
-                            marginVertical: 10,
-                            color: colors.primary,
-                        }}
-                    >
-                        {"forgot passoword"}
-                    </RegularText>
-                    <RoundedButton
-                        text="Sign in"
+                    <RoundedInputButton
+                        placeholder="Date of Birth"
                         onPress={() => {}}
+                        value={dob}
+                    />
+                    <RoundedInput
+                        placeholder="Address"
+                        value={address}
+                        onChangeText={onChangeTextHandler.bind(null, appConstants.ADDRESS)}
+                        onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.ADDRESS)}
+                        maxLength={100}
+                        ref={addressRef}
                     />
                 </View>
-                <AuthFooter
-                    baseText={"Don't have an account? "}
-                    innerText={"Claim Now"}
-                    onPress={onClaimPressHandler}
-                    style={{ marginBottom: 15 }}
+                <RoundedButton
+                    style={{ borderRadius: 0 }}
+                    onPress={nextPressHandler}
+                    text={"Next"}
                 />
             </View>
         </View>
@@ -124,7 +126,6 @@ const styles = StyleSheet.create({
         flex: 0.35,
         alignItems: 'center',
         justifyContent: 'center',
-        // backgroundColor: 'pink'
     },
     logoStyle: {
         height: 100,
@@ -144,8 +145,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
         paddingTop: 20,
-        paddingHorizontal: 35
     }
 })
 
-export default LoginScreen
+export default EnterContactInformation

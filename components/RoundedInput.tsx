@@ -20,7 +20,7 @@ const RoundedInput = forwardRef((props: RoundedInputProps & TextInputProps, ref:
                 style={{
                     position: 'absolute',
                     top: -12,
-                    left: 18,
+                    left: 22,
                     backgroundColor: colors.white,
                     paddingHorizontal: 5,
                 }}
@@ -31,9 +31,10 @@ const RoundedInput = forwardRef((props: RoundedInputProps & TextInputProps, ref:
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="next"
+                blurOnSubmit={false}
                 {...props}
                 placeholder=""
-                style={{ paddingHorizontal: 15, ...props.inputStyle }}
+                style={{ paddingHorizontal: 20, ...props.inputStyle }}
             />
         </View>
     )

@@ -1,31 +1,52 @@
 import React from "react";
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { View, Text } from 'react-native'
+
 import LoginScreen from "../screens/LoginScreen";
+import SelectRegionScreen from "../screens/SelectRegionScreen";
+import SelectChapterScreen from "../screens/SelectChapterScreen";
+import FetchMatriculationDetailsScreen from "../screens/FetchMatriculationDetailsScreen";
+import EnterContactInformationScreen from "../screens/EnterContactInformationScreen";
+import OTPScreen from "../screens/OTPScreen";
+import ConfirmRegistrationScreen from "../screens/ConfirmRegistration";
 
 const Stack = createNativeStackNavigator()
 
-function HomeScreen() {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Home Screen</Text>
-      </View>
-    );
-  }
-
-function DetailsScreen() {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Details Screen</Text>
-      </View>
-    );
-  }
-
 const AuthNavigator = () => {
     return (
-        <Stack.Navigator initialRouteName="Home">
-            <Stack.Screen name="login" component={LoginScreen} />
-            {/* <Stack.Screen name="Details" component={DetailsScreen} /> */}
+        <Stack.Navigator
+          initialRouteName="login"
+          screenOptions={{
+            headerShown: false
+          }}
+        >
+            <Stack.Screen
+              name="login"
+              component={LoginScreen}
+            />
+            <Stack.Screen
+              name="selectRegion"
+              component={SelectRegionScreen}
+            />
+            <Stack.Screen
+              name="selectChapter"
+              component={SelectChapterScreen}
+            />
+            <Stack.Screen
+              name="fetchMatriculationDetails"
+              component={FetchMatriculationDetailsScreen}
+            />
+            <Stack.Screen
+              name="enterContactInformation"
+              component={EnterContactInformationScreen}
+            />
+            <Stack.Screen
+              name="otpScreen"
+              component={OTPScreen}
+            />
+            <Stack.Screen
+              name="confirmRegistration"
+              component={ConfirmRegistrationScreen}
+            />
         </Stack.Navigator>
     )
 }
