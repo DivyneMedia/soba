@@ -34,6 +34,7 @@ const RoundedInput = forwardRef((props: RoundedInputProps & TextInputProps, ref:
                 blurOnSubmit={false}
                 {...props}
                 placeholder=""
+                ref={ref}
                 style={{ paddingHorizontal: 20, ...props.inputStyle }}
             />
         </View>

@@ -35,12 +35,12 @@ android_library(
 
 android_build_config(
     name = "build_config",
-    package = "com.soba",
+    package = "com.divynemedia.soba",
 )
 
 android_resource(
     name = "res",
-    package = "com.soba",
+    package = "com.divynemedia.soba",
     res = "src/main/res",
 )
 

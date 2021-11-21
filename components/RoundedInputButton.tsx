@@ -53,7 +53,8 @@ const RoundedInputButton = (props: RoundedInputButtonProps) => {
                 />
                 <RegularText
                     style={{
-                        fontSize: 14
+                        fontSize: 14,
+                        marginLeft: 5
                     }}
                 >
                     {value}

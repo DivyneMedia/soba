@@ -1,4 +1,4 @@
-package com.soba;
+package com.divynemedia.soba;
 
 import com.facebook.react.ReactActivity;
 import android.os.Bundle;

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SOBA</string>
+    <string name="appName">TextView</string>
+    <string name="splashText">SASSE Old Boys Association</string>
 </resources>

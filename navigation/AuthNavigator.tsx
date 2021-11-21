@@ -1,5 +1,5 @@
 import React from "react";
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createNativeStackNavigator, NativeStackHeaderProps } from '@react-navigation/native-stack'
 
 import LoginScreen from "../screens/LoginScreen";
 import SelectRegionScreen from "../screens/SelectRegionScreen";
@@ -8,6 +8,9 @@ import FetchMatriculationDetailsScreen from "../screens/FetchMatriculationDetail
 import EnterContactInformationScreen from "../screens/EnterContactInformationScreen";
 import OTPScreen from "../screens/OTPScreen";
 import ConfirmRegistrationScreen from "../screens/ConfirmRegistration";
+import images from "../assets/images";
+import colors from "../constants/colors";
+import { Image, Pressable, View } from "react-native";
 
 const Stack = createNativeStackNavigator()
 

@@ -3,6 +3,7 @@ import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
 import images from "../assets/images";
 
 import AuthFooter from "../components/AuthFooter";
+import BackgroundImageComp from "../components/BackgroundImageComp";
 import BoldText from "../components/BoldText";
 import RegularText from "../components/RegularText";
 import RoundedButton from "../components/RoundedButton";
@@ -11,6 +12,7 @@ import ScreenHeader from "../components/ScreenHeader";
 import appConstants from "../constants/appConstants";
 
 import colors from "../constants/colors";
+import { SuccessToast } from "../utils/ToastUtils";
 
 const LoginScreen = (props: any) => {
     const { navigation } = props
@@ -21,12 +23,12 @@ const LoginScreen = (props: any) => {
     const passwordRef = useRef<TextInput>(null)
 
     const onForgotPasswordPress = useCallback(() => {
-        console.log('forgot password')
+        SuccessToast("Coming Soon")
     }, [])
 
     const signInHandler = useCallback(async () => {
         try {
-
+            SuccessToast("Coming Soon")
         } catch (err) {
             console.log('[signInHandler] Error : ', err)
         }
@@ -60,59 +62,61 @@ const LoginScreen = (props: any) => {
     }, [signInHandler])
 
     return (
-        <View style={styles.root}>
-            <ScreenHeader
-                containerStyle={styles.headerContainer}
-                logo={images.ic_logo}
-                logoStyle={styles.logoStyle}
-            />
-            <View style={styles.detailsContainer}>
-                <View style={{ flex: 1 }}>
-                    <BoldText style={{ fontSize: 22, alignSelf: 'center' }}>
-                        {"Sign-in Now!"}
-                    </BoldText>
-                    <RoundedInput
-                        placeholder="email or username"
-                        value={email}
-                        onChangeText={onChangeTextHandler.bind(null, appConstants.EMAIL)}
-                        onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.EMAIL)}
-                        maxLength={50}
-                        ref={emailRef}
-                    />
-                    <RoundedInput
-                        placeholder="password"
-                        value={password}
-                        onChangeText={onChangeTextHandler.bind(null, appConstants.PASSWORD)}
-                        onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.PASSWORD)}
-                        blurOnSubmit={true}
-                        secureTextEntry={true}
-                        returnKeyType="done"
-                        maxLength={15}
-                        ref={passwordRef}
-                    />
-                    <RegularText
-                        onPress={onForgotPasswordPress}
-                        style={{
-                            alignSelf: 'flex-end',
-                            marginVertical: 10,
-                            color: colors.primary,
-                        }}
-                    >
-                        {"forgot passoword"}
-                    </RegularText>
-                    <RoundedButton
-                        text="Sign in"
-                        onPress={() => {}}
+        <BackgroundImageComp>
+            <View style={styles.root}>
+                <ScreenHeader
+                    containerStyle={styles.headerContainer}
+                    logo={images.ic_logo}
+                    logoStyle={styles.logoStyle}
+                />
+                <View style={styles.detailsContainer}>
+                    <View style={{ flex: 1 }}>
+                        <BoldText style={{ fontSize: 22, alignSelf: 'center' }}>
+                            {"Sign-in Now!"}
+                        </BoldText>
+                        <RoundedInput
+                            placeholder="email or username"
+                            value={email}
+                            onChangeText={onChangeTextHandler.bind(null, appConstants.EMAIL)}
+                            onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.EMAIL)}
+                            maxLength={50}
+                            ref={emailRef}
+                        />
+                        <RoundedInput
+                            placeholder="password"
+                            value={password}
+                            onChangeText={onChangeTextHandler.bind(null, appConstants.PASSWORD)}
+                            onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.PASSWORD)}
+                            blurOnSubmit={true}
+                            secureTextEntry={true}
+                            returnKeyType="done"
+                            maxLength={15}
+                            ref={passwordRef}
+                        />
+                        <RegularText
+                            onPress={onForgotPasswordPress}
+                            style={{
+                                alignSelf: 'flex-end',
+                                marginVertical: 10,
+                                color: colors.primary,
+                            }}
+                        >
+                            {"forgot passoword"}
+                        </RegularText>
+                        <RoundedButton
+                            text="Sign in"
+                            onPress={signInHandler}
+                        />
+                    </View>
+                    <AuthFooter
+                        baseText={"Don't have an account? "}
+                        innerText={"Claim Now"}
+                        onPress={onClaimPressHandler}
+                        style={{ marginBottom: 15 }}
                     />
                 </View>
-                <AuthFooter
-                    baseText={"Don't have an account? "}
-                    innerText={"Claim Now"}
-                    onPress={onClaimPressHandler}
-                    style={{ marginBottom: 15 }}
-                />
             </View>
-        </View>
+        </BackgroundImageComp>
     )
 }
 
