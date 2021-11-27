@@ -13,7 +13,11 @@ export default (state = initialState, action: ActionType) => {
     const { type, payload } = action
     switch (type) {
         case authActions.LOGIN:
-            return state
+            console.log(payload)
+            return {
+                ...state,
+                ...payload
+            }
         case authActions.SIGNUP:
             return state
         case authActions.SET_REGION:

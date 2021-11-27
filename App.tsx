@@ -3,7 +3,8 @@ import SplashScreen from './screens/SplashScreen';
 import Toast from 'react-native-toast-message';
 import { Provider } from 'react-redux';
 import RootNavigator from './navigation/RootNavigator';
-import { store } from './store/store';
+import { store, persistor } from './store';
+import { PersistGate } from 'redux-persist/integration/react'
 import { delay } from './utils/delay';
 
 const App = () => {
@@ -28,8 +29,10 @@ const App = () => {
   
   return (
     <Provider store={store}>
-      <RootNavigator />
-      <Toast ref={setInitialToastRef} />
+      <PersistGate persistor={persistor} loading={null}>
+        <RootNavigator />
+        <Toast ref={setInitialToastRef} />
+      </PersistGate>
     </Provider>
   );
 };

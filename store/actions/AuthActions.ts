@@ -4,16 +4,16 @@ export const SET_REGION = "SET_REGION"
 export const SET_CHAPTER = "SET_CHAPTER"
 
 export const login = (loginReq: any) => {
-    return {
-        type: LOGIN,
-        payload: loginReq
-    }
-    // return (dispatch: Dispatch, getState: any) => {
-    //     dispatch({
-    //         type: LOGIN,
-    //         payload: loginReq
-    //     })
+    // return {
+    //     type: LOGIN,
+    //     payload: loginReq
     // }
+    return async (dispatch: any, getState: any) => {
+        dispatch({
+            type: LOGIN,
+            payload: loginReq
+        })
+    }
 }
 
 export const setRegion = (region: number) => {

@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
+import { useDispatch, useSelector } from "react-redux";
 import images from "../assets/images";
 
 import AuthFooter from "../components/AuthFooter";
@@ -10,12 +11,16 @@ import RoundedButton from "../components/RoundedButton";
 import RoundedInput from "../components/RoundedInput";
 import ScreenHeader from "../components/ScreenHeader";
 import appConstants from "../constants/appConstants";
+import * as authActions from '../store/actions/AuthActions'
 
 import colors from "../constants/colors";
 import { SuccessToast } from "../utils/ToastUtils";
 
 const LoginScreen = (props: any) => {
     const { navigation } = props
+
+    const dispatch = useDispatch()
+
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
@@ -28,11 +33,14 @@ const LoginScreen = (props: any) => {
 
     const signInHandler = useCallback(async () => {
         try {
+            await dispatch(authActions.login({
+                isLoggedIn: true
+            }))
             SuccessToast("Coming Soon")
         } catch (err) {
             console.log('[signInHandler] Error : ', err)
         }
-    }, [])
+    }, [dispatch])
 
     const onClaimPressHandler = useCallback(() => {
         navigation.navigate("selectRegion")
