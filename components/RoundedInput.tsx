@@ -1,13 +1,22 @@
-import React, { forwardRef } from "react"
-import { View, TextInput, TextInputProps, TextStyle } from 'react-native'
+import React, { forwardRef, useCallback, useState } from "react"
+import { Image, View, TextInput, TextInputProps, TextStyle, Pressable } from 'react-native'
+import images from "../assets/images"
 import colors from "../constants/colors"
 import RegularText from "./RegularText"
 
 type RoundedInputProps = {
     inputStyle?: TextStyle
+    password?: boolean
 }
 
 const RoundedInput = forwardRef((props: RoundedInputProps & TextInputProps, ref: any) => {
+    const { password }  = props
+    const [showPassword, setShowPassword] = useState(true)
+
+    const manageTextVisibilityHandler = useCallback(() => {
+        setShowPassword(prevState => !prevState)
+    }, [])
+
     return (
         <View
             style={{
@@ -27,16 +36,46 @@ const RoundedInput = forwardRef((props: RoundedInputProps & TextInputProps, ref:
             >
                 {props.placeholder}
             </RegularText>
-            <TextInput
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="next"
-                blurOnSubmit={false}
-                {...props}
-                placeholder=""
-                ref={ref}
-                style={{ paddingHorizontal: 20, ...props.inputStyle }}
-            />
+            <View
+                style={{
+                    flexDirection: 'row',
+                    alignItems: 'center'
+                }}
+            >
+                <TextInput
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                    {...props}
+                    secureTextEntry={password ? showPassword : false}
+                    placeholder=""
+                    ref={ref}
+                    style={{ flex: 1, paddingHorizontal: 20, ...props.inputStyle }}
+                />
+                {
+                    password
+                    ?
+                        <Pressable
+                            style={{
+                                padding: 5,
+                                marginRight: 15
+                            }}
+                            onPress={manageTextVisibilityHandler}
+                        >
+                            <Image
+                                source={images.ic_visibility}
+                                style={{
+                                    height: 24,
+                                    width: 24
+                                }}
+                                resizeMode="contain"
+                            />
+                        </Pressable>
+                    :
+                        null
+                }
+            </View>
         </View>
     )
 })

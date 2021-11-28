@@ -2,6 +2,7 @@ export const LOGIN = "LOGIN"
 export const SIGNUP = "SIGNUP"
 export const SET_REGION = "SET_REGION"
 export const SET_CHAPTER = "SET_CHAPTER"
+export const LOGOUT = "LOGOUT"
 
 export const login = (loginReq: any) => {
     // return {
@@ -40,4 +41,15 @@ export const setChapter = (chapter: number) => {
     //         payload: region
     //     })
     // }
+}
+
+export const logout = () => {
+    return async (dispatch: any, getState: any) => {
+        dispatch({
+            type: LOGOUT,
+            payload: {
+                isLoggedIn:false
+            }
+        })
+    }
 }

@@ -13,7 +13,6 @@ export default (state = initialState, action: ActionType) => {
     const { type, payload } = action
     switch (type) {
         case authActions.LOGIN:
-            console.log(payload)
             return {
                 ...state,
                 ...payload
@@ -29,6 +28,11 @@ export default (state = initialState, action: ActionType) => {
             return {
                 ...state,
                 chapterId: payload
+            }
+        case authActions.LOGOUT:
+            return {
+                ...state,
+                ...payload
             }
         default:
             return state

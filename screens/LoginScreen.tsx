@@ -36,7 +36,7 @@ const LoginScreen = (props: any) => {
             await dispatch(authActions.login({
                 isLoggedIn: true
             }))
-            SuccessToast("Coming Soon")
+            SuccessToast("Login Successfully.")
         } catch (err) {
             console.log('[signInHandler] Error : ', err)
         }

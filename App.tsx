@@ -6,6 +6,7 @@ import RootNavigator from './navigation/RootNavigator';
 import { store, persistor } from './store';
 import { PersistGate } from 'redux-persist/integration/react'
 import { delay } from './utils/delay';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const App = () => {
   const [isLoading, setLoading] = useState(true)
@@ -28,12 +29,14 @@ const App = () => {
   }
   
   return (
-    <Provider store={store}>
-      <PersistGate persistor={persistor} loading={null}>
-        <RootNavigator />
-        <Toast ref={setInitialToastRef} />
-      </PersistGate>
-    </Provider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <PersistGate persistor={persistor} loading={null}>
+          <RootNavigator />
+          <Toast ref={setInitialToastRef} />
+        </PersistGate>
+      </Provider>
+    </GestureHandlerRootView>
   );
 };
 

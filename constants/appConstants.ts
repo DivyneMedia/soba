@@ -8,6 +8,7 @@ export default {
     OTP: 'OTP',
     USERNAME: 'USERNAME',
     CONF_PASSWORD: 'CONF_PASSWORD',
+    BASE_CHAPTER: 'BASE_CHAPTER',
 
     TAB_HOME: 'TAB_HOME',
     TAB_CHAT: 'TAB_CHAT',

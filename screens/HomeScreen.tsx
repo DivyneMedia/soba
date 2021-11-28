@@ -1,42 +1,138 @@
-import React from "react";
-import { Image, StyleSheet, TextInput, useWindowDimensions, View }  from 'react-native';
+import React, { useCallback, useMemo, useState } from "react";
+import { FlatList, StyleSheet, View }  from 'react-native';
+
 import images from "../assets/images";
-import BoldText from "../components/BoldText";
 import colors from "../constants/colors";
+import { SuccessToast } from "../utils/ToastUtils";
+import dummyData, { EventProps, NewsFeed } from "../data/dummyData";
+
+import SearchBar from "../components/SearchBar";
+import BoldText from "../components/BoldText";
+import TextButton from "../components/TextButton";
+import NewsFeedItem from "../components/NewsFeedItem";
 
 type HomeScreenProps = {
 
 }
 
 const HomeScreen = (props: HomeScreenProps) => {
-    return (
-        <View style={styles.root}>
-            <View style={styles.searchBarContainer}>
-                <Image
-                    source={images.ic_search}
-                    style={{
-                        height: 17,
-                        width: 17,
-                        marginRight: 5,
-                    }}
-                />
-                <TextInput
-                    placeholder="search your friends or chapter"
-                    style={{
-                        flex: 1,
-                        lineHeight: 18,
-                        fontSize: 15
-                    }}
-                />
-                <Image
-                    source={images.ic_filter}
-                    style={{
-                        height: 17,
-                        width: 17,
-                        marginLeft: 10,
-                    }}
+    const [searchText, setSearchText] = useState('')
+    const [newsFeedSelected, setNewsFeedSelected] = useState(false)
+    const [upcomingEventSelected, setUpcomingEventSelected] = useState(false)
+
+    const filterButtonPressHandler = useCallback(() => {
+        SuccessToast('Coming Soon')
+    }, [])
+
+    const morePressHandler = useCallback((type: 'NEWS' | 'EVENT') => {
+        SuccessToast('Coming Soon')
+    }, [])
+
+    const registerEventHandler = useCallback(() => {
+        SuccessToast('Coming Soon')
+    }, [])
+
+    const renderNewsFeedHandler = useCallback((item: any) => {
+        try {
+            const { item: newsFeed, index }: { item: NewsFeed, index: number } = item
+           return (
+               <NewsFeedItem
+                    key={newsFeed.id}
+                    title={newsFeed.title}
+                    createdAt={newsFeed.createdAt}
+                    comments={newsFeed.comments}
+                    imageUri={images.bg_soba}
+                    likes={newsFeed.likes}
+                    description={newsFeed.description}
+                    onMore={morePressHandler.bind(null, 'NEWS')}
+               />
+           )
+        } catch (err: any) {
+            console.log('[renderNewsFeedHandler] Error : ', err?.message)
+            return null
+        }
+    }, [morePressHandler])
+
+    const renderEventsHandler = useCallback((item: any) => {
+        try {
+            const { item: event, index }: { item: EventProps, index: number } = item
+           return (
+               <NewsFeedItem
+                    key={event.id}
+                    title={event.title}
+                    createdAt={event.duration}
+                    imageUri={images.bg_soba}
+                    description={event.description}
+                    duration={event.duration}
+                    onRegister={registerEventHandler}
+                    onMore={morePressHandler.bind(null, 'EVENT')}
+               />
+           )
+        } catch (err: any) {
+            console.log('[renderEventsHandler] Error : ', err?.message)
+            return null
+        }
+    }, [registerEventHandler, morePressHandler])
+
+    const NewsFeed = useMemo(() => {
+        return (
+            <FlatList
+                data={dummyData.newsFeed}
+                renderItem={renderNewsFeedHandler}
+                keyExtractor={(item, index) => index.toString()}
+            />
+        )
+    }, [renderNewsFeedHandler])
+
+    const Event = useMemo(() => {
+        return (
+            <View style={{ flex: 1 }}>
+                <View style={styles.eventTypesContainer}>
+                    <TextButton
+                        isSelected={upcomingEventSelected}
+                        text="Upcoming"
+                        onPress={setUpcomingEventSelected.bind(null, true)}
+                        textStyle={{ fontSize: 12 }}
+                        style={{ paddingVertical: 5 }}
+                    />
+                    <TextButton
+                        isSelected={!upcomingEventSelected}
+                        text="Past"
+                        onPress={setUpcomingEventSelected.bind(null, false)}
+                        textStyle={{ fontSize: 12 }}
+                        style={{ paddingVertical: 5 }}
+                    />
+                </View>
+                <FlatList
+                    data={dummyData.events}
+                    renderItem={renderEventsHandler}
+                    keyExtractor={(item, index) => index.toString()}
                 />
             </View>
+        )
+    }, [upcomingEventSelected])
+
+    return (
+        <View style={styles.root}>
+            <SearchBar
+                value={searchText}
+                onChangeText={setSearchText}
+                onFilterButtonPress={filterButtonPressHandler}
+            />
+            <View style={styles.newsFeedEventButtonContainer}>
+                <TextButton
+                    isSelected={newsFeedSelected}
+                    text="News Feed"
+                    onPress={setNewsFeedSelected.bind(null, true)}
+                />
+                <TextButton
+                    isSelected={!newsFeedSelected}
+                    text="Event"
+                    onPress={setNewsFeedSelected.bind(null, false)}
+                />
+            </View>
+            <BoldText style={styles.contentText}>{"SOBBA Dallas related content"}</BoldText>
+            {newsFeedSelected ? NewsFeed : Event}
         </View>
     )
 }
@@ -46,14 +142,31 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.white
     },
-    searchBarContainer: {
+    newsFeedEventButtonContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        height: 50,
         backgroundColor: colors.grey,
+        height: 50,
+        marginHorizontal: 10,
         borderRadius: 10,
-        margin: 10,
-        paddingHorizontal: 15,
+        overflow: 'hidden'
+    },
+    contentText: {
+        alignSelf: 'center',
+        textAlign: 'center',
+        fontSize: 10,
+        marginVertical: 10,
+        color: colors.black,
+    },
+    eventTypesContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colors.grey,
+        height: 30,
+        marginHorizontal: '15%',
+        borderRadius: 10,
+        overflow: 'hidden',
+        marginBottom: 5,
     }
 })
 

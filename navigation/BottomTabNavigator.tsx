@@ -28,6 +28,9 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
             <Tab.Screen
                 name="home"
                 component={HomeScreen}
+                options={{
+                    tabBarShowLabel: false
+                }}
                 // options={(props: BottomTabNavigatorProps) => {
                 //     return {
                 //         tabBarButton: (props) => {
@@ -47,6 +50,9 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
             <Tab.Screen
                 name="chat"
                 component={ChatScreen}
+                options={{
+                    tabBarShowLabel: false
+                }}
                 // options={(props: BottomTabNavigatorProps) => {
                 //     return {
                 //         tabBarButton: (props) => {
@@ -66,6 +72,9 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
             <Tab.Screen
                 name="videoLibrary"
                 component={VideoLibraryScreen}
+                options={{
+                    tabBarShowLabel: false
+                }}
                 // options={(props: BottomTabNavigatorProps) => {
                 //     return {
                 //         tabBarButton: (props) => {
@@ -85,6 +94,9 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
             <Tab.Screen
                 name="giftCard"
                 component={GiftCardScreen}
+                options={{
+                    tabBarShowLabel: false
+                }}
                 // options={(props: BottomTabNavigatorProps) => {
                 //     return {
                 //         tabBarButton: (props) => {
@@ -104,6 +116,9 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
             <Tab.Screen
                 name="account"
                 component={AccountScreen}
+                options={{
+                    tabBarShowLabel: false
+                }}
                 // options={(props: BottomTabNavigatorProps) => {
                 //     return {
                 //         tabBarButton: (props) => {
