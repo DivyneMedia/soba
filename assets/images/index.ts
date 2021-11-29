@@ -26,4 +26,6 @@ export default {
     ic_logout: require('./ic_logout.png'),
     ic_show_qr_code: require('./ic_show_qr_code.png'),
     ic_visibility: require('./ic_visibility.png'),
+    ic_play_button: require('./ic_play_button.png'),
+    ic_video_camera: require('./ic_video_camera.png')
 }
