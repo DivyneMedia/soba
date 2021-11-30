@@ -1,6 +1,7 @@
 import React from "react";
 import { Image, Pressable, StyleSheet } from "react-native";
 import images from "../assets/images";
+import colors from "../constants/colors";
 import BoldText from "./BoldText";
 
 type LiveBroadcastProps = {
@@ -29,6 +30,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: colors.grey
     },
     img: {
         height: 24,

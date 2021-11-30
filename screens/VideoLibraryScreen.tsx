@@ -71,6 +71,27 @@ const VideoLibraryScreen = (props: VideoLibraryScreenProps) => {
                             }}
                         />
                     </ImageBackground>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginTop: 5,
+                            paddingHorizontal: 10,
+                        }}
+                    >
+                        <View style={{ flex: 1, marginLeft: 10, alignItems: 'flex-start', justifyContent: 'center' }}>
+                            <BoldText style={{ fontSize: 12 }}>{'Man. United 0 - 5 Liverpool'}</BoldText>
+                            <RegularText style={{ fontSize: 10 }}>{'SOBA America TV - SPORTS'}</RegularText>
+                        </View>
+                        <Image
+                            style={{
+                                height: 24,
+                                width: 22
+                            }}
+                            source={images.ic_forward}
+                            resizeMode="contain"
+                        />
+                    </View>
                 </Pressable>
             )
         } catch (err: any) {
@@ -78,12 +99,6 @@ const VideoLibraryScreen = (props: VideoLibraryScreenProps) => {
             return null
         }
     }, [])
-
-    // const renderListHeaderComponent = useCallback(() => {
-    //     return (
-            
-    //     )
-    // }, [])
     
     return (
         <View style={styles.root}>
