@@ -1,5 +1,5 @@
 import React from "react"
-import { Image, Pressable, View } from 'react-native'
+import { Image, ImageRequireSource, Pressable, View, ViewStyle } from 'react-native'
 
 import RegularText from "./RegularText"
 
@@ -10,17 +10,21 @@ type RoundedInputButtonProps = {
     placeholder: string
     value: string
     onPress: () => any
+    style?: ViewStyle
+    icon?: ImageRequireSource
+    hideIcon?: boolean
 }
 
 const RoundedInputButton = (props: RoundedInputButtonProps) => {
-    const { placeholder, value, onPress } = props
+    const { placeholder, value, onPress, style, icon, hideIcon } = props
     return (
         <Pressable
             style={{
                 borderRadius: 30,
                 borderWidth: 1,
                 marginTop: 20,
-                minHeight: 50
+                minHeight: 50,
+                ...style
             }}
             onPress={onPress}
         >
@@ -35,31 +39,37 @@ const RoundedInputButton = (props: RoundedInputButtonProps) => {
             >
                 {placeholder}
             </RegularText>
-            <View
-                style={{
-                    flexDirection: "row",
-                    alignItems: 'center',
-                    paddingHorizontal: 20,
-                    paddingVertical: 12
-                }}
-            >
-                <Image
-                    source={images.ic_calendar}
-                    style={{
-                        height: 24,
-                        width: 24
-                    }}
-                    resizeMode="contain"
-                />
-                <RegularText
-                    style={{
-                        fontSize: 14,
-                        marginLeft: 5
-                    }}
-                >
-                    {value}
-                </RegularText>
-            </View>
+            {
+                hideIcon
+                ?
+                    null
+                :
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            alignItems: 'center',
+                            paddingHorizontal: 20,
+                            paddingVertical: 12
+                        }}
+                    >
+                        <Image
+                            source={icon || images.ic_calendar}
+                            style={{
+                                height: 24,
+                                width: 24
+                            }}
+                            resizeMode="contain"
+                        />
+                        <RegularText
+                            style={{
+                                fontSize: 14,
+                                marginLeft: 5
+                            }}
+                        >
+                            {value}
+                        </RegularText>
+                    </View>
+            }
         </Pressable>
     )
 }

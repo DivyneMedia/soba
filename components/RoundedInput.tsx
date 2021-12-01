@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback, useState } from "react"
-import { Image, View, TextInput, TextInputProps, TextStyle, Pressable } from 'react-native'
+import { Image, View, TextInput, TextInputProps, TextStyle, Pressable, ViewStyle } from 'react-native'
 import images from "../assets/images"
 import colors from "../constants/colors"
 import RegularText from "./RegularText"
@@ -7,10 +7,11 @@ import RegularText from "./RegularText"
 type RoundedInputProps = {
     inputStyle?: TextStyle
     password?: boolean
+    style?: ViewStyle
 }
 
 const RoundedInput = forwardRef((props: RoundedInputProps & TextInputProps, ref: any) => {
-    const { password }  = props
+    const { password, style }  = props
     const [showPassword, setShowPassword] = useState(true)
 
     const manageTextVisibilityHandler = useCallback(() => {
@@ -22,7 +23,8 @@ const RoundedInput = forwardRef((props: RoundedInputProps & TextInputProps, ref:
             style={{
                 borderRadius: 30,
                 borderWidth: 1,
-                marginTop: 20
+                marginTop: 20,
+                ...style
             }}
         >
             <RegularText

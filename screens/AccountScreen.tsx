@@ -28,56 +28,7 @@ import Animated, {
 import { useDispatch } from "react-redux";
 import * as authActions from '../store/actions/AuthActions'
 import { SuccessToast } from "../utils/ToastUtils";
-
-// const CustomBackground: React.FC<BottomSheetBackgroundProps> = ({
-//     style,
-//     animatedIndex,
-//   }) => {
-//     //#region styles
-//     const containerAnimatedStyle = useAnimatedStyle(() => ({
-//       // @ts-ignore
-//       backgroundColor: interpolateColor(
-//         animatedIndex.value,
-//         [0, 1],
-//         ["#ffffff", "#a8b5eb"]
-//       ),
-//     }));
-//     const containerStyle = useMemo(
-//       () => [style, containerAnimatedStyle],
-//       [style, containerAnimatedStyle]
-//     );
-//     //#endregion
-  
-//     // render
-//     return <Animated.View pointerEvents="none" style={containerStyle} />;
-// };
-
-const CustomBackdrop = ({ animatedIndex, style }: BottomSheetBackdropProps) => {
-    // animated variables
-    const containerAnimatedStyle = useAnimatedStyle(() => ({
-      opacity: interpolate(
-        animatedIndex.value,
-        [0, 1],
-        [0, 1],
-        Extrapolate.CLAMP
-      ),
-    }));
-  
-    // styles
-    const containerStyle = useMemo(
-      () => [
-        style,
-        {
-          backgroundColor: '#00000080',
-        },
-        containerAnimatedStyle,
-      ],
-      [style, containerAnimatedStyle]
-    );
-  
-    return <Animated.View style={containerStyle} />;
-};
-  
+import CustomBackdrop from "../components/CustomBackdrop";
 
 type AccountScreenProps = {
     navigation: any
@@ -92,7 +43,7 @@ const AccountScreen = (props: AccountScreenProps) => {
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
     // variables
-    const snapPoints = useMemo(() => ['25%', '50%'], []);
+    const snapPoints = useMemo(() => ['50%'], []);
 
     // callbacks
     const handlePresentModalPress = useCallback(() => {
@@ -198,7 +149,7 @@ const AccountScreen = (props: AccountScreenProps) => {
                 </ScrollView>
                 <BottomSheetModal
                     ref={bottomSheetModalRef}
-                    index={1}
+                    index={0}
                     snapPoints={snapPoints}
                     onChange={handleSheetChanges}
                     backdropComponent={CustomBackdrop}

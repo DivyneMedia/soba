@@ -32,7 +32,8 @@ const data = [
 ]
 
 type GiftCardScreenProps = {
-
+    navigation: any
+    route: any
 }
 
 type EventProps = {
@@ -44,12 +45,20 @@ type EventProps = {
 }
 
 const GiftCardScreen = (props: GiftCardScreenProps) => {
+    const { navigation } = props
+    
     const [mandatory, setMandatory] = useState(true)
 
     const showDetailsHandler = useCallback((eventPayload: any) => {
         const { description, id, logo, origin, title } = eventPayload
-        
-    }, [])
+        navigation.navigate('donationDetails', {
+            id,
+            title,
+            description,
+            logo,
+            origin,
+        })
+    }, [navigation])
 
     const renderItemHandler = useCallback((item: any) => {
         try {
