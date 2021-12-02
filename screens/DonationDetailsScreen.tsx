@@ -1,6 +1,6 @@
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Image, Keyboard, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 import BoldText from "../components/BoldText";
 import CustomBackdrop from "../components/CustomBackdrop";
 import RegularText from "../components/RegularText";
@@ -8,6 +8,9 @@ import RoundedButton from "../components/RoundedButton";
 import RoundedInput from "../components/RoundedInput";
 import RoundedInputButton from "../components/RoundedInputButton";
 import colors from "../constants/colors";
+import { ErrorToast } from "../utils/ToastUtils";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+
 
 type DonationDetailsScreenProps = {
     navigation: any
@@ -21,7 +24,13 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
 
     const [amount, setAmount] = useState('')
     const [payWithCreditDebit, setPayWithCreditDebit] = useState(false)
-
+    const [cardNumber, setCardNumber] = useState('')
+    const [expiryDate, setExpiryDate] = useState('')
+    const [cvc, setCVC] = useState('')
+    const [fullname, setFullname] = useState('')
+    const [zipCode, setZipCode] = useState('')
+    const [showDatePicker, setShowDatePicker] = useState(false)
+    
     // ref
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -34,12 +43,29 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
     }, []);
     
     const handleSheetChanges = useCallback((index: number) => {
-        // console.log('handleSheetChanges', index);
+        console.log('handleSheetChanges', index);
+        if (index === -1) {
+            setPayWithCreditDebit(false)
+            setCardNumber('')
+            setExpiryDate('')
+            setCVC('')
+            setFullname('')
+            setZipCode('')
+        }
     }, []);
 
     const makePamentPressHandler = useCallback(() => {
+        if (!amount || !amount.trim()) {
+            ErrorToast("Please enter amount to continue.")
+            return
+        }
+        if (isNaN(+amount)) {
+            ErrorToast("Please enter a valid amount.")
+            return
+        }
         bottomSheetModalRef.current?.present();
-    }, [])
+        Keyboard.dismiss()
+    }, [amount])
 
     const closeBottomSheetHandler = useCallback(() => {
         payWithCreditDebit && setPayWithCreditDebit(false)
@@ -56,17 +82,20 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
                 backdropComponent={CustomBackdrop}
                 enablePanDownToClose={true}
             >
-                <View
+                <View   
                     style={{
                         flex: 1,
                         minHeight: '100%',
                     }}
                 >
-                    <View
+                    <ScrollView
                         style={{
                             flex: 1,
+                        }}
+                        contentContainerStyle={{
                             paddingHorizontal: 20,
-                            paddingTop: 10
+                            paddingTop: 10,
+                            // marginBottom: 10
                         }}
                     >
                         {
@@ -76,8 +105,8 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
                                     <BoldText>{"Input Credit Card Details"}</BoldText>
                                     <RoundedInput
                                         placeholder="Card Number"
-                                        value={amount}
-                                        onChangeText={enteredText => setAmount(enteredText)}
+                                        value={cardNumber}
+                                        onChangeText={enteredText => setCardNumber(enteredText)}
                                         onSubmitEditing={() => {}}
                                         maxLength={16}
                                         style={{  }}
@@ -86,44 +115,37 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
                                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <RoundedInputButton
                                             placeholder="Expiry Date"
-                                            onPress={() => {}}
-                                            value={''}
+                                            onPress={() => setShowDatePicker(true)}
+                                            value={expiryDate}
                                             style={{ flex: 0.45 }}
-                                            hideIcon
+                                            // hideIcon
                                         />
-                                        {/* <RoundedInputButton
-                                            placeholder="CVC"
-                                            onPress={() => {}}
-                                            value={''}
-                                            style={{ flex: 0.45 }}
-                                            hideIcon
-                                        /> */}
                                         <RoundedInput
                                             placeholder="CVC"
-                                            value={amount}
-                                            onChangeText={enteredText => setAmount(enteredText)}
+                                            value={cvc}
+                                            onChangeText={enteredText => setCVC(enteredText)}
                                             onSubmitEditing={() => {}}
-                                            maxLength={50}
+                                            maxLength={3}
                                             style={{ flex: 0.45 }}
-                                            keyboardType="default"
+                                            keyboardType="number-pad"
                                         />
                                     </View>
                                     <RoundedInput
                                         placeholder="Full Name"
-                                        value={amount}
-                                        onChangeText={enteredText => setAmount(enteredText)}
+                                        value={fullname}
+                                        onChangeText={enteredText => setFullname(enteredText)}
                                         onSubmitEditing={() => {}}
-                                        maxLength={50}
+                                        maxLength={30}
                                         style={{  }}
                                         keyboardType="default"
                                     />
                                     <RoundedInput
                                         placeholder="Zip Code"
-                                        value={amount}
-                                        onChangeText={enteredText => setAmount(enteredText)}
+                                        value={zipCode}
+                                        onChangeText={enteredText => setZipCode(enteredText)}
                                         onSubmitEditing={() => {}}
                                         maxLength={6}
-                                        style={{  }}
+                                        style={{ marginBottom: 5 }}
                                         keyboardType="number-pad"
                                         returnKeyType="done"
                                     />
@@ -157,21 +179,29 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
                                     />
                                 </>
                         }
-                    </View>
+                    </ScrollView>
                     <RoundedButton
                         text={payWithCreditDebit ? "Pay" : "Back"}
                         onPress={closeBottomSheetHandler}
                         style={{ borderRadius: 0 }}
-                        // textStyle={{ color: colors.primary }}
                     />
                 </View>
             </BottomSheetModal>
         )
-    }, [closeBottomSheetHandler, payWithCreditDebit])
+    }, [closeBottomSheetHandler, payWithCreditDebit, cardNumber, expiryDate, cvc, fullname, zipCode])
 
     return (
         <BottomSheetModalProvider>
             {renderBottomSheetHandler}
+            <DateTimePickerModal
+                isVisible={showDatePicker}
+                mode="date"
+                onConfirm={date => {
+                    setExpiryDate(new Date(date).toLocaleDateString())
+                    setShowDatePicker(false)
+                }}
+                onCancel={setShowDatePicker.bind(null, false)}
+            />
         <ScrollView style={styles.root} contentContainerStyle={{ minHeight: '100%' }}>
             <View style={styles.topContent}>
                 <Image
@@ -209,13 +239,13 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
                         keyboardType="number-pad"
                     />
                 </View>
-                <RoundedButton
-                    text="Make Payment"
-                    onPress={makePamentPressHandler}
-                    style={{ borderRadius: 0 }}
-                />
             </View>
         </ScrollView>
+        <RoundedButton
+                text="Make Payment"
+                onPress={makePamentPressHandler}
+                style={{ borderRadius: 0 }}
+            />
         </BottomSheetModalProvider>
     )
 }

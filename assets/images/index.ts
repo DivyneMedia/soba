@@ -28,5 +28,6 @@ export default {
     ic_visibility: require('./ic_visibility.png'),
     ic_play_button: require('./ic_play_button.png'),
     ic_video_camera: require('./ic_video_camera.png'),
-    ic_pin: require('./ic_pin.png')
+    ic_pin: require('./ic_pin.png'),
+    ic_edit: require('./ic_edit.png')
 }

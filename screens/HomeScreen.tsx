@@ -17,7 +17,7 @@ type HomeScreenProps = {
 
 const HomeScreen = (props: HomeScreenProps) => {
     const [searchText, setSearchText] = useState('')
-    const [newsFeedSelected, setNewsFeedSelected] = useState(false)
+    const [newsFeedSelected, setNewsFeedSelected] = useState(true)
     const [upcomingEventSelected, setUpcomingEventSelected] = useState(false)
 
     const filterButtonPressHandler = useCallback(() => {

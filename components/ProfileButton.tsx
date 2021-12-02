@@ -20,7 +20,7 @@ const ProfileButton = (props: ProfileButtonType) => {
             >
                 <Pressable style={styles.editButtonContainer}>
                     <Image
-                        source={images.ic_send}
+                        source={images.ic_edit}
                         style={styles.editLogoStyle}
                         resizeMode="contain"
                     />

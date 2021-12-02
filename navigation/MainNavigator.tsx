@@ -35,6 +35,7 @@ const MainNavigator = () => {
               component={DonationDetailsScreen}
               options={{
                 headerShown: true,
+                headerTitle: "Dontion Details"
               }}
             />
         </Stack.Navigator>
