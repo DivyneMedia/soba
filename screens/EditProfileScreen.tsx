@@ -193,7 +193,7 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
                 }}
             >
                 <Image
-                    source={images.ic_yellow_symbol}
+                    source={images.ic_ok}
                     style={{
                         height: 48,
                         width: 48

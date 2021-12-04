@@ -7,6 +7,8 @@ import { store, persistor } from './store';
 import { PersistGate } from 'redux-persist/integration/react'
 import { delay } from './utils/delay';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import KeyboardManager from 'react-native-keyboard-manager';
+import { isIos } from './utils/MiscUtils';
 
 const App = () => {
   const [isLoading, setLoading] = useState(true)
@@ -16,6 +18,9 @@ const App = () => {
   }, [])
 
   useEffect(() => {
+    KeyboardManager.setEnable(isIos)
+    KeyboardManager.setToolbarPreviousNextButtonEnable(isIos)
+
     delay(1500)
       .finally(() => {
         setLoading(false)

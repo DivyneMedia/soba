@@ -131,7 +131,7 @@ const AccountScreen = (props: AccountScreenProps) => {
                     <HorizontalRular />
                     <View style={styles.actionsContainer}>
                         <TextLogoButton
-                            icon={images.ic_yellow_symbol}
+                            icon={images.ic_blue_symbol}
                             text="Membership Plan"
                             onPress={showMembershipPlanHandler}
                         />
