@@ -11,22 +11,20 @@ type ProfileButtonType = {
 const ProfileButton = (props: ProfileButtonType) => {
     const { onPress, profileImageUri } = props
     return (
-        <Pressable onPress={onPress}>
-            <ImageBackground
-                source={profileImageUri || images.ic_user}
-                style={styles.imageBackgoundStyle}
-                imageStyle={styles.imageStyle}
-                resizeMode="contain"
-            >
-                <Pressable style={styles.editButtonContainer}>
-                    <Image
-                        source={images.ic_edit}
-                        style={styles.editLogoStyle}
-                        resizeMode="contain"
-                    />
-                </Pressable>
-            </ImageBackground>
-        </Pressable>
+        <ImageBackground
+            source={profileImageUri || images.ic_user}
+            style={styles.imageBackgoundStyle}
+            imageStyle={styles.imageStyle}
+            resizeMode="contain"
+        >
+            <Pressable onPress={onPress} style={styles.editButtonContainer}>
+                <Image
+                    source={images.ic_edit}
+                    style={styles.editLogoStyle}
+                    resizeMode="contain"
+                />
+            </Pressable>
+        </ImageBackground>
     )
 }
 

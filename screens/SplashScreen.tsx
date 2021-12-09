@@ -27,16 +27,17 @@ const SplashScreen = (props: any) => {
                     justifyContent: 'center'
                 }}
             >
-                <BoldText style={{ fontSize: 26 }} >{"SOBA"}</BoldText>
-                <RegularText style={{ fontSize: 12 }}>{"SASSE Old Boys Association"}</RegularText>
+                <BoldText style={{ fontSize: 24 }} >{"SOBA AMERICA"}</BoldText>
                 <Image
-                    source={images.ic_logo}
+                    source={images.ic_soba_america}
                     style={{
-                        height: 180,
-                        width: 180,
+                        height: 150,
+                        width: 150,
                         marginTop: 8
                     }}
+                    resizeMode="contain"
                 />
+                <RegularText style={{ fontSize: 12, marginTop: 20 }}>{"Few Proud Different"}</RegularText>
             </View>
         </ImageBackground>
     )

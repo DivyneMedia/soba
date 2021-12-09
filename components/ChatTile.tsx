@@ -10,7 +10,8 @@ export type ChatTileProps = {
     name: string
     lastSeen: string
     onOpen: () => any
-    onFavPress: () => any
+    onFavPress: (() => void) | null
+    isGroup?: boolean
 }
 
 const ChatTile = (props: ChatTileProps) => {
@@ -33,17 +34,21 @@ const ChatTile = (props: ChatTileProps) => {
                 <BoldText style={{ fontSize: 12 }}>{name}</BoldText>
                 <RegularText style={{ fontSize: 10 }}>{lastSeen}</RegularText>
             </View>
-            <Pressable
-                onPress={onFavPress}
-            >
-                <Image
-                    style={{
-                        height: 20,
-                        width: 20
-                    }}
-                    source={images.ic_pin}
-                    resizeMode="contain" />
-            </Pressable>
+            {
+                typeof onFavPress === "function"
+                ? <Pressable
+                        onPress={onFavPress}
+                    >
+                        <Image
+                            style={{
+                                height: 20,
+                                width: 20
+                            }}
+                            source={images.ic_pin}
+                            resizeMode="contain" />
+                    </Pressable>
+                : null
+            }
         </Pressable>
     )
 }

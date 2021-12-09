@@ -83,7 +83,7 @@ const LoginScreen = (props: any) => {
                             {"Sign-in Now!"}
                         </BoldText>
                         <RoundedInput
-                            placeholder="email or username"
+                            placeholder="SOBA Number or username"
                             value={email}
                             onChangeText={onChangeTextHandler.bind(null, appConstants.EMAIL)}
                             onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.EMAIL)}

@@ -14,48 +14,56 @@ const chatList = [
         profile: images.ic_soba_uk,
         name: 'SOBA Dallas Business',
         lastSeen: 'Active 2 minutes ago',
+        isGroup: true
     },
     {
         id: 1,
         profile: images.ic_soba_america,
         name: 'SOBA Dallas Social',
         lastSeen: 'Active',
+        isGroup: true
     },
     {
         id: 2,
         profile: images.ic_soba_uk,
         name: 'SOBA Dallas Executive (Restricted)',
         lastSeen: 'Active',
+        isGroup: true
     },
     {
         id: 3,
         profile: images.ic_soba_america,
         name: 'SOBA Convention Committee',
         lastSeen: 'Active',
+        isGroup: true
     },
     {
         id: 4,
         profile: images.ic_logo,
         name: 'SOBA 2000 USA',
         lastSeen: 'Active 2 minutes ago',
+        isGroup: true
     },
     {
         id: 5,
         profile: images.ic_logo,
         name: 'SOBA 2000 General',
         lastSeen: 'Active 2 minutes ago',
+        isGroup: true
     },
     {
         id: 6,
         profile: images.ic_soba_uk,
         name: 'Mola Ndoko',
         lastSeen: 'Active 5 minutes ago',
+        isGroup: true
     },
     {
         id: 7,
-        profile: images.ic_user,
+        profile: images.ic_account,
         name: 'Edwin Eselem',
         lastSeen: 'Active 5 minutes ago',
+        isGroup: false
     },
 ]
 
@@ -72,7 +80,7 @@ const ChatScreen = (props: ChatScreenProps) => {
     const filterButtonPressHandler = useCallback(() => {}, [])
 
     const openChatHandler = useCallback((chatPayload: any) => {
-        const { id, lastSeen, name, profile } = chatPayload
+        const { id, lastSeen, name, profile, isGroup } = chatPayload
         navigation.navigate('chattingScreen', {
             id,
             lastSeen,
@@ -88,7 +96,7 @@ const ChatScreen = (props: ChatScreenProps) => {
     const renderChatListHandler = useCallback((item: any) => {
         try {
             const {item: chat, index}: { item: ChatTileProps, index: number } = item
-            const { id, lastSeen, name, profile } = chat
+            const { id, lastSeen, name, profile, isGroup } = chat
             return (
                 <ChatTile
                     id={id}
@@ -96,7 +104,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                     name={name}
                     profile={profile}
                     onOpen={openChatHandler.bind(null, chat)}
-                    onFavPress={favoriteChatHander.bind(null, chat)}
+                    onFavPress={isGroup ? favoriteChatHander.bind(null, chat) : null}
                 />
             )
         } catch (err: any) {

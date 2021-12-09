@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: colors.grey
     },
     img: {
         height: 24,

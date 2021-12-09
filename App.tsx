@@ -18,9 +18,11 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    KeyboardManager.setEnable(isIos)
-    KeyboardManager.setToolbarPreviousNextButtonEnable(isIos)
-
+    if (isIos) {
+      KeyboardManager.setEnable(isIos)
+      KeyboardManager.setToolbarPreviousNextButtonEnable(isIos)
+    }
+    
     delay(1500)
       .finally(() => {
         setLoading(false)

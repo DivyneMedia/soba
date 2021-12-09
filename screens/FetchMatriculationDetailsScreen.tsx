@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Image, Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSelector } from "react-redux";
 
@@ -23,6 +23,8 @@ const FetchMatriculationDetailsScreen = (props: any) => {
     const { regionId } = useSelector((state: any) => state.auth)
 
     const [matriculationNumber, setMatriculationNumber] = useState('')
+    const [details, setDetails] = useState<any>(null)
+
 
     const matriculationInputRef = useRef<TextInput>(null)
 
@@ -43,13 +45,51 @@ const FetchMatriculationDetailsScreen = (props: any) => {
     }, [])
 
     const nextPressHandler = useCallback(() => {
+        navigation.navigate('enterContactInformation')
+    }, [navigation])
+
+    const onFetchDetailsHandler = useCallback(() => {
         if (!matriculationNumber || !matriculationNumber.trim()) {
             ErrorToast("Enter your Matriculation Number to continue.")
             return
         }
+        setDetails({
+            profile: images.ic_user,
+            name: 'Philbert Mac Etchu',
+            from: 'SOBA 2000'
+        })
+    }, [matriculationNumber])
 
-        navigation.navigate('enterContactInformation')
-    }, [navigation, matriculationNumber])
+    const renderDetailsHandler = useMemo(() => {
+        if (details) {
+            const { profile, name, from } = details
+            return (
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={{ minHeight: 150, alignItems: 'center', justifyContent: 'center' }}>
+                        <Image
+                            source={profile}
+                            style={{
+                                height: 70,
+                                width: 70,
+                                borderRadius: 35,
+                                overflow: 'hidden',
+                                marginBottom: 10
+                            }}
+                            resizeMode="contain"
+                        />
+                        <BoldText style={{ textAlign: 'center' }}>
+                            {name}
+                        </BoldText>
+                        <RegularText style={{ textAlign: 'center', marginTop: 5 }}>
+                            {from}
+                        </RegularText>
+                    </View>
+                </View>
+            )
+        } else {
+            return null
+        }
+    }, [details])
 
     return (
         <BackgroundImageComp>
@@ -65,12 +105,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
                         <BoldText style={{ fontSize: 22, alignSelf: 'center', textAlign: 'center' }}>
                             {"Enter Your Matriculation Number"}
                         </BoldText>
-                        <View
-                            style={{
-                                flex: 1,
-                                marginTop: 10,
-                            }}
-                        >
+                        <View style={{ marginVertical: 10 }}>
                             <RoundedInput
                                 ref={matriculationInputRef}
                                 placeholder="Matriculation Number"
@@ -87,6 +122,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
                                     top: 36,
                                     right: 20
                                 }}
+                                onPress={onFetchDetailsHandler}
                             >
                                 <Image
                                     source={images.ic_send}
@@ -98,11 +134,13 @@ const FetchMatriculationDetailsScreen = (props: any) => {
                                 />
                             </Pressable>
                         </View>
+                        {renderDetailsHandler}
                     </View>
                     <RoundedButton
                         style={{ borderRadius: 0 }}
                         onPress={nextPressHandler}
                         text={"Next"}
+                        disabled={!details}
                     />
                 </View>
             </View>

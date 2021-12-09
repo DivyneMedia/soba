@@ -31,32 +31,32 @@ const EnterContactInformation = (props: any) => {
     const emailRef = useRef<TextInput>(null)
     const addressRef = useRef<TextInput>(null)
 
-    const isDataValid = useCallback(() => {
+    const isDataValid = useCallback((showError = false) => {
         if (!phone || !phone.trim()) {
-            ErrorToast("Phone number required.")
+            showError && ErrorToast("Phone number required.")
             return false
         }
         if (isNaN(+phone)) {
-            ErrorToast("Entered wrong phone number.")
+            showError && ErrorToast("Entered wrong phone number.")
             return false
         }
         if (!email || !email.trim()) {
-            ErrorToast("Email address required.")
+            showError && ErrorToast("Email address required.")
             return false
         }
         if (!dob) {
-            ErrorToast("Select your Date of birth to continue.")
+            showError && ErrorToast("Select your Date of birth to continue.")
             return false
         }
         if (!address || !address.trim()) {
-            ErrorToast("Address address required.")
+            showError && ErrorToast("Address address required.")
             return false
         }
         return true
     }, [email, phone, dob, address])
 
     const nextPressHandler = useCallback(() => {
-        if (!isDataValid()) {
+        if (!isDataValid(true)) {
             return
         }
         navigation.navigate("otpScreen")

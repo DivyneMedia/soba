@@ -11,6 +11,7 @@ import ConfirmRegistrationScreen from "../screens/ConfirmRegistration";
 import images from "../assets/images";
 import colors from "../constants/colors";
 import { Image, Pressable, View } from "react-native";
+import ChattingScreen from "../screens/ChattingScreen";
 
 const Stack = createNativeStackNavigator()
 
@@ -49,6 +50,14 @@ const AuthNavigator = () => {
             <Stack.Screen
               name="confirmRegistration"
               component={ConfirmRegistrationScreen}
+            />
+            <Stack.Screen
+              name="chattingScreen"
+              component={ChattingScreen}
+              options={{
+                headerShown: true,
+                headerTitle: 'Chat',
+              }}
             />
         </Stack.Navigator>
     )

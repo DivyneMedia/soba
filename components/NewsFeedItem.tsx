@@ -115,7 +115,7 @@ const NewsFeedItem = (props: NewsFeedItemProps) => {
                 ?
                     <View
                         style={{
-                            width: '75%',
+                            width: '20%',
                             paddingVertical: 10,
                             paddingHorizontal: 30,
                             borderTopLeftRadius: 30,
@@ -124,16 +124,17 @@ const NewsFeedItem = (props: NewsFeedItemProps) => {
                             alignSelf: 'flex-end',
                             flexDirection: 'row',
                             alignItems: 'center',
+                            justifyContent: 'center'
                         }}
                     >
-                        <IconButton
+                        {/* <IconButton
                             icon={images.ic_heart_selected}
                             text={likes}
                         />
                         <IconButton
                             icon={images.ic_comment}
                             text={comments}
-                        />
+                        /> */}
                         <IconButton
                             icon={images.ic_forward}
                         />

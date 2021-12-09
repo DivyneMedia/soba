@@ -190,7 +190,7 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
                                 <TabBarButton
                                     activeIcon={images.ic_account_selected}
                                     focused={focused}
-                                    inActiveIcon={images.ic_account}
+                                    inActiveIcon={images.ic_account_primary}
                                     onPress={() => navigation.navigate('account')}
                                 />
                             )

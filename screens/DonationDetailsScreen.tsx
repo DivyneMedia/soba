@@ -10,6 +10,7 @@ import RoundedInputButton from "../components/RoundedInputButton";
 import colors from "../constants/colors";
 import { ErrorToast } from "../utils/ToastUtils";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import images from "../assets/images";
 
 
 type DonationDetailsScreenProps = {
@@ -23,13 +24,15 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
     const { description, logo, onOpen, origin, title } = params
 
     const [amount, setAmount] = useState('')
-    const [payWithCreditDebit, setPayWithCreditDebit] = useState(false)
     const [cardNumber, setCardNumber] = useState('')
     const [expiryDate, setExpiryDate] = useState('')
     const [cvc, setCVC] = useState('')
     const [fullname, setFullname] = useState('')
     const [zipCode, setZipCode] = useState('')
+
+    const [payWithCreditDebit, setPayWithCreditDebit] = useState(false)
     const [showDatePicker, setShowDatePicker] = useState(false)
+    const [showPaymentDone, setShowPaymentDone] = useState(false)
     
     // ref
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -41,6 +44,12 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
     const handlePresentModalPress = useCallback(() => {
         bottomSheetModalRef.current?.present();
     }, []);
+    
+    const closeBottomSheetHandler = useCallback(() => {
+        payWithCreditDebit && setPayWithCreditDebit(false)
+        !payWithCreditDebit && bottomSheetModalRef.current?.close();
+        setShowPaymentDone(false)
+    }, [payWithCreditDebit])
     
     const handleSheetChanges = useCallback((index: number) => {
         console.log('handleSheetChanges', index);
@@ -67,10 +76,9 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
         Keyboard.dismiss()
     }, [amount])
 
-    const closeBottomSheetHandler = useCallback(() => {
-        payWithCreditDebit && setPayWithCreditDebit(false)
-        !payWithCreditDebit && bottomSheetModalRef.current?.close();
-    }, [payWithCreditDebit])
+    const payWithCardHandler = useCallback(() => {
+        setShowPaymentDone(true)
+    }, [])
 
     const renderBottomSheetHandler = useMemo(() => {
         return (
@@ -88,107 +96,141 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
                         minHeight: '100%',
                     }}
                 >
-                    <ScrollView
-                        style={{
-                            flex: 1,
-                        }}
-                        contentContainerStyle={{
-                            paddingHorizontal: 20,
-                            paddingTop: 10,
-                            // marginBottom: 10
-                        }}
-                    >
-                        {
-                            payWithCreditDebit
-                            ?
-                                <>
-                                    <BoldText>{"Input Credit Card Details"}</BoldText>
-                                    <RoundedInput
-                                        placeholder="Card Number"
-                                        value={cardNumber}
-                                        onChangeText={enteredText => setCardNumber(enteredText)}
-                                        onSubmitEditing={() => {}}
-                                        maxLength={16}
-                                        style={{  }}
-                                        keyboardType="number-pad"
-                                    />
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <RoundedInputButton
-                                            placeholder="Expiry Date"
-                                            onPress={() => setShowDatePicker(true)}
-                                            value={expiryDate}
-                                            style={{ flex: 0.45 }}
-                                            // hideIcon
-                                        />
-                                        <RoundedInput
-                                            placeholder="CVC"
-                                            value={cvc}
-                                            onChangeText={enteredText => setCVC(enteredText)}
-                                            onSubmitEditing={() => {}}
-                                            maxLength={3}
-                                            style={{ flex: 0.45 }}
-                                            keyboardType="number-pad"
-                                        />
-                                    </View>
-                                    <RoundedInput
-                                        placeholder="Full Name"
-                                        value={fullname}
-                                        onChangeText={enteredText => setFullname(enteredText)}
-                                        onSubmitEditing={() => {}}
-                                        maxLength={30}
-                                        style={{  }}
-                                        keyboardType="default"
-                                    />
-                                    <RoundedInput
-                                        placeholder="Zip Code"
-                                        value={zipCode}
-                                        onChangeText={enteredText => setZipCode(enteredText)}
-                                        onSubmitEditing={() => {}}
-                                        maxLength={6}
-                                        style={{ marginBottom: 5 }}
-                                        keyboardType="number-pad"
-                                        returnKeyType="done"
-                                    />
-                                </>
-                            :
-                                <>
-                                    <BoldText>{"Select Payment Method"}</BoldText>
-                                    <RoundedButton
-                                        text="Credit or Debit Card"
-                                        onPress={setPayWithCreditDebit.bind(null, true)}
-                                        style={{ backgroundColor: colors.grey, marginTop: 20 }}
-                                        textStyle={{ color: colors.primary }}
-                                    />
-                                    <RoundedButton
-                                        text="Paypal (sobadallas@yahoo.com)"
-                                        onPress={closeBottomSheetHandler}
-                                        style={{ backgroundColor: colors.grey, marginTop: 20 }}
-                                        textStyle={{ color: colors.primary }}
-                                    />
-                                    <RoundedButton
-                                        text="Zelle (sobadallas@yahoo.com)"
-                                        onPress={closeBottomSheetHandler}
-                                        style={{ backgroundColor: colors.grey, marginTop: 20 }}
-                                        textStyle={{ color: colors.primary }}
-                                    />
-                                    <RoundedButton
-                                        text="CashApp ($Sobadallas1)"
-                                        onPress={closeBottomSheetHandler}
-                                        style={{ backgroundColor: colors.grey, marginTop: 20 }}
-                                        textStyle={{ color: colors.primary }}
-                                    />
-                                </>
-                        }
-                    </ScrollView>
-                    <RoundedButton
-                        text={payWithCreditDebit ? "Pay" : "Back"}
-                        onPress={closeBottomSheetHandler}
-                        style={{ borderRadius: 0 }}
-                    />
+                    {
+                        showPaymentDone
+                        ?
+                            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                <Image
+                                    source={images.ic_done}
+                                    style={{
+                                        height: 80,
+                                        width: 80
+                                    }}
+                                    resizeMode="contain"
+                                />
+                                <BoldText style={{ marginTop: 50 }}>{"Awesome,"}</BoldText>
+                                <BoldText style={{ }}>{"Your payment has been done!"}</BoldText>
+                            </View>
+                        :
+                            <ScrollView
+                                style={{
+                                    flex: 1,
+                                }}
+                                contentContainerStyle={{
+                                    paddingHorizontal: 20,
+                                    paddingTop: 10,
+                                    // marginBottom: 10
+                                }}
+                            >
+                                {
+                                    payWithCreditDebit
+                                    ?
+                                        <>
+                                            <BoldText>{"Input Credit Card Details"}</BoldText>
+                                            <RoundedInput
+                                                placeholder="Card Number"
+                                                value={cardNumber}
+                                                onChangeText={enteredText => setCardNumber(enteredText)}
+                                                onSubmitEditing={() => {}}
+                                                maxLength={16}
+                                                style={{  }}
+                                                keyboardType="number-pad"
+                                            />
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <RoundedInputButton
+                                                    placeholder="Expiry Date"
+                                                    onPress={() => setShowDatePicker(true)}
+                                                    value={expiryDate}
+                                                    style={{ flex: 0.45 }}
+                                                    // hideIcon
+                                                />
+                                                <RoundedInput
+                                                    placeholder="CVC"
+                                                    value={cvc}
+                                                    onChangeText={enteredText => setCVC(enteredText)}
+                                                    onSubmitEditing={() => {}}
+                                                    maxLength={3}
+                                                    style={{ flex: 0.45 }}
+                                                    keyboardType="number-pad"
+                                                />
+                                            </View>
+                                            <RoundedInput
+                                                placeholder="Full Name"
+                                                value={fullname}
+                                                onChangeText={enteredText => setFullname(enteredText)}
+                                                onSubmitEditing={() => {}}
+                                                maxLength={30}
+                                                style={{  }}
+                                                keyboardType="default"
+                                            />
+                                            <RoundedInput
+                                                placeholder="Zip Code"
+                                                value={zipCode}
+                                                onChangeText={enteredText => setZipCode(enteredText)}
+                                                onSubmitEditing={() => {}}
+                                                maxLength={6}
+                                                style={{ marginBottom: 5 }}
+                                                keyboardType="number-pad"
+                                                returnKeyType="done"
+                                            />
+                                        </>
+                                    :
+                                        <>
+                                            <BoldText>{"Select Payment Method"}</BoldText>
+                                            <RoundedButton
+                                                text="Credit or Debit Card"
+                                                onPress={setPayWithCreditDebit.bind(null, true)}
+                                                style={{ backgroundColor: colors.grey, marginTop: 20 }}
+                                                textStyle={{ color: colors.primary }}
+                                            />
+                                            <RoundedButton
+                                                text="Paypal (sobadallas@yahoo.com)"
+                                                onPress={closeBottomSheetHandler}
+                                                style={{ backgroundColor: colors.grey, marginTop: 20 }}
+                                                textStyle={{ color: colors.primary }}
+                                            />
+                                            <RoundedButton
+                                                text="Zelle (sobadallas@yahoo.com)"
+                                                onPress={closeBottomSheetHandler}
+                                                style={{ backgroundColor: colors.grey, marginTop: 20 }}
+                                                textStyle={{ color: colors.primary }}
+                                            />
+                                            <RoundedButton
+                                                text="CashApp ($Sobadallas1)"
+                                                onPress={closeBottomSheetHandler}
+                                                style={{ backgroundColor: colors.grey, marginTop: 20 }}
+                                                textStyle={{ color: colors.primary }}
+                                            />
+                                        </>
+                                }
+                            </ScrollView>
+                    }
+                    {
+                        payWithCreditDebit && !showPaymentDone
+                        ?
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <RoundedButton
+                                    text={"Back"}
+                                    onPress={closeBottomSheetHandler}
+                                    style={{ width: "49.9%", borderRadius: 0,  }}
+                                />
+                                <RoundedButton
+                                    text={"Pay"}
+                                    onPress={payWithCardHandler}
+                                    style={{ width: "49.9%", borderRadius: 0,  }}
+                                />
+                            </View>
+                        : <RoundedButton
+                                text={showPaymentDone ? "Done" : "Back"}
+                                onPress={closeBottomSheetHandler}
+                                style={{ borderRadius: 0 }}
+                            />
+                    }
+                    
                 </View>
             </BottomSheetModal>
         )
-    }, [closeBottomSheetHandler, payWithCreditDebit, cardNumber, expiryDate, cvc, fullname, zipCode])
+    }, [closeBottomSheetHandler, showPaymentDone, payWithCreditDebit, cardNumber, expiryDate, cvc, fullname, zipCode, payWithCardHandler])
 
     return (
         <BottomSheetModalProvider>

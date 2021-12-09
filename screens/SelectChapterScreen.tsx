@@ -85,6 +85,7 @@ const SelectChapterScreen = (props: any) => {
                         style={{ borderRadius: 0 }}
                         onPress={nextPressHandler}
                         text={"Next"}
+                        disabled={selectedOption === -1}
                     />
                 </View>
             </View>

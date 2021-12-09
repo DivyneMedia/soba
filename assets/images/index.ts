@@ -36,4 +36,6 @@ export default {
     ic_pin: require('./ic_pin.png'),
     ic_edit: require('./ic_edit.png'),
     ic_ok: require('./ic_ok.png'),
+    ic_done: require('./ic_done.png'),
+    ic_account_primary: require('./ic_account_primary.png')
 }

@@ -4,7 +4,7 @@ import colors from "../constants/colors";
 
 const HorizontalRular = () => {
     return (
-        <View style={{ borderWidth: 0.3, width: '85%', alignSelf: 'center', marginTop: 20, borderColor: colors.black }} />
+        <View style={{ borderWidth: 1, height: 0.1, width: '85%', alignSelf: 'center', marginTop: 20, borderColor: '#00000010' }} />
     )
 }
 
