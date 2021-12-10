@@ -19,6 +19,7 @@ type NewsFeedItemProps = {
     comments?: string | number
     onRegister?: () => any
     onMore: () => any
+    onPress: () => any
 }
 
 const checkPropsEqual = (prevProps: NewsFeedItemProps, newProps: NewsFeedItemProps): boolean => {
@@ -35,11 +36,13 @@ const NewsFeedItem = (props: NewsFeedItemProps) => {
         likes,
         comments,
         onMore,
-        onRegister
+        onRegister,
+        onPress
     } = props
 
     return (
-        <View
+        <Pressable
+            onPress={onPress}
             style={{
                 borderRadius: 10,
                 padding: 10,
@@ -156,7 +159,7 @@ const NewsFeedItem = (props: NewsFeedItemProps) => {
                         <RegularText style={{ fontSize: 8, textAlign: 'center' }}>{duration}</RegularText>
                     </View>
             }
-        </View>
+        </Pressable>
     )
 }
 

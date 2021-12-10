@@ -4,6 +4,7 @@ import BottomTabNavigator from "./BottomTabNavigator";
 import EditProfileScreen from "../screens/EditProfileScreen";
 import ChattingScreen from "../screens/ChattingScreen";
 import DonationDetailsScreen from "../screens/DonationDetailsScreen";
+import DetailsScreen from "../screens/DetailsScreen";
 
 const Stack = createNativeStackNavigator()
 
@@ -18,6 +19,14 @@ const MainNavigator = () => {
             <Stack.Screen
               name="bottomTab"
               component={BottomTabNavigator}
+            />
+             <Stack.Screen
+              name="detailsScreen"
+              component={DetailsScreen}
+              options={{
+                headerShown: true,
+                headerTitle: "Details"
+              }}
             />
             <Stack.Screen
               name="editProfile"

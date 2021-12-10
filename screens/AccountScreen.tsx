@@ -108,22 +108,27 @@ const AccountScreen = (props: AccountScreenProps) => {
                     <HorizontalRular />
                     <View style={styles.profileDetailsContainer}>
                         <TitleText
+                            logo={images.ic_email}
                             title={"Email address"}
                             text={"petchu87@yahoo.com"}
                         />
                         <TitleText
+                            logo={images.ic_phone}
                             title={"Phone No."}
                             text={"+1 (804) 605-3051"}
                         />
                         <TitleText
+                            logo={images.ic_acc_calendar}
                             title={"Date of Birth"}
                             text={"July 26, 1987"}
                         />
                         <TitleText
+                            logo={images.ic_address}
                             title={"Address"}
                             text={"11788 Culebra Rd, San Antonio, TX 78253"}
                         />
                         <TitleText
+                            logo={images.ic_chapter}
                             title={"Base Chapter"}
                             text={"SOBA Dallas"}
                         />
@@ -197,12 +202,10 @@ const styles = StyleSheet.create({
     },
     profileDetailsContainer: {
         flex: 1,
-        alignSelf: 'center',
-        paddingHorizontal: '12%'
     },
     actionsContainer: {
         flex: 1,
-        paddingHorizontal: 20,
+        // paddingHorizontal: 20,
         paddingBottom: 20,
         marginTop: 10
     },

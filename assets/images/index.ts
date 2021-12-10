@@ -37,5 +37,10 @@ export default {
     ic_edit: require('./ic_edit.png'),
     ic_ok: require('./ic_ok.png'),
     ic_done: require('./ic_done.png'),
-    ic_account_primary: require('./ic_account_primary.png')
+    ic_account_primary: require('./ic_account_primary.png'),
+    ic_address: require('./ic_address.png'),
+    ic_chapter: require('./ic_chapter.png'),
+    ic_email: require('./ic_email.png'),
+    ic_phone: require('./ic_phone.png'),
+    ic_acc_calendar: require('./ic_acc_calendar.png'),
 }

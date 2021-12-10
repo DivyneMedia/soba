@@ -12,10 +12,13 @@ import TextButton from "../components/TextButton";
 import NewsFeedItem from "../components/NewsFeedItem";
 
 type HomeScreenProps = {
-
+    navigation: any
+    route: any
 }
 
 const HomeScreen = (props: HomeScreenProps) => {
+    const { navigation, route } = props
+
     const [searchText, setSearchText] = useState('')
     const [newsFeedSelected, setNewsFeedSelected] = useState(true)
     const [upcomingEventSelected, setUpcomingEventSelected] = useState(false)
@@ -32,6 +35,12 @@ const HomeScreen = (props: HomeScreenProps) => {
         SuccessToast('Coming Soon')
     }, [])
 
+    const showDetailsHandler = useCallback((item: any) => {
+        navigation.navigate('detailsScreen', {
+            data: item
+        })
+    }, [navigation])
+
     const renderNewsFeedHandler = useCallback((item: any) => {
         try {
             const { item: newsFeed, index }: { item: NewsFeed, index: number } = item
@@ -45,13 +54,14 @@ const HomeScreen = (props: HomeScreenProps) => {
                     likes={newsFeed.likes}
                     description={newsFeed.description}
                     onMore={morePressHandler.bind(null, 'NEWS')}
+                    onPress={showDetailsHandler.bind(null, newsFeed)}
                />
            )
         } catch (err: any) {
             console.log('[renderNewsFeedHandler] Error : ', err?.message)
             return null
         }
-    }, [morePressHandler])
+    }, [morePressHandler, showDetailsHandler])
 
     const renderEventsHandler = useCallback((item: any) => {
         try {
@@ -66,13 +76,14 @@ const HomeScreen = (props: HomeScreenProps) => {
                     duration={event.duration}
                     onRegister={registerEventHandler}
                     onMore={morePressHandler.bind(null, 'EVENT')}
+                    onPress={showDetailsHandler.bind(null, event)}
                />
            )
         } catch (err: any) {
             console.log('[renderEventsHandler] Error : ', err?.message)
             return null
         }
-    }, [registerEventHandler, morePressHandler])
+    }, [registerEventHandler, morePressHandler, showDetailsHandler])
 
     const NewsFeed = useMemo(() => {
         return (
