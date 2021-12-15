@@ -23,7 +23,7 @@ const TabBarIcon = (props: TabBarIconProps) => {
     return (
         <Image
             source={focused ? activeIcon : inActiveIcon}
-            style={{ height: 24, width: 24 }}
+            style={{ height: 21, width: 21 }}
             resizeMode="contain"
         />
     )
@@ -48,6 +48,7 @@ const TabBarButton = (props: TabBarButtonProps) => {
       <Pressable
         onPress={onPress}
         style={{
+            marginVertical: 5,
           flex: 1,
         //   padding: 2,
           width: width / 5,
@@ -87,7 +88,10 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
     return (
         <Tab.Navigator
             screenOptions={{
-                headerShown: false
+                headerShown: false,
+                tabBarStyle: {
+                    paddingHorizontal: 10,
+                }
             }}
         >
             <Tab.Screen

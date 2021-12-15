@@ -16,11 +16,11 @@ const TitleText = (props: TitleTextProps) => {
             <View style={{ width: "15%", alignItems: 'center', justifyContent: 'center' }}>
             <Image
                 source={logo}
-                style={{ height: 30, width: 30 }}
+                style={{ height: 18, width: 18 }}
                 resizeMode='contain'
             />
             </View>
-            <View style={{ marginTop: 10 }}>
+            <View style={{ flex: 1, marginTop: 10 }}>
                 <RegularText style={styles.titleStyle}>{title}</RegularText>
                 <RegularText style={styles.textStyle}>{text}</RegularText>
             </View>
@@ -29,8 +29,8 @@ const TitleText = (props: TitleTextProps) => {
 }
 
 const styles = StyleSheet.create({
-    titleStyle: { fontSize: 16, textAlign: 'left' },
-    textStyle: { color: colors.primary, fontSize: 16, textAlign: 'left' }
+    titleStyle: { flex: 1, fontSize: 16, textAlign: 'left' },
+    textStyle: { flex: 1, color: colors.primary, fontSize: 16, textAlign: 'left' }
 })
 
 export default TitleText

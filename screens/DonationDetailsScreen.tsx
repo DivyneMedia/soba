@@ -180,25 +180,25 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
                                             <RoundedButton
                                                 text="Credit or Debit Card"
                                                 onPress={setPayWithCreditDebit.bind(null, true)}
-                                                style={{ backgroundColor: colors.grey, marginTop: 20 }}
+                                                style={styles.paymentMethodButton}
                                                 textStyle={{ color: colors.primary }}
                                             />
                                             <RoundedButton
                                                 text="Paypal (sobadallas@yahoo.com)"
                                                 onPress={closeBottomSheetHandler}
-                                                style={{ backgroundColor: colors.grey, marginTop: 20 }}
+                                                style={styles.paymentMethodButton}
                                                 textStyle={{ color: colors.primary }}
                                             />
                                             <RoundedButton
                                                 text="Zelle (sobadallas@yahoo.com)"
                                                 onPress={closeBottomSheetHandler}
-                                                style={{ backgroundColor: colors.grey, marginTop: 20 }}
+                                                style={styles.paymentMethodButton}
                                                 textStyle={{ color: colors.primary }}
                                             />
                                             <RoundedButton
                                                 text="CashApp ($Sobadallas1)"
                                                 onPress={closeBottomSheetHandler}
-                                                style={{ backgroundColor: colors.grey, marginTop: 20 }}
+                                                style={styles.paymentMethodButton}
                                                 textStyle={{ color: colors.primary }}
                                             />
                                         </>
@@ -284,10 +284,10 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
             </View>
         </ScrollView>
         <RoundedButton
-                text="Make Payment"
-                onPress={makePamentPressHandler}
-                style={{ borderRadius: 0 }}
-            />
+            text="Make Payment"
+            onPress={makePamentPressHandler}
+            style={{ borderRadius: 0 }}
+        />
         </BottomSheetModalProvider>
     )
 }
@@ -308,10 +308,17 @@ const styles = StyleSheet.create({
         marginVertical: 15,
         backgroundColor: colors.grey,
         borderRadius: 10,
-        margin: 10
+        margin: 10,
+        paddingTop: 10
     },
     bottomContent: {
         flex: 0.4,
+    },
+    paymentMethodButton: {
+        backgroundColor: colors.grey,
+        marginTop: 20,
+        alignItems: 'flex-start',
+        paddingLeft: 20
     }
 })
 

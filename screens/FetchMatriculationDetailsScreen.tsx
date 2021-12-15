@@ -54,7 +54,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
             return
         }
         setDetails({
-            profile: images.ic_user,
+            profile: images.ic_account,
             name: 'Philbert Mac Etchu',
             from: 'SOBA 2000'
         })
@@ -64,8 +64,8 @@ const FetchMatriculationDetailsScreen = (props: any) => {
         if (details) {
             const { profile, name, from } = details
             return (
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    <View style={{ minHeight: 150, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <View style={{ minHeight: 180, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.grey }}>
                         <Image
                             source={profile}
                             style={{
@@ -84,6 +84,14 @@ const FetchMatriculationDetailsScreen = (props: any) => {
                             {from}
                         </RegularText>
                     </View>
+
+                    <BoldText style={{ textAlign: 'center', marginTop: 20 }}>
+                        {"is this you ?"}
+                    </BoldText>
+                    <RegularText style={{ textAlign: 'center', marginTop: 5 }}>
+                        {"Click the below button to claim your account."}
+                    </RegularText>
+
                 </View>
             )
         } else {
