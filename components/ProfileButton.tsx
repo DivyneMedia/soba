@@ -41,16 +41,16 @@ const styles = StyleSheet.create({
         opacity: 0.5
     },
     editButtonContainer: {
-        padding: 7,
-        backgroundColor: colors.white,
+        // padding: 7,
+        // backgroundColor: colors.white,
         borderRadius: 30,
-        marginRight: -2,
-        marginBottom: -12,
-        borderWidth: 1
+        marginRight: 0,
+        marginBottom: -6,
+        // borderWidth: 1
     },
     editLogoStyle: {
-        height: 12,
-        width: 12,
+        height: 28,
+        width: 28,
     }
 })
 

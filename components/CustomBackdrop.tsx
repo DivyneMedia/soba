@@ -5,7 +5,7 @@ import Animated, { Extrapolate, interpolate, useAnimatedStyle } from 'react-nati
 const CustomBackdrop = ({ animatedIndex, style }: BottomSheetBackdropProps) => {
     // animated variables
     const containerAnimatedStyle = useAnimatedStyle(() => {
-        console.log('index : ', animatedIndex)
+        // console.log('index : ', animatedIndex)
         return {
             opacity: interpolate(
                 animatedIndex.value,

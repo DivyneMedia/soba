@@ -74,7 +74,7 @@ const LoginScreen = (props: any) => {
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}
-                    logo={images.ic_logo}
+                    logo={images.ic_soba_america}
                     logoStyle={styles.logoStyle}
                 />
                 <View style={styles.detailsContainer}>
@@ -91,7 +91,7 @@ const LoginScreen = (props: any) => {
                             ref={emailRef}
                         />
                         <RoundedInput
-                            placeholder="password"
+                            placeholder="Password"
                             value={password}
                             onChangeText={onChangeTextHandler.bind(null, appConstants.PASSWORD)}
                             onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.PASSWORD)}
@@ -109,7 +109,7 @@ const LoginScreen = (props: any) => {
                                 color: colors.primary,
                             }}
                         >
-                            {"forgot passoword"}
+                            {"Forgot Password?"}
                         </RegularText>
                         <RoundedButton
                             text="Sign in"

@@ -72,7 +72,7 @@ const SelectRegionScreen = (props: any) => {
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}
-                    logo={images.ic_logo}
+                    logo={images.ic_soba_america}
                     logoStyle={styles.logoStyle}
                     onBackPress={navigation.goBack}
                 />

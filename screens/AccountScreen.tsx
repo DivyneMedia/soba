@@ -92,7 +92,7 @@ const AccountScreen = (props: AccountScreenProps) => {
                 <ScrollView style={styles.root}>
                     <View style={styles.headerContainer} >
                         <ProfileButton
-                            profileImageUri={images.ic_user}
+                            profileImageUri={images.ic_account}
                             onPress={editProfileHandler}
                         />
                         <BoldText style={{ marginTop: 20 }}>{"Philbert Mac Etchu"}</BoldText>
@@ -157,7 +157,8 @@ const AccountScreen = (props: AccountScreenProps) => {
                     index={0}
                     snapPoints={snapPoints}
                     onChange={handleSheetChanges}
-                    backdropComponent={CustomBackdrop}
+                    backdropComponent={(props: BottomSheetBackdropProps) => <CustomBackdrop {...props} close={() => bottomSheetModalRef.current.close()} />}
+                    enableDismissOnClose={true}
                 >
                     <View
                         style={{

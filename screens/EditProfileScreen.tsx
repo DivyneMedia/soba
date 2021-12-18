@@ -107,7 +107,7 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
             />
             <View style={styles.headerContainer} >
                 <ProfileButton
-                    profileImageUri={images.ic_user}
+                    profileImageUri={images.ic_account}
                     onPress={setShowImagePicker.bind(null, true)}
                 />
                 <BoldText style={{ marginTop: 20 }}>{"Philbert Mac Etchu"}</BoldText>
