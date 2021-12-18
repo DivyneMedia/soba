@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useRef } from "react";
-import { Button, ScrollView, StyleSheet, View }  from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import { BackHandler, Button, ScrollView, StyleSheet, View }  from 'react-native';
 import colors from "../constants/colors";
 import {
     BottomSheetBackdropProps,
@@ -41,6 +41,7 @@ const AccountScreen = (props: AccountScreenProps) => {
 
     // ref
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+    const bottomSheetOpenStatusRef = useRef(false)
 
     // variables
     const snapPoints = useMemo(() => ['50%'], []);
@@ -52,6 +53,7 @@ const AccountScreen = (props: AccountScreenProps) => {
     
     const handleSheetChanges = useCallback((index: number) => {
         // console.log('handleSheetChanges', index);
+        bottomSheetOpenStatusRef.current = index !== -1
     }, []);
 
     const editProfileHandler = useCallback(() => {
@@ -85,6 +87,20 @@ const AccountScreen = (props: AccountScreenProps) => {
             console.log('[onEditPressHandler] Error : ', err?.message)
         }
     }, [])
+
+    const androidBackButtonPressHandler = useCallback(() => {
+        if (bottomSheetOpenStatusRef.current) {
+            bottomSheetModalRef.current?.close()
+            return true
+        } else {
+            return false
+        }
+    }, [])
+
+    useEffect(() => {
+        const backHandlerEvent = BackHandler.addEventListener("hardwareBackPress", androidBackButtonPressHandler)
+        return () => backHandlerEvent.remove()
+    }, [androidBackButtonPressHandler])
 
     return (
         <BottomSheetModalProvider>
@@ -157,7 +173,7 @@ const AccountScreen = (props: AccountScreenProps) => {
                     index={0}
                     snapPoints={snapPoints}
                     onChange={handleSheetChanges}
-                    backdropComponent={(props: BottomSheetBackdropProps) => <CustomBackdrop {...props} close={() => bottomSheetModalRef.current.close()} />}
+                    backdropComponent={(props: BottomSheetBackdropProps) => <CustomBackdrop {...props} onPress={() => bottomSheetModalRef.current.close()} />}
                     enableDismissOnClose={true}
                 >
                     <View

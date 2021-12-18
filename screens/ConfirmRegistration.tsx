@@ -1,6 +1,6 @@
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import React, { useCallback, useMemo, useRef, useState } from "react";
-import { FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { BackHandler, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSelector } from "react-redux";
 import images from "../assets/images";
 
@@ -121,6 +121,7 @@ const ConfirmRegistrationScreen = (props: any) => {
 
     // ref
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+    const bottomSheetOpenStatusRef = useRef(false)
 
     // variables
     const snapPoints = useMemo(() => ['85%'], []);
@@ -135,9 +136,7 @@ const ConfirmRegistrationScreen = (props: any) => {
     }, [])
 
     const handleSheetChanges = useCallback((index: number) => {
-        // console.log('handleSheetChanges', index);
-        if (index === -1) {
-        }
+        bottomSheetOpenStatusRef.current = index !== -1
     }, []);
 
     const openChatHandler = useCallback((data: any) => {
@@ -188,6 +187,25 @@ const ConfirmRegistrationScreen = (props: any) => {
         }
     }, [openChatHandler])
 
+    const forceCloseBottomSheet = useCallback(() => {
+        bottomSheetModalRef.current?.close();
+    }, [])
+
+    const androidBackButtonPressHandler = useCallback(() => {
+        if (bottomSheetOpenStatusRef.current) {
+            forceCloseBottomSheet()
+            return true
+        } else {
+            return false
+        }
+    }, [])
+
+    useEffect(() => {
+        const backHandlerEvent = BackHandler.addEventListener("hardwareBackPress", androidBackButtonPressHandler)
+        return () => backHandlerEvent.remove()
+    }, [androidBackButtonPressHandler])
+
+
     const renderSuccessDialog = useMemo(() => {
         return (
             <BottomSheetModal
@@ -195,7 +213,8 @@ const ConfirmRegistrationScreen = (props: any) => {
                 index={0}
                 snapPoints={snapPoints}
                 onChange={handleSheetChanges}
-                backdropComponent={CustomBackdrop}
+                // backdropComponent={CustomBackdrop}
+                backdropComponent={(props) => <CustomBackdrop {...props} onPress={forceCloseBottomSheet} />}
                 enablePanDownToClose={false}
             >
                 <View   
@@ -234,7 +253,7 @@ const ConfirmRegistrationScreen = (props: any) => {
                 </View>
             </BottomSheetModal>
         )
-    }, [renderItemHandler])
+    }, [renderItemHandler, forceCloseBottomSheet])
 
     return (
         <BottomSheetModalProvider>

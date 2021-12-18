@@ -1,6 +1,6 @@
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Image, Keyboard, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { BackHandler, Image, Keyboard, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 import BoldText from "../components/BoldText";
 import CustomBackdrop from "../components/CustomBackdrop";
 import RegularText from "../components/RegularText";
@@ -33,9 +33,10 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
     const [payWithCreditDebit, setPayWithCreditDebit] = useState(false)
     const [showDatePicker, setShowDatePicker] = useState(false)
     const [showPaymentDone, setShowPaymentDone] = useState(false)
-    
+
     // ref
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+    const bottomSheetOpenStatusRef = useRef(false)
 
     // variables
     const snapPoints = useMemo(() => ['70%'], []);
@@ -46,10 +47,17 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
     }, []);
     
     const closeBottomSheetHandler = useCallback(() => {
+        console.log(bottomSheetModalRef.current)
         payWithCreditDebit && setPayWithCreditDebit(false)
         !payWithCreditDebit && bottomSheetModalRef.current?.close();
         setShowPaymentDone(false)
     }, [payWithCreditDebit])
+
+    const forceCloseBottomSheet = useCallback(() => {
+        setShowPaymentDone(false)
+        setPayWithCreditDebit(false)
+        bottomSheetModalRef.current?.close()
+    }, [])
     
     const handleSheetChanges = useCallback((index: number) => {
         console.log('handleSheetChanges', index);
@@ -60,8 +68,26 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
             setCVC('')
             setFullname('')
             setZipCode('')
+            bottomSheetOpenStatusRef.current = false
+        } else {
+            bottomSheetOpenStatusRef.current = true
         }
     }, []);
+
+    const androidBackButtonPressHandler = useCallback(() => {
+        if (bottomSheetOpenStatusRef.current) {
+            forceCloseBottomSheet()
+            return true
+        } else {
+            return false
+        }
+    }, [forceCloseBottomSheet])
+
+    useEffect(() => {
+        const backHandlerEvent = BackHandler.addEventListener("hardwareBackPress", androidBackButtonPressHandler)
+        return () => backHandlerEvent.remove()
+    }, [androidBackButtonPressHandler])
+    
 
     const makePamentPressHandler = useCallback(() => {
         if (!amount || !amount.trim()) {
@@ -87,7 +113,7 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
                 index={0}
                 snapPoints={snapPoints}
                 onChange={handleSheetChanges}
-                backdropComponent={CustomBackdrop}
+                backdropComponent={(props) => <CustomBackdrop {...props} onPress={forceCloseBottomSheet} />}
                 enablePanDownToClose={true}
             >
                 <View   
