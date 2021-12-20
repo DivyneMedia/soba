@@ -13,6 +13,7 @@ import HorizontalRular from "../components/HorizontalRular";
 import RoundedInput from "../components/RoundedInput";
 import appConstants from "../constants/appConstants";
 import RoundedInputButton from "../components/RoundedInputButton";
+import RoundedButton from "../components/RoundedButton";
 
 type EditProfileScreenProps = {
     navigation: any
@@ -185,22 +186,11 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
                 />
             </View>
             <HorizontalRular />
-            <Pressable
+            <RoundedButton
+                text="SAVE"
+                style={{ borderRadius: 0 }}
                 onPress={updateProfileHandler}
-                style={{
-                    marginVertical: 20,
-                    alignSelf: 'center'
-                }}
-            >
-                <Image
-                    source={images.ic_ok}
-                    style={{
-                        height: 48,
-                        width: 48
-                    }}
-                    resizeMode="contain"
-                />
-            </Pressable>
+            />
         </ScrollView>
     )
 }
