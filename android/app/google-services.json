@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "620461915889",
+    "project_id": "soba-1027e",
+    "storage_bucket": "soba-1027e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:620461915889:android:ff9d5426a55c59db2ef350",
+        "android_client_info": {
+          "package_name": "com.divynemedia.soba"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "620461915889-b9qa2ouj47gvela4scvvoblssodih8v4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDycKT-eikEuPTKZNl9jGLUEKaLoY_sic"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "620461915889-b9qa2ouj47gvela4scvvoblssodih8v4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
