@@ -1,4 +1,8 @@
 export default {
+    BASE_URL: 'https://api.neoncrm.com/v2',
+    orgId: 'sobaamerica',
+    apiKey: '8d87d28de4dfd6eaaf1a1d89fd00050c',
+
     EMAIL: 'EMAIL',
     PASSWORD: 'PASSWORD',
     MATRICULATION_INPUT: 'MATRICULATION_INPUT',

@@ -21,8 +21,8 @@ const LoginScreen = (props: any) => {
 
     const dispatch = useDispatch()
 
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [email, setEmail] = useState('tndime')
+    const [password, setPassword] = useState('12345')
 
     const emailRef = useRef<TextInput>(null)
     const passwordRef = useRef<TextInput>(null)
@@ -34,13 +34,14 @@ const LoginScreen = (props: any) => {
     const signInHandler = useCallback(async () => {
         try {
             await dispatch(authActions.login({
-                isLoggedIn: true
+                username: email,
+                password: password
             }))
             SuccessToast("Login Successfully.")
         } catch (err) {
             console.log('[signInHandler] Error : ', err)
         }
-    }, [dispatch])
+    }, [dispatch, email, password])
 
     const onClaimPressHandler = useCallback(() => {
         navigation.navigate("selectRegion")

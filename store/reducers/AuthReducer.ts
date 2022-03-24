@@ -29,6 +29,11 @@ export default (state = initialState, action: ActionType) => {
                 ...state,
                 chapterId: payload
             }
+        case authActions.SET_CHAPTERS:
+            return {
+                ...state,
+                chapters: payload
+            }
         case authActions.LOGOUT:
             return {
                 ...state,

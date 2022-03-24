@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from "react";
-import { StyleSheet, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from "react";
+import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from "react-redux";
 
 import BackgroundImageComp from "../components/BackgroundImageComp";
@@ -11,7 +11,7 @@ import RoundedButton from "../components/RoundedButton";
 import ScreenHeader from "../components/ScreenHeader";
 
 import colors from "../constants/colors";
-import { setChapter } from "../store/actions/AuthActions";
+import { getChapters, setChapter } from "../store/actions/AuthActions";
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
 
@@ -19,7 +19,9 @@ const SelectChapterScreen = (props: any) => {
     const { navigation } = props
     const dispatch = useDispatch()
 
-    const { regionId } = useSelector((state: any) => state.auth)
+    const [isLoading, setLoading] = useState(true)
+
+    const { regionId, chapters } = useSelector((state: any) => state.auth)
 
     const [selectedOption, setSelectedOption] = useState(-1)
 
@@ -33,6 +35,38 @@ const SelectChapterScreen = (props: any) => {
             chapterId: selectedOption
         })
     }, [dispatch, navigation, selectedOption])
+
+    const initHandler = useCallback(async () => {
+        try {
+            await dispatch(getChapters())
+            setLoading(false)
+        } catch (err: any) {
+            console.log('initHandler : ', err?.message)
+        }
+    }, [])
+
+    useEffect(() => {
+        initHandler()
+    }, [])
+
+    const keyExtractorHandler = (_item: any, index: number) => index.toString()
+
+    const renderChapterHandler = (chapterObj: any) => {
+        try {
+            // const {item, index}: { item: any, index: any } = chapterObj
+            const { id, name, code } = chapterObj
+            return (
+                <ChapterButton
+                    text={name}
+                    onPress={setSelectedOption.bind(null, +id)}
+                    selected={selectedOption === +id}
+                />
+            )
+        } catch (err: any) {
+            console.log('[renderChapterHandler] Error : ', err.message)
+            return null
+        }
+    }
 
     return (
         <BackgroundImageComp>
@@ -51,15 +85,20 @@ const SelectChapterScreen = (props: any) => {
                         <RegularText style={{ textAlign: 'center', marginTop: 10 }}>
                             {"Please choose one out of four chapter to continue."}
                         </RegularText>
-                        <View
+                        <ScrollView
                             style={{
-                                flex: 1,
-                                alignItems: 'center',
+                                // maxHeight: 200,
+                                flexShrink: 1,
+                                // alignItems: 'center',
+                                // maxHeight: "100%",
                                 paddingHorizontal: 30,
                                 marginTop: 10
                             }}
                         >
-                            <ChapterButton
+                            {
+                                chapters && Array.isArray(chapters) && chapters.map(renderChapterHandler)
+                            }
+                            {/* <ChapterButton
                                 text="SOBA Arizona"
                                 onPress={setSelectedOption.bind(null, 0)}
                                 selected={selectedOption === 0}
@@ -78,8 +117,15 @@ const SelectChapterScreen = (props: any) => {
                                 text="SOBA Dallas"
                                 onPress={setSelectedOption.bind(null, 3)}
                                 selected={selectedOption === 3}
-                            />
-                        </View>
+                            /> */}
+                            {/* <FlatList
+                                data={chapters ?? []}
+                                style={{ flex: 1 }}
+                                keyExtractor={keyExtractorHandler}
+                                renderItem={renderChapterHandler}
+                                ListEmptyComponent={null}
+                            /> */}
+                        </ScrollView>
                     </View>
                     <RoundedButton
                         style={{ borderRadius: 0 }}

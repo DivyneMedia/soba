@@ -17,6 +17,7 @@ import appConstants from "../constants/appConstants";
 import colors from "../constants/colors";
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
+import axios from '../axios.auth'
 
 const FetchMatriculationDetailsScreen = (props: any) => {
     const { navigation } = props
@@ -24,7 +25,6 @@ const FetchMatriculationDetailsScreen = (props: any) => {
 
     const [matriculationNumber, setMatriculationNumber] = useState('')
     const [details, setDetails] = useState<any>(null)
-
 
     const matriculationInputRef = useRef<TextInput>(null)
 
@@ -48,17 +48,75 @@ const FetchMatriculationDetailsScreen = (props: any) => {
         navigation.navigate('enterContactInformation')
     }, [navigation])
 
+    const getAccountFromAccountNumber = useCallback(async (accountId: any) => {
+        try {
+            console.log('accountId : ', accountId)
+            const accDetailsRes = await axios.post('/accounts/search', {
+                "outputFields": [
+                    "Account ID",
+                    "Account Login Name",
+                    "Account Note",
+                    "Account Type",
+                    "Address Type",
+                    "City",
+                    "Country",
+                    "DOB Day",
+                    "DOB Month",
+                    "DOB Year",
+                    "Email 1",
+                    "First Name",
+                    "Last Name",
+                    "Full Name (F)",
+                    "Full Street Address (F)",
+                    "Full Zip Code (F)",
+                    "Gender",
+                    "Photo URL",
+                    75,
+                    77,
+                    83,
+                    85,
+                    86,
+                    87
+                ],
+                "pagination": {
+                    "currentPage": 0,
+                    "pageSize": 20
+                },
+                "searchFields": [
+                    {
+                        "field": "Admission Number",
+                        "operator": "EQUAL",
+                        "value": accountId
+                    }
+                ]
+            })
+
+            const data = {
+                profile: accDetailsRes.data.searchResults[0]["Photo URL"],
+                name: accDetailsRes.data.searchResults[0]["Full Name (F)"],
+                from: accDetailsRes.data.searchResults[0]["Year of Entry"]
+            }
+            console.log('accDetailsRes : ', data)
+
+            setDetails(data)
+
+        } catch (err: any) {
+            console.log('[getAccountFromAccountNumber] Error : ', err?.message)
+        }
+    }, [])
+
     const onFetchDetailsHandler = useCallback(() => {
         if (!matriculationNumber || !matriculationNumber.trim()) {
             ErrorToast("Enter your Matriculation Number to continue.")
             return
         }
-        setDetails({
-            profile: images.ic_account,
-            name: 'Philbert Mac Etchu',
-            from: 'SOBA 2000'
-        })
-    }, [matriculationNumber])
+        getAccountFromAccountNumber(matriculationNumber)
+        // setDetails({
+        //     profile: images.ic_account,
+        //     name: 'Philbert Mac Etchu',
+        //     from: 'SOBA 2000'
+        // })
+    }, [matriculationNumber, getAccountFromAccountNumber])
 
     const renderDetailsHandler = useMemo(() => {
         if (details) {
@@ -67,11 +125,11 @@ const FetchMatriculationDetailsScreen = (props: any) => {
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <View style={{ minHeight: 180, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.grey }}>
                         <Image
-                            source={profile}
+                            source={{uri: profile}}
                             style={{
                                 height: 70,
                                 width: 70,
-                                borderRadius: 35,
+                                borderRadius: 50,
                                 overflow: 'hidden',
                                 marginBottom: 10
                             }}
