@@ -1,7 +1,8 @@
 import React, { useCallback, useRef, useState } from "react";
-import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
+import { Image, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSelector } from "react-redux";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import DateTimePickerModal, { PickerComponent } from "react-native-modal-datetime-picker";
+import CountryPicker from 'react-native-country-picker-modal'
 
 import BackgroundImageComp from "../components/BackgroundImageComp";
 import RoundedInputButton from "../components/RoundedInputButton";
@@ -16,15 +17,29 @@ import colors from "../constants/colors";
 
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
+import moment from "moment";
+
+type STRING_UNDEFINED = string | undefined
+
+type RouteParams = {
+    address: STRING_UNDEFINED,
+    dob: STRING_UNDEFINED,
+    email: STRING_UNDEFINED,
+    phoneNumber: STRING_UNDEFINED
+    callingCode: STRING_UNDEFINED
+} 
 
 const EnterContactInformation = (props: any) => {
-    const { navigation } = props
+    const { navigation, route } = props
+    const params: RouteParams = route.params
+
     const { regionId } = useSelector((state: any) => state.auth)
 
-    const [phone, setPhone] = useState('')
-    const [email, setEmail] = useState('')
-    const [dob, setDob] = useState('')
-    const [address, setAddress] = useState('')
+    const [callingCode, setCallingCode] = useState(params?.callingCode ? `+${params?.callingCode}` : '+91')
+    const [phone, setPhone] = useState(params?.phoneNumber ?? '')
+    const [email, setEmail] = useState(params?.email ?? '')
+    const [dob, setDob] = useState(params?.dob ? +params?.dob : '')
+    const [address, setAddress] = useState(params?.address ?? '')
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
     const phoneRef = useRef<TextInput>(null)
@@ -89,8 +104,9 @@ const EnterContactInformation = (props: any) => {
                 // setDatePickerVisibility(true)
                 break
             case appConstants.DOB: // on date select
+            console.log(value)
                 if (value) {
-                    setDob(value)
+                    setDob(moment(value).unix() * 1000)
                     setDatePickerVisibility(false)
                 }
                 addressRef.current?.focus()
@@ -124,15 +140,58 @@ const EnterContactInformation = (props: any) => {
                         <RegularText style={{ textAlign: 'center', marginVertical: 10 }}>
                             {"To complete your account setup, please\ncreate your username and password"}
                         </RegularText>
-                        <RoundedInput
-                            placeholder="Phone No."
-                            value={phone}
-                            onChangeText={onChangeTextHandler.bind(null, appConstants.PHONE)}
-                            onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.PHONE)}
-                            maxLength={15}
-                            ref={phoneRef}
-                            keyboardType="number-pad"
-                        />
+                        <View
+                            style={{
+                                width: "100%",
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                borderWidth: 1,
+                                paddingHorizontal: 20,
+                                borderRadius: 30,
+                                marginTop: 20
+                            }}
+                        >
+                            <RegularText
+                                style={{
+                                    position: 'absolute',
+                                    top: -10,
+                                    left: 23,
+                                    paddingHorizontal: 5,
+                                    backgroundColor: colors.white,
+                                }}
+                            >
+                                {"Phone No."}
+                            </RegularText>
+                            <CountryPicker
+                                withAlphaFilter={true}
+                                withCallingCode={true}
+                                placeholder={
+                                    <BoldText
+                                        style={{
+                                            fontSize: 14
+                                        }}
+                                    >
+                                        {callingCode}
+                                    </BoldText>
+                                }
+                                onSelect={(data) => {
+                                    if (data.callingCode.length) {
+                                        setCallingCode(`+${data.callingCode[0]}`)
+                                    }
+                                }}
+                            />
+                            <TextInput
+                                placeholder="Phone No."
+                                value={phone}
+                                onChangeText={onChangeTextHandler.bind(null, appConstants.PHONE)}
+                                onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.PHONE)}
+                                maxLength={10}
+                                ref={phoneRef}
+                                style={{ flex: 1, paddingTop: 12 }}
+                                // inputStyle={{ flex: 1, paddingLeft: 50 }}
+                                keyboardType="number-pad"
+                            />
+                        </View>
                         <RoundedInput
                             placeholder="Email Address"
                             value={email}
@@ -146,7 +205,7 @@ const EnterContactInformation = (props: any) => {
                         <RoundedInputButton
                             placeholder="Date of Birth"
                             onPress={setDatePickerVisibility.bind(null, true)}
-                            value={dob ? new Date(dob).toLocaleDateString() : ''}
+                            value={dob ? moment(dob).format('DD-MM-YYYY') : ''}
                         />
                         <RoundedInput
                             placeholder="Address"

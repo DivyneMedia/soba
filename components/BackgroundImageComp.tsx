@@ -4,9 +4,9 @@ import images from "../assets/images";
 import Root from "./RootComponent";
 
 const BackgroundImageComp = (props: any) => {
-    const { children } = props
+    const { dismissKeyboardAvoiding, children } = props
     return (
-        <Root>
+        <Root dismissKeyboardAvoiding={dismissKeyboardAvoiding} >
             <ImageBackground
                 source={images.bg_soba}
                 style={{
@@ -18,7 +18,7 @@ const BackgroundImageComp = (props: any) => {
                 }}
                 resizeMode="cover"
             >
-                    {children}
+                {children}
             </ImageBackground>
         </Root>
     )

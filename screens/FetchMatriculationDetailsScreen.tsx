@@ -18,10 +18,18 @@ import colors from "../constants/colors";
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
 import axios from '../axios.auth'
+import useAccount from "../hooks/useAccount";
+import AppLoader from "../components/AppLoader";
+import { UserRespose } from "../types/UserResponse";
+import moment from "moment";
+
+var userBasicInfo: UserRespose | undefined = undefined
 
 const FetchMatriculationDetailsScreen = (props: any) => {
     const { navigation } = props
     const { regionId } = useSelector((state: any) => state.auth)
+
+    const { isLoading, getUserByAccountId } = useAccount()
 
     const [matriculationNumber, setMatriculationNumber] = useState('')
     const [details, setDetails] = useState<any>(null)
@@ -45,78 +53,49 @@ const FetchMatriculationDetailsScreen = (props: any) => {
     }, [])
 
     const nextPressHandler = useCallback(() => {
-        navigation.navigate('enterContactInformation')
+        try {
+            if (!userBasicInfo?.searchResults.length) {
+                return
+            }
+            const date = userBasicInfo?.searchResults[0]["DOB Day"]
+            const month = userBasicInfo?.searchResults[0]["DOB Month"]
+            const year = userBasicInfo?.searchResults[0]["DOB Year"]
+    
+            const dob = moment(`${date}-${month}-${year}`, "D-M-YYYY")
+            navigation.navigate('enterContactInformation', {
+                phoneNumber: userBasicInfo?.searchResults[0]["Phone 1 Number"]?.split('-').join('').split(' ').join(''),
+                callingCode: userBasicInfo?.searchResults[0]["Phone 1 Area Code"],
+                email: userBasicInfo?.searchResults[0]["Email 1"],
+                dob: dob.unix() * 1000,
+                address: userBasicInfo?.searchResults[0]["Full Street Address (F)"],
+            })
+        } catch (err: any) {
+            console.log('[nextPressHandler] Error : ', err?.message)
+            ErrorToast(appConstants.SOMETHING_WENT_WRONG)
+        }
     }, [navigation])
 
-    const getAccountFromAccountNumber = useCallback(async (accountId: any) => {
-        try {
-            console.log('accountId : ', accountId)
-            const accDetailsRes = await axios.post('/accounts/search', {
-                "outputFields": [
-                    "Account ID",
-                    "Account Login Name",
-                    "Account Note",
-                    "Account Type",
-                    "Address Type",
-                    "City",
-                    "Country",
-                    "DOB Day",
-                    "DOB Month",
-                    "DOB Year",
-                    "Email 1",
-                    "First Name",
-                    "Last Name",
-                    "Full Name (F)",
-                    "Full Street Address (F)",
-                    "Full Zip Code (F)",
-                    "Gender",
-                    "Photo URL",
-                    75,
-                    77,
-                    83,
-                    85,
-                    86,
-                    87
-                ],
-                "pagination": {
-                    "currentPage": 0,
-                    "pageSize": 20
-                },
-                "searchFields": [
-                    {
-                        "field": "Admission Number",
-                        "operator": "EQUAL",
-                        "value": accountId
-                    }
-                ]
-            })
-
-            const data = {
-                profile: accDetailsRes.data.searchResults[0]["Photo URL"],
-                name: accDetailsRes.data.searchResults[0]["Full Name (F)"],
-                from: accDetailsRes.data.searchResults[0]["Year of Entry"]
-            }
-            console.log('accDetailsRes : ', data)
-
-            setDetails(data)
-
-        } catch (err: any) {
-            console.log('[getAccountFromAccountNumber] Error : ', err?.message)
-        }
-    }, [])
-
-    const onFetchDetailsHandler = useCallback(() => {
+    const onFetchDetailsHandler = useCallback(async () => {
         if (!matriculationNumber || !matriculationNumber.trim()) {
             ErrorToast("Enter your Matriculation Number to continue.")
             return
         }
-        getAccountFromAccountNumber(matriculationNumber)
-        // setDetails({
-        //     profile: images.ic_account,
-        //     name: 'Philbert Mac Etchu',
-        //     from: 'SOBA 2000'
-        // })
-    }, [matriculationNumber, getAccountFromAccountNumber])
+        if (isNaN(+matriculationNumber)) {
+            ErrorToast("Enter valid Matriculation Number to continue.")
+            return
+        }
+        const data: UserRespose | undefined = await getUserByAccountId(+matriculationNumber)
+        if (data && typeof data !== "undefined") {
+            userBasicInfo = data
+
+            const confirmationData = {
+                profile: data.searchResults[0]["Photo URL"],
+                name: data.searchResults[0]["Full Name (F)"],
+                from: data.searchResults[0]["Year of Entry"]
+            }
+            setDetails(confirmationData)
+        }
+    }, [matriculationNumber, getUserByAccountId])
 
     const renderDetailsHandler = useMemo(() => {
         if (details) {
@@ -159,6 +138,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
 
     return (
         <BackgroundImageComp>
+            <AppLoader isVisible={isLoading} />
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}

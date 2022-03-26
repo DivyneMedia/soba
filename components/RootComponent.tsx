@@ -6,11 +6,18 @@ import colors from "../constants/colors"
 
 type RootProps = {
   children: React.ReactNode | React.ReactNode[]
+  dismissKeyboardAvoiding?: boolean
   style?: ViewStyle
 }
 
 const Root = (props: RootProps) => {
-  const { style, children } = props
+  const { style, dismissKeyboardAvoiding, children } = props
+
+  if (dismissKeyboardAvoiding) {
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+      {children}
+    </SafeAreaView>
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
