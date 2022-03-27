@@ -1,19 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+
 import AuthNavigation from './AuthNavigator';
 import MainNavigator from './MainNavigator';
+import UserAccountApproveNavigator from './UserAccountApproveNavigator';
+
 import { useSelector } from 'react-redux';
+import { USER } from '../types/UserResponse';
+
+type UserPayload = {
+  userData: USER
+}
 
 const RootNavigator = () => {
-  const userData = useSelector((state: any) => state?.auth)
-  console.log(userData)
+  const { userData }: UserPayload = useSelector((state: any) => state?.auth)
 
   return (
-    <NavigationContainer onReady={() => console.log('ready')}>
+    <NavigationContainer>
+      {/* {
+        userData?.['Account ID']
+        ? userData?.['Account ID'] && !userData?.['Mobile App Account Approved']
+          ? <UserAccountApproveNavigator />
+          : <MainNavigator />
+        : <AuthNavigation />
+      } */}
       {
-        !userData?.isLoggedIn
-        ? <AuthNavigation />
-        : <MainNavigator />
+        userData?.['Account ID'] && userData?.['Mobile App Account Approved']
+          ? <MainNavigator />
+          : <AuthNavigation />
       }
     </NavigationContainer>
   );

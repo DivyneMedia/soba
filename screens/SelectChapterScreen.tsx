@@ -24,8 +24,6 @@ const SelectChapterScreen = (props: any) => {
     const dispatch = useDispatch()
 
     const { isLoading, getAvailableChapters } = useAccount()
-    const { regionId } = useSelector((state: any) => state.auth)
-
     const [selectedOption, setSelectedOption] = useState(-1)
     const [availableChapters, setAvailableChapters] = useState<OPTION_VALUES[]>([])
 
@@ -57,7 +55,6 @@ const SelectChapterScreen = (props: any) => {
 
     const renderChapterHandler = (chapterObj: any) => {
         try {
-            // const {item, index}: { item: any, index: any } = chapterObj
             const { id, name, code } = chapterObj
             return (
                 <ChapterButton
@@ -74,36 +71,33 @@ const SelectChapterScreen = (props: any) => {
     }
 
     return (
-        <BackgroundImageComp dismissKeyboardAvoiding>
+        <BackgroundImageComp dismissKeyboardAvoiding={true} >
             <AppLoader isVisible={isLoading} />
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}
-                    logo={getRegionIcon(regionId)}
+                    logo={getRegionIcon()}
                     logoStyle={styles.logoStyle}
                     onBackPress={navigation.goBack}
                 />
                 <View style={styles.detailsContainer}>
-                    {/* <View style={{ flex: 1 }}> */}
-                        <ScrollView
-                            style={{
-                                flex: 1,
-                                paddingHorizontal: 30,
-                                marginTop: 10
-                            }}
-                        >
-                            <BoldText style={{ fontSize: 22, alignSelf: 'center', textAlign: 'center' }}>
-                                {"Select Your Chapter"}
-                            </BoldText>
-                            <RegularText style={{ textAlign: 'center', marginTop: 10 }}>
-                                {"Please choose one out of four chapter to continue."}
-                            </RegularText>
-                            
-                            {availableChapters.map(renderChapterHandler)}
-                        </ScrollView>
-                    {/* </View> */}
+                    <BoldText style={{ fontSize: 22, alignSelf: 'center', textAlign: 'center' }}>
+                        {"Select Your Chapter"}
+                    </BoldText>
+                    <RegularText style={{ textAlign: 'center', marginTop: 10 }}>
+                        {"Please choose one out of four chapter to continue."}
+                    </RegularText>
+                    <ScrollView
+                        style={{
+                            flex: 1,
+                            paddingHorizontal: 30,
+                            marginTop: 10
+                        }}
+                    >                            
+                        {availableChapters.map(renderChapterHandler)}
+                    </ScrollView>
                     <RoundedButton
-                        style={{ borderRadius: 0 }}
+                        style={{ borderRadius: 0, marginTop: 0 }}
                         onPress={nextPressHandler}
                         text={"Next"}
                         disabled={selectedOption === -1}
@@ -129,7 +123,7 @@ const styles = StyleSheet.create({
     },
     detailsContainer: {
         flex: 1,
-        backgroundColor: "pink", // colors.white,
+        backgroundColor: colors.white,
         shadowColor: colors.black,
         shadowOffset: {
             width: 0,

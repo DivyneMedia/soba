@@ -10,7 +10,7 @@ type PAGINATION = {
     "totalResults": NUMBER_NULL
 }
 
-type USER = {
+export type USER = {
     "Admission Number": STRING_NULL,
     "DOB Month": STRING_NULL,
     "First Name": STRING_NULL,
@@ -40,7 +40,8 @@ type USER = {
     "Mobile App Username": STRING_NULL,
     "Country": STRING_NULL,
     "Chapter Affiliate": STRING_NULL,
-    "Last Name": STRING_NULL
+    "Last Name": STRING_NULL,
+    "Mobile App Account Approved": STRING_NULL,
 }
 
 export type UserRespose = {

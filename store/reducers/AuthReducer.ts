@@ -15,7 +15,9 @@ export default (state = initialState, action: ActionType) => {
         case authActions.LOGIN:
             return {
                 ...state,
-                ...payload
+                userData: {
+                    ...payload
+                }
             }
         case authActions.SIGNUP:
             return state
@@ -35,10 +37,7 @@ export default (state = initialState, action: ActionType) => {
                 chapters: payload
             }
         case authActions.LOGOUT:
-            return {
-                ...state,
-                ...payload
-            }
+            return initialState
         default:
             return state
     }

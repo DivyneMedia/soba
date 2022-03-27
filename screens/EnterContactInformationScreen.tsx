@@ -1,8 +1,9 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Image, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSelector } from "react-redux";
-import DateTimePickerModal, { PickerComponent } from "react-native-modal-datetime-picker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import CountryPicker from 'react-native-country-picker-modal'
+import auth from '@react-native-firebase/auth';
 
 import BackgroundImageComp from "../components/BackgroundImageComp";
 import RoundedInputButton from "../components/RoundedInputButton";
@@ -18,10 +19,12 @@ import colors from "../constants/colors";
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
 import moment from "moment";
+import AppLoader from "../components/AppLoader";
 
 type STRING_UNDEFINED = string | undefined
 
 type RouteParams = {
+    accId: STRING_UNDEFINED,
     address: STRING_UNDEFINED,
     dob: STRING_UNDEFINED,
     email: STRING_UNDEFINED,
@@ -33,18 +36,28 @@ const EnterContactInformation = (props: any) => {
     const { navigation, route } = props
     const params: RouteParams = route.params
 
-    const { regionId } = useSelector((state: any) => state.auth)
-
-    const [callingCode, setCallingCode] = useState(params?.callingCode ? `+${params?.callingCode}` : '+91')
-    const [phone, setPhone] = useState(params?.phoneNumber ?? '')
+    // **States
+    const [callingCode, setCallingCode] = useState('+91') // useState(params?.callingCode ? `+${params?.callingCode}` : '+91')
+    const [phone, setPhone] = useState('9662343453') // useState(params?.phoneNumber ?? '')
     const [email, setEmail] = useState(params?.email ?? '')
     const [dob, setDob] = useState(params?.dob ? +params?.dob : '')
     const [address, setAddress] = useState(params?.address ?? '')
+    
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [isLoading, setLoading] = useState(false);
 
+    // **Refs
+    const mountedRef = useRef(false)
     const phoneRef = useRef<TextInput>(null)
     const emailRef = useRef<TextInput>(null)
     const addressRef = useRef<TextInput>(null)
+
+    useEffect(() => {
+        mountedRef.current = true
+        return () => {
+            mountedRef.current = false
+        }
+    }, [])
 
     const isDataValid = useCallback((showError = false) => {
         if (!phone || !phone.trim()) {
@@ -70,12 +83,23 @@ const EnterContactInformation = (props: any) => {
         return true
     }, [email, phone, dob, address])
 
-    const nextPressHandler = useCallback(() => {
-        if (!isDataValid(true)) {
-            return
+    const nextPressHandler = useCallback(async () => {
+        try {
+            if (!isDataValid(true)) {
+                return
+            }
+            setLoading(true)
+            const confirmation = await auth().signInWithPhoneNumber(`${callingCode} ${phone}`)
+            navigation.navigate("otpScreen", {
+                accId: params?.accId,
+                confirmation
+            })
+        } catch (err: any) {
+            ErrorToast(appConstants.SOMETHING_WENT_WRONG)
+        } finally {
+            mountedRef.current && setLoading(false)
         }
-        navigation.navigate("otpScreen")
-    }, [navigation, isDataValid])
+    }, [navigation, isDataValid, callingCode, phone, params])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
@@ -120,9 +144,10 @@ const EnterContactInformation = (props: any) => {
     return (
         <BackgroundImageComp>
             <View style={styles.root}>
+                <AppLoader isVisible={isLoading} />
                 <ScreenHeader
                     containerStyle={styles.headerContainer}
-                    logo={getRegionIcon(regionId)}
+                    logo={getRegionIcon()}
                     logoStyle={styles.logoStyle}
                     onBackPress={navigation.goBack}
                 />

@@ -18,19 +18,42 @@ import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
 
 const OTPScreen = (props: any) => {
-    const { navigation } = props
-    const { regionId } = useSelector((state: any) => state.auth)
+    const { navigation, route } = props
+    const { params } = route
+    const { accId, confirmation } = params
 
     const [otp, setOtp] = useState('')
     const [otpViaPhone, setOtpViaPhone] = useState(true)
 
-    const nextPressHandler = useCallback(() => {
+    const nextPressHandler = useCallback(async () => {
         if (!otp || !otp.trim()) {
             ErrorToast("Enter OTP to continue.")
             return
         }
-        navigation.navigate('confirmRegistration')
-    }, [otp, navigation])
+        const res = await confirmation?.confirm(otp)
+        if (res) {
+            const { additionalUserInfo, user } = res
+            const { isNewUser } = additionalUserInfo
+            const { uid, phoneNumber } = user
+
+            navigation.navigate('confirmRegistration', {
+                uid,
+                accId,
+                phoneNumber
+            })
+            // if (isNewUser) {
+            //     // create new user in firestore
+            //     navigation.navigate('confirmRegistration', {
+            //         isNewUser,
+            //         uid,
+            //         phoneNumber
+            //     })
+            // } else {
+            //     // will think on it
+            //     ErrorToast('User already exist with same phone number.')
+            // }
+        }
+    }, [otp, confirmation, navigation, accId])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
@@ -57,7 +80,7 @@ const OTPScreen = (props: any) => {
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}
-                    logo={getRegionIcon(regionId)}
+                    logo={getRegionIcon()}
                     logoStyle={styles.logoStyle}
                     onBackPress={navigation.goBack}
                 />

@@ -1,4 +1,8 @@
+import { AxiosResponse } from 'axios'
 import axios from '../../axios.auth'
+import appConstants from '../../constants/appConstants'
+import { userPayload } from '../../model/UserData'
+import { UserRespose } from '../../types/UserResponse'
 export const LOGIN = "LOGIN"
 export const SIGNUP = "SIGNUP"
 export const SET_REGION = "SET_REGION"
@@ -16,39 +20,8 @@ export const login = (loginReq: LoginRequestType) => {
         try {
             const { username, password } = loginReq
 
-            const loginRes = await axios.post('/accounts/search', {
-                outputFields: [
-                    "Account Created By",
-                    "Account Created Date/Time",
-                    "Account ID",
-                    "Account Login Name",
-                    "Account Note",
-                    "Account Type",
-                    "Address Type",
-                    "City",
-                    "Country",
-                    "DOB Day",
-                    "DOB Month",
-                    "DOB Year",
-                    "Email 1",
-                    "First Name",
-                    "Last Name",
-                    "Full Name (F)",
-                    "Full Street Address (F)",
-                    "Full Zip Code (F)",
-                    "Gender",
-                    "Photo URL",
-                    75,
-                    77,
-                    83,
-                    85,
-                    86,
-                    87
-                ],
-                pagination: {
-                    currentPage: 0,
-                    pageSize: 20
-                },
+            const loginRes: AxiosResponse<UserRespose> = await axios.post('/accounts/search', {
+                ...userPayload,
                 searchFields: [
                     {
                         "field": "Mobile App Username",
@@ -63,14 +36,22 @@ export const login = (loginReq: LoginRequestType) => {
                 ]
             })
 
-            console.log('loginRes : ', loginRes.data)
-
-            // dispatch({
-            //     type: LOGIN,
-            //     payload: loginReq
-            // })
+            if (loginRes && loginRes.data) {
+                const {searchResults} = loginRes.data
+                if (searchResults && Array.isArray(searchResults) && searchResults.length) {
+                    dispatch({
+                        type: LOGIN,
+                        payload: searchResults[0]
+                    })
+                } else {
+                    throw new Error("User not found, Please check details and try again.")
+                }
+            } else {
+                throw new Error("User not found, Please check details and try again.")
+            }
         } catch (err: any) {
             console.log('Error : ', err?.message)
+            throw new Error(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
         }
     }
 }
@@ -119,10 +100,7 @@ export const setChapter = (chapter: number) => {
 export const logout = () => {
     return async (dispatch: any, getState: any) => {
         dispatch({
-            type: LOGOUT,
-            payload: {
-                isLoggedIn:false
-            }
+            type: LOGOUT
         })
     }
 }

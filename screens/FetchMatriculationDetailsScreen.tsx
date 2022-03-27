@@ -27,8 +27,6 @@ var userBasicInfo: UserRespose | undefined = undefined
 
 const FetchMatriculationDetailsScreen = (props: any) => {
     const { navigation } = props
-    const { regionId } = useSelector((state: any) => state.auth)
-
     const { isLoading, getUserByAccountId } = useAccount()
 
     const [matriculationNumber, setMatriculationNumber] = useState('')
@@ -63,6 +61,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
     
             const dob = moment(`${date}-${month}-${year}`, "D-M-YYYY")
             navigation.navigate('enterContactInformation', {
+                accId: userBasicInfo?.searchResults[0]["Account ID"],
                 phoneNumber: userBasicInfo?.searchResults[0]["Phone 1 Number"]?.split('-').join('').split(' ').join(''),
                 callingCode: userBasicInfo?.searchResults[0]["Phone 1 Area Code"],
                 email: userBasicInfo?.searchResults[0]["Email 1"],
@@ -76,24 +75,30 @@ const FetchMatriculationDetailsScreen = (props: any) => {
     }, [navigation])
 
     const onFetchDetailsHandler = useCallback(async () => {
-        if (!matriculationNumber || !matriculationNumber.trim()) {
-            ErrorToast("Enter your Matriculation Number to continue.")
-            return
-        }
-        if (isNaN(+matriculationNumber)) {
-            ErrorToast("Enter valid Matriculation Number to continue.")
-            return
-        }
-        const data: UserRespose | undefined = await getUserByAccountId(+matriculationNumber)
-        if (data && typeof data !== "undefined") {
-            userBasicInfo = data
-
-            const confirmationData = {
-                profile: data.searchResults[0]["Photo URL"],
-                name: data.searchResults[0]["Full Name (F)"],
-                from: data.searchResults[0]["Year of Entry"]
+        try {
+            if (!matriculationNumber || !matriculationNumber.trim()) {
+                ErrorToast("Enter your Matriculation Number to continue.")
+                return
             }
-            setDetails(confirmationData)
+            if (isNaN(+matriculationNumber)) {
+                ErrorToast("Enter valid Matriculation Number to continue.")
+                return
+            }
+            const data: UserRespose | undefined = await getUserByAccountId(+matriculationNumber)
+            if (data && typeof data !== "undefined") {
+                userBasicInfo = data
+    
+                const confirmationData = {
+                    profile: data.searchResults[0]["Photo URL"],
+                    name: data.searchResults[0]["Full Name (F)"],
+                    from: data.searchResults[0]["Year of Entry"]
+                }
+                setDetails(confirmationData)
+            } else {
+                setDetails(null)
+            }
+        } catch (err: any) {
+            ErrorToast(err.message)
         }
     }, [matriculationNumber, getUserByAccountId])
 
@@ -142,7 +147,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}
-                    logo={getRegionIcon(regionId)}
+                    logo={getRegionIcon()}
                     logoStyle={styles.logoStyle}
                     onBackPress={navigation.goBack}
                 />

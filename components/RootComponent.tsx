@@ -14,9 +14,13 @@ const Root = (props: RootProps) => {
   const { style, dismissKeyboardAvoiding, children } = props
 
   if (dismissKeyboardAvoiding) {
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
-      {children}
-    </SafeAreaView>
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+        <View style={{ flex: 1 }}>
+          {children}
+        </View>
+      </SafeAreaView>
+    )
   }
 
   return (

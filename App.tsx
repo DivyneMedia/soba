@@ -9,6 +9,8 @@ import { delay } from './utils/delay';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import KeyboardManager from 'react-native-keyboard-manager';
 import { isIos } from './utils/MiscUtils';
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs(['Non-serializable values were found in the navigation state.'])
 
 const App = () => {
   const [isLoading, setLoading] = useState(true)

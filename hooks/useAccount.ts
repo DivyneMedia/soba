@@ -56,6 +56,11 @@ const useAccount = () => {
                             "field": "Admission Number",
                             "operator": "EQUAL",
                             "value": accountId
+                        },
+                        {
+                            "field": "Mobile App Account Claimed",
+                            "operator": "EQUAL",
+                            "value": false
                         }
                     ]
                 })
@@ -65,11 +70,12 @@ const useAccount = () => {
             }
 
             if (!accDetailsRes.data.searchResults.length) {
-                throw new Error("Account not found.")
+                throw new Error("Account not found or already been claimed.")
             }
             return accDetailsRes.data
         } catch (err: any) {
             console.log('[getUserByAccountId] Error : ', err?.message)
+            throw new Error(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
         } finally {
             toggleLoader(false)
         }

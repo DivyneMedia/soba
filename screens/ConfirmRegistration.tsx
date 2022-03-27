@@ -1,12 +1,12 @@
-import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BackHandler, FlatList, Image, Keyboard, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import React, { useCallback, useRef, useState } from "react";
+import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
 import { useSelector } from "react-redux";
 import images from "../assets/images";
+import AppLoader from "../components/AppLoader";
 
 import BackgroundImageComp from "../components/BackgroundImageComp";
 import BoldText from "../components/BoldText";
-import CustomBackdrop from "../components/CustomBackdrop";
 import RegularText from "../components/RegularText";
 import RoundedButton from "../components/RoundedButton";
 import RoundedInput from "../components/RoundedInput";
@@ -14,6 +14,7 @@ import ScreenHeader from "../components/ScreenHeader";
 import appConstants from "../constants/appConstants";
 
 import colors from "../constants/colors";
+import useFirebase from "../hooks/useFirebase";
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
 
@@ -45,14 +46,15 @@ const data = [
 ]
 
 const ConfirmRegistrationScreen = (props: any) => {
-    const { navigation } = props
+    const { navigation, route } = props
+    const { params } = route
+    const { accId, uid, phoneNumber } = params
 
-    const { regionId } = useSelector((state: any) => state.auth)
+    const { isLoading, createUserAcc } = useFirebase()
 
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
-    const [showSuccess, setShowSuccess] = useState(false)
+    const [username, setUsername] = useState('tndime')
+    const [password, setPassword] = useState('123456')
+    const [confirmPassword, setConfirmPassword] = useState('123456')
 
     const usernameRef = useRef<TextInput>(null)
     const passwordRef = useRef<TextInput>(null)
@@ -67,8 +69,8 @@ const ConfirmRegistrationScreen = (props: any) => {
             showError && ErrorToast("Password required.")
             return false
         }
-        if (password.length < 8) {
-            showError && ErrorToast("Password should be minimum 8 character long.")
+        if (password.length < 6) {
+            showError && ErrorToast("Password should be minimum 6 character long.")
             return false
         }
         if (!confirmPassword || !confirmPassword.trim()) {
@@ -82,14 +84,32 @@ const ConfirmRegistrationScreen = (props: any) => {
         return true
     }, [username, password, confirmPassword])
 
-    const nextPressHandler = useCallback(() => {
-        console.log('press')
-        if (!isDataValid(true)) {
-            return
+    const nextPressHandler = useCallback(async () => {
+        try {
+            if (!isDataValid(true)) {
+                return
+            }
+    
+            const createAccRes = await createUserAcc({
+                accId,
+                uid,
+                phoneNumber,
+                username,
+                password
+            })
+    
+            if (createAccRes) {
+                SuccessToast('Account setup success. please login to continue.')
+                navigation.popToTop()
+            }
+            
+            // setShowSuccess(true)
+            // bottomSheetModalRef.current?.present();
+        } catch (err: any) {
+            console.log('Error : ', err?.message)
+            ErrorToast(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
         }
-        // setShowSuccess(true)
-        bottomSheetModalRef.current?.present();
-    }, [isDataValid, navigation])
+    }, [isDataValid, navigation, username, phoneNumber, uid, accId, password])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
@@ -119,150 +139,150 @@ const ConfirmRegistrationScreen = (props: any) => {
         }
     }, [])
 
-    // ref
-    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    const bottomSheetOpenStatusRef = useRef(false)
+    // // ref
+    // const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+    // const bottomSheetOpenStatusRef = useRef(false)
 
-    // variables
-    const snapPoints = useMemo(() => ['85%'], []);
+    // // variables
+    // const snapPoints = useMemo(() => ['85%'], []);
 
-    // callbacks
-    const handlePresentModalPress = useCallback(() => {
-        bottomSheetModalRef.current?.present();
-    }, []);
+    // // callbacks
+    // const handlePresentModalPress = useCallback(() => {
+    //     bottomSheetModalRef.current?.present();
+    // }, []);
 
-    const closeBottomSheetHandler = useCallback(() => {
-        // bottomSheetModalRef.current?.close();
-    }, [])
+    // const closeBottomSheetHandler = useCallback(() => {
+    //     // bottomSheetModalRef.current?.close();
+    // }, [])
 
-    const handleSheetChanges = useCallback((index: number) => {
-        bottomSheetOpenStatusRef.current = index !== -1
-    }, []);
+    // const handleSheetChanges = useCallback((index: number) => {
+    //     bottomSheetOpenStatusRef.current = index !== -1
+    // }, []);
 
-    const openChatHandler = useCallback((data: any) => {
-        try {
-            const { id, profile, title, phone } = data
-            navigation.navigate('chattingScreen', {
-                name: title
-            })
-        } catch (err: any) {
-            console.log('[openChatHandler] Error : ', err.message)
-        }
-    }, [navigation])
+    // const openChatHandler = useCallback((data: any) => {
+    //     try {
+    //         const { id, profile, title, phone } = data
+    //         navigation.navigate('chattingScreen', {
+    //             name: title
+    //         })
+    //     } catch (err: any) {
+    //         console.log('[openChatHandler] Error : ', err.message)
+    //     }
+    // }, [navigation])
 
-    const renderItemHandler = useCallback((user) => {
-        try {
-            const {item, index} = user
-            const { id, profile, title, phone } = item
-            return (
-                <Pressable
-                    onPress={openChatHandler.bind(null, item)}
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        marginTop: 10,
-                        backgroundColor: colors.grey,
-                        borderRadius: 30,
-                        paddingVertical: 10,
-                        paddingHorizontal: 10
-                    }}
-                >
-                    <Image
-                        source={profile}
-                        style={{
-                            height: 36,
-                            width: 36
-                        }}
-                        resizeMode="contain"
-                    />
-                    <View style={{ marginLeft: 10 }}>
-                        <BoldText style={{ fontSize: 14 }}>{title}</BoldText>
-                        <RegularText style={{ fontSize: 11 }}>{phone}</RegularText>
-                    </View>
-                </Pressable>
-            )
-        } catch (err: any) {
-            console.log('Error : ', err.message)
-            return null
-        }
-    }, [openChatHandler])
+    // const renderItemHandler = useCallback((user) => {
+    //     try {
+    //         const {item, index} = user
+    //         const { id, profile, title, phone } = item
+    //         return (
+    //             <Pressable
+    //                 onPress={openChatHandler.bind(null, item)}
+    //                 style={{
+    //                     flexDirection: 'row',
+    //                     alignItems: 'center',
+    //                     marginTop: 10,
+    //                     backgroundColor: colors.grey,
+    //                     borderRadius: 30,
+    //                     paddingVertical: 10,
+    //                     paddingHorizontal: 10
+    //                 }}
+    //             >
+    //                 <Image
+    //                     source={profile}
+    //                     style={{
+    //                         height: 36,
+    //                         width: 36
+    //                     }}
+    //                     resizeMode="contain"
+    //                 />
+    //                 <View style={{ marginLeft: 10 }}>
+    //                     <BoldText style={{ fontSize: 14 }}>{title}</BoldText>
+    //                     <RegularText style={{ fontSize: 11 }}>{phone}</RegularText>
+    //                 </View>
+    //             </Pressable>
+    //         )
+    //     } catch (err: any) {
+    //         console.log('Error : ', err.message)
+    //         return null
+    //     }
+    // }, [openChatHandler])
 
-    const forceCloseBottomSheet = useCallback(() => {
-        bottomSheetModalRef.current?.close();
-    }, [])
+    // const forceCloseBottomSheet = useCallback(() => {
+    //     bottomSheetModalRef.current?.close();
+    // }, [])
 
-    const androidBackButtonPressHandler = useCallback(() => {
-        if (bottomSheetOpenStatusRef.current) {
-            forceCloseBottomSheet()
-            return true
-        } else {
-            return false
-        }
-    }, [])
+    // const androidBackButtonPressHandler = useCallback(() => {
+    //     if (bottomSheetOpenStatusRef.current) {
+    //         forceCloseBottomSheet()
+    //         return true
+    //     } else {
+    //         return false
+    //     }
+    // }, [])
 
-    useEffect(() => {
-        const backHandlerEvent = BackHandler.addEventListener("hardwareBackPress", androidBackButtonPressHandler)
-        return () => backHandlerEvent.remove()
-    }, [androidBackButtonPressHandler])
+    // useEffect(() => {
+    //     const backHandlerEvent = BackHandler.addEventListener("hardwareBackPress", androidBackButtonPressHandler)
+    //     return () => backHandlerEvent.remove()
+    // }, [androidBackButtonPressHandler])
 
-
-    const renderSuccessDialog = useMemo(() => {
-        return (
-            <BottomSheetModal
-                ref={bottomSheetModalRef}
-                index={0}
-                snapPoints={snapPoints}
-                onChange={handleSheetChanges}
-                // backdropComponent={CustomBackdrop}
-                backdropComponent={(props) => <CustomBackdrop {...props} onPress={forceCloseBottomSheet} />}
-                enablePanDownToClose={false}
-            >
-                <View   
-                    style={{
-                        flex: 1,
-                        minHeight: '100%',
-                    }}
-                >
-                    <Image
-                        source={images.ic_done}
-                        style={{
-                            height: 80,
-                            width: 80,
-                            alignSelf: 'center',
-                            marginVertical: 10
-                        }}
-                        resizeMode="contain"
-                    />
-                    <View style={{ flex: 1, padding: 20 }}>
-                        <BoldText style={{ textAlign: 'center' }}>{"Welcome, Soban 7443!"}</BoldText>
-                        <RegularText style={{ textAlign: 'center', marginVertical: 10 }}>
-                            {"It's great to have you on board.\nNotify us for approval"}
-                        </RegularText>
-                        <FlatList
-                            data={data}
-                            renderItem={renderItemHandler}
-                            keyExtractor={(item, index) => index.toString()}
-                        />
-                    </View>
-                    <RegularText style={{ fontSize: 11, textAlign: 'center' }}>{"Approval make take between up to 72 hours"}</RegularText>
-                    <RoundedButton
-                        text={"Fides * Quarrens * Intellectum"}
-                        onPress={closeBottomSheetHandler}
-                        style={{ borderRadius: 0 }}
-                    />
-                </View>
-            </BottomSheetModal>
-        )
-    }, [renderItemHandler, forceCloseBottomSheet])
+    // const renderSuccessDialog = useMemo(() => {
+    //     return (
+    //         <BottomSheetModal
+    //             ref={bottomSheetModalRef}
+    //             index={0}
+    //             snapPoints={snapPoints}
+    //             onChange={handleSheetChanges}
+    //             // backdropComponent={CustomBackdrop}
+    //             backdropComponent={(props) => <CustomBackdrop {...props} onPress={forceCloseBottomSheet} />}
+    //             enablePanDownToClose={false}
+    //         >
+    //             <View   
+    //                 style={{
+    //                     flex: 1,
+    //                     minHeight: '100%',
+    //                 }}
+    //             >
+    //                 <Image
+    //                     source={images.ic_done}
+    //                     style={{
+    //                         height: 80,
+    //                         width: 80,
+    //                         alignSelf: 'center',
+    //                         marginVertical: 10
+    //                     }}
+    //                     resizeMode="contain"
+    //                 />
+    //                 <View style={{ flex: 1, padding: 20 }}>
+    //                     <BoldText style={{ textAlign: 'center' }}>{"Welcome, Soban 7443!"}</BoldText>
+    //                     <RegularText style={{ textAlign: 'center', marginVertical: 10 }}>
+    //                         {"It's great to have you on board.\nNotify us for approval"}
+    //                     </RegularText>
+    //                     <FlatList
+    //                         data={data}
+    //                         renderItem={renderItemHandler}
+    //                         keyExtractor={(item, index) => index.toString()}
+    //                     />
+    //                 </View>
+    //                 <RegularText style={{ fontSize: 11, textAlign: 'center' }}>{"Approval make take between up to 72 hours"}</RegularText>
+    //                 <RoundedButton
+    //                     text={"Fides * Quarrens * Intellectum"}
+    //                     onPress={closeBottomSheetHandler}
+    //                     style={{ borderRadius: 0 }}
+    //                 />
+    //             </View>
+    //         </BottomSheetModal>
+    //     )
+    // }, [renderItemHandler, forceCloseBottomSheet])
 
     return (
-        <BottomSheetModalProvider>
-           {renderSuccessDialog}
+        // <BottomSheetModalProvider>
+        //    {/* {renderSuccessDialog} */}
             <BackgroundImageComp>
+                <AppLoader isVisible={isLoading} />
                 <View style={styles.root}>
                     <ScreenHeader
                         containerStyle={styles.headerContainer}
-                        logo={getRegionIcon(regionId)}
+                        logo={getRegionIcon()}
                         logoStyle={styles.logoStyle}
                         onBackPress={navigation.goBack}
                     />
@@ -310,7 +330,7 @@ const ConfirmRegistrationScreen = (props: any) => {
                     </View>
                 </View>
             </BackgroundImageComp>
-        </BottomSheetModalProvider>
+        // </BottomSheetModalProvider>
     )
 }
 
