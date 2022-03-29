@@ -7,7 +7,7 @@ import appConstants from '../constants/appConstants'
 const users = "users"
 const usersCollection = firestore().collection(users)
 
-const getCurrFirestoreTimeStamp = () => firestore.FieldValue.serverTimestamp()
+export const getCurrFirestoreTimeStamp = () => firestore.FieldValue.serverTimestamp()
 
 type UserAccDeails = {
     accId: string,
@@ -64,6 +64,11 @@ const useFirebase = () => {
                                 "id": "85",
                                 "name": "Mobile App Account Claimed",
                                 "value": true
+                            },
+                            {
+                                "id": "89",
+                                "name": "Mobile App Firebase UID",
+                                "value": uid
                             }
                         ]
                     }

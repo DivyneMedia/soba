@@ -1,8 +1,10 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
-import { FlatList, Image, Platform, Pressable, StyleSheet, TextInput, View }  from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, FlatList, Image, Platform, Pressable, StyleSheet, TextInput, View }  from 'react-native';
 import images from "../assets/images";
+import AppLoader from "../components/AppLoader";
 import ChatMessageItem from "../components/ChatMessageItem";
 import colors from "../constants/colors";
+import useChatHistory from "../hooks/useChatHistory";
 
 type ChatItem = {
     chatId: string,
@@ -95,14 +97,26 @@ type ChattingScreenProps = {
 }
 
 const ChattingScreen = (props: ChattingScreenProps) => {
-    const { navigation, route } = props
-    const { params } = route
-    const chatName = params?.name
+    const { navigation, route } = useMemo(() => props, [props]) 
+    const { params } = useMemo(() => route, [route])
+    const chatName = useMemo(() => params?.name, [params])
+    const chatChannelId = useMemo(() => params?.channelId, [params])
+    const chatSenderId = useMemo(() => params?.firebaseUid, [params])
+
+    const {
+        isLoading,
+        toggleLoader,
+        getChatHistory,
+        fetchMore,
+        messages,
+        endReached,
+        sendMessage
+    } = useChatHistory(chatChannelId, chatSenderId)
 
     const flatListRef = useRef(null)
 
     const [message, setMessage] = useState('')
-    
+
     useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: chatName
@@ -114,7 +128,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
             const { item: chatItem, index }: { item: ChatItem, index: number } = item
             return (
                 <ChatMessageItem
-                    currUserId="M4nChx1GjNdhDo2CXUhjDaZE9El1"
+                    currUserId={chatSenderId}
                     message={chatItem.message}
                     messageTime={chatItem.messageTime}
                     senderId={chatItem.senderId}
@@ -125,23 +139,45 @@ const ChattingScreen = (props: ChattingScreenProps) => {
             console.log('Error : ', err.message)
             return null
         }
-    }, [])
+    }, [chatSenderId])
+
+    const getChatMessagesHandler = useCallback(async () => {
+        try {
+            await getChatHistory()
+        } catch (err: any) {
+            console.log('Error : ', err.message)
+        }
+    }, [chatChannelId])
+
+    useEffect(() => {
+        getChatMessagesHandler()
+    }, [getChatMessagesHandler])
+
+    const sendMessageHandler = useCallback(() => {
+        sendMessage(message)
+        setMessage('')
+    }, [sendMessage, message])
 
     return (
         <View style={styles.root}>
+            <AppLoader isVisible={isLoading} />
             <FlatList
                 ref={flatListRef}
                 style={{flex: 1}}
                 keyExtractor={(item, index) => index.toString()}
                 inverted={true}
-                data={chatHistory}
+                data={messages}
                 // viewabilityConfig={viewConfigRef.current}
                 // onViewableItemsChanged={onViewRef.current}
                 onEndReachedThreshold={0.01}
-                // ListFooterComponent={() => {
-                //   return endReached ? null : <PaginationLoader />;
-                // }}
-                onEndReached={() => {}}
+                ListFooterComponent={() => {
+                  return endReached ? null : (
+                    <View style={{ height: 50, alignItems: 'center', justifyContent: 'center' }}>
+                        <ActivityIndicator size={"large"} color={colors.primary} />
+                    </View>
+                  );
+                }}
+                onEndReached={fetchMore}
                 renderItem={renderChatHandler}
             />
             <View
@@ -195,7 +231,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
                     }}
                 >
                     <Pressable
-                        onPress={() => {}}
+                        onPress={sendMessageHandler}
                         style={{
                             alignItems: 'center',
                             justifyContent: 'center',

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BackHandler, FlatList, Image, Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { BackHandler, FlatList, Image, Keyboard, Pressable, StyleSheet, TextInput, View, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from "react-redux";
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
@@ -20,12 +20,19 @@ import images from "../assets/images";
 import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
 import * as authActions from '../store/actions/AuthActions'
 import { USER } from "../types/UserResponse";
+import useChat from "../hooks/useChat";
 
 const LoginScreen = (props: any) => {
     const { navigation } = props
 
-    // **Redux Hooks
+    // **Hooks
     const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
+    const {
+        isLoading: firebaseLoading,
+        officialChats,
+        getAllOfficialChannelsHandler,
+        createChannelIdDoesNotExist
+    } = useChat()
     const dispatch = useDispatch()
 
     // **States
@@ -113,21 +120,44 @@ const LoginScreen = (props: any) => {
         bottomSheetOpenStatusRef.current = index !== -1
     }, []);
 
-    const openChatHandler = useCallback((data: any) => {
+    const openChatHandler = useCallback(async (data: any) => {
         try {
-            const { id, profile, title, phone } = data
-            navigation.navigate('chattingScreen', {
-                name: title
-            })
+            // navigation.navigate('chattingScreen', {
+            //     name
+            // })
+            // console.log(userData)
+            if (userData["Mobile App Firebase UID"] && data) {
+                const { id, profile, name, phone } = data
+                const firebaseUid = userData["Mobile App Firebase UID"]
+                const channelData = await createChannelIdDoesNotExist(firebaseUid, id)
+                if (channelData) {
+                    const {
+                        channelId,
+                        createdAt,
+                        isDeleted,
+                        updatedAt
+                    } = channelData
+
+                    navigation.navigate('chattingScreen', {
+                        name,
+                        channelId,
+                        firebaseUid
+                    })   
+                } else {
+                    ErrorToast(appConstants.SOMETHING_WENT_WRONG)
+                }
+            } else {
+                ErrorToast(appConstants.SOMETHING_WENT_WRONG)
+            }
         } catch (err: any) {
             console.log('[openChatHandler] Error : ', err.message)
         }
-    }, [navigation])
+    }, [navigation, userData])
 
     const renderItemHandler = useCallback((user) => {
         try {
             const {item, index} = user
-            const { id, profile, title, phone } = item
+            const { id, profile, name, phone } = item
             return (
                 <Pressable
                     onPress={openChatHandler.bind(null, item)}
@@ -142,7 +172,7 @@ const LoginScreen = (props: any) => {
                     }}
                 >
                     <Image
-                        source={profile}
+                        source={profile || images.ic_account}
                         style={{
                             height: 36,
                             width: 36
@@ -150,7 +180,7 @@ const LoginScreen = (props: any) => {
                         resizeMode="contain"
                     />
                     <View style={{ marginLeft: 10 }}>
-                        <BoldText style={{ fontSize: 14 }}>{title}</BoldText>
+                        <BoldText style={{ fontSize: 14 }}>{name}</BoldText>
                         <RegularText style={{ fontSize: 11 }}>{phone}</RegularText>
                     </View>
                 </Pressable>
@@ -190,48 +220,57 @@ const LoginScreen = (props: any) => {
                 backdropComponent={(props) => <CustomBackdrop {...props} onPress={forceCloseBottomSheet} />}
                 enablePanDownToClose={false}
             >
-                <View   
-                    style={{
-                        flex: 1,
-                        minHeight: '100%',
-                    }}
-                >
-                    <Image
-                        source={images.ic_done}
-                        style={{
-                            height: 80,
-                            width: 80,
-                            alignSelf: 'center',
-                            marginVertical: 10
-                        }}
-                        resizeMode="contain"
-                    />
-                    <View style={{ flex: 1, padding: 20 }}>
-                        <BoldText style={{ textAlign: 'center' }}>{`Hello, ${userData["Mobile App Username"]}!`}</BoldText>
-                        <RegularText style={{ textAlign: 'center', marginVertical: 10 }}>
-                            {"It's great to have you on board.\nNotify us for approval"}
-                        </RegularText>
-                        <FlatList
-                            data={data.chatAccounts}
-                            renderItem={renderItemHandler}
-                            keyExtractor={(item, index) => index.toString()}
-                        />
-                    </View>
-                    <RegularText style={{ fontSize: 11, textAlign: 'center' }}>
-                        {"Approval make take between up to 72 hours"}
-                    </RegularText>
-                    <RoundedButton
-                        text={"Fides * Quarrens * Intellectum"}
-                        onPress={closeBottomSheetHandler}
-                        style={{ borderRadius: 0 }}
-                    />
-                </View>
+                {
+                    firebaseLoading
+                    ?
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: "center" }}>
+                            <ActivityIndicator size={'large'} color={colors.primary} />
+                        </View>
+                    :
+                        <View
+                            style={{
+                                flex: 1,
+                                minHeight: '100%',
+                            }}
+                        >
+                            <Image
+                                source={images.ic_done}
+                                style={{
+                                    height: 80,
+                                    width: 80,
+                                    alignSelf: 'center',
+                                    marginVertical: 10
+                                }}
+                                resizeMode="contain"
+                            />
+                            <View style={{ flex: 1, padding: 20 }}>
+                                <BoldText style={{ textAlign: 'center' }}>{`Hello, ${userData["Mobile App Username"]}!`}</BoldText>
+                                <RegularText style={{ textAlign: 'center', marginVertical: 10 }}>
+                                    {"It's great to have you on board.\nNotify us for approval"}
+                                </RegularText>
+                                <FlatList
+                                    data={officialChats}
+                                    renderItem={renderItemHandler}
+                                    keyExtractor={(item, index) => index.toString()}
+                                />
+                            </View>
+                            <RegularText style={{ fontSize: 11, textAlign: 'center' }}>
+                                {"Approval make take between up to 72 hours"}
+                            </RegularText>
+                            <RoundedButton
+                                text={"Fides * Quarrens * Intellectum"}
+                                onPress={closeBottomSheetHandler}
+                                style={{ borderRadius: 0 }}
+                            />
+                        </View>    
+                }
             </BottomSheetModal>
         )
-    }, [renderItemHandler, forceCloseBottomSheet, userData])
+    }, [renderItemHandler, forceCloseBottomSheet, userData, firebaseLoading, officialChats])
 
     useEffect(() => { 
         if (userData && !userData["Mobile App Account Approved"]) {
+            getAllOfficialChannelsHandler()
             bottomSheetModalRef.current?.present();
         }
     }, [userData])

@@ -20,4 +20,12 @@ export default {
     TAB_VIDEO_LIB: 'TAB_VIDEO_LIB',
     TAB_GIFT_CARD: 'TAB_GIFT_CARD',
     TAB_ACCOUNT: 'TAB_ACCOUNT',
+
+    // CHAT
+    defaultChannels: 'defaultChannels',
+    privateChannel: 'privateChannel',
+    users: 'users',
+    chatMembersData: 'chatMembersData',
+    chatMessages: 'chatMessages',
+    chatMessagesFetchLimit: 15
 }
