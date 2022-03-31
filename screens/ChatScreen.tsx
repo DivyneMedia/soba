@@ -1,11 +1,15 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, Image, ImageRequireSource, Pressable, StyleSheet, View }  from 'react-native';
+import { useSelector } from "react-redux";
 import images from "../assets/images";
+import AppLoader from "../components/AppLoader";
 import BoldText from "../components/BoldText";
 import ChatTile, { ChatTileProps } from "../components/ChatTile";
 import RegularText from "../components/RegularText";
 import SearchBar from "../components/SearchBar";
 import colors from "../constants/colors";
+import useChat from "../hooks/useChat";
+import { USER } from "../types/UserResponse";
 import { SuccessToast } from "../utils/ToastUtils";
 
 const chatList = [
@@ -72,21 +76,42 @@ type ChatScreenProps = {
     route: any
 }
 
+const keyExtractHandler = (item: any, index: number) => index.toString()
+
 const ChatScreen = (props: ChatScreenProps) => {
     const { navigation } = props
+
+    const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
+    const isAdmin = useMemo(() => userData?.["Email 1"] === "admin@gmail.com", [userData?.["Email 1"]])
+
+    const {
+        getAllOfficialChannelsHandler,
+        isLoading,
+        officialChats,
+        toggleLoaderHandler
+    } = useChat()
     
     const [searchText, setSearchText] = useState('')
 
     const filterButtonPressHandler = useCallback(() => {}, [])
 
     const openChatHandler = useCallback((chatPayload: any) => {
-        const { id, lastSeen, name, profile, isGroup } = chatPayload
-        navigation.navigate('chattingScreen', {
+        console.log(chatPayload)
+        const { id, name, phone, profile } = chatPayload
+        navigation.navigate('chatRequestsScreen', {
             id,
-            lastSeen,
             name,
+            phone,
             profile
         })
+        // return
+        // const { id, lastSeen, name, profile, isGroup } = chatPayload
+        // navigation.navigate('chattingScreen', {
+        //     id,
+        //     lastSeen,
+        //     name,
+        //     profile
+        // })
     }, [navigation])
 
     const favoriteChatHander = useCallback((chatPayload: any) => {
@@ -102,7 +127,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                     id={id}
                     lastSeen={lastSeen}
                     name={name}
-                    profile={profile}
+                    profile={profile || images.ic_user}
                     onOpen={openChatHandler.bind(null, chat)}
                     onFavPress={isGroup ? favoriteChatHander.bind(null, chat) : null}
                 />
@@ -113,16 +138,23 @@ const ChatScreen = (props: ChatScreenProps) => {
         }
     }, [])
 
+    useEffect(() => {
+        if (isAdmin) {
+            getAllOfficialChannelsHandler()
+        }
+    }, [isAdmin])
+
     return (
         <View style={styles.root}>
+            <AppLoader isVisible={isLoading} />
             <SearchBar
                 value={searchText}
                 onChangeText={setSearchText}
                 onFilterButtonPress={filterButtonPressHandler}
             />
             <FlatList
-                data={chatList}
-                keyExtractor={(item, index) => index.toString()}
+                data={isAdmin ? officialChats : chatList}
+                keyExtractor={keyExtractHandler}
                 renderItem={renderChatListHandler}
             />
         </View>

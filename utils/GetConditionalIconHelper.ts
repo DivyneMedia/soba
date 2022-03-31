@@ -1,6 +1,6 @@
 import images from "../assets/images"
 
-export const getRegionIcon = (regionId: number) => {
+export const getRegionIcon = (/* regionId: number */) => {
     return images.ic_soba_america
     // switch (regionId) {
     //     case 0:

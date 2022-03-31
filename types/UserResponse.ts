@@ -43,6 +43,7 @@ export type USER = {
     "Last Name": STRING_NULL,
     "Mobile App Account Approved": STRING_NULL,
     "Mobile App Firebase UID": STRING_NULL,
+    "State/Province": STRING_NULL
 }
 
 export type UserRespose = {

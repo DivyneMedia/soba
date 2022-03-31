@@ -7,6 +7,7 @@ import UserAccountApproveNavigator from './UserAccountApproveNavigator';
 
 import { useSelector } from 'react-redux';
 import { USER } from '../types/UserResponse';
+import AdminNavigator from './AdminNavigator';
 
 type UserPayload = {
   userData: USER
@@ -25,7 +26,9 @@ const RootNavigator = () => {
         : <AuthNavigation />
       } */}
       {
-        userData?.['Account ID'] && userData?.['Mobile App Account Approved']
+        userData?.['Email 1'] === "admin@gmail.com"
+        ? <AdminNavigator />
+        : userData?.['Account ID'] && userData?.['Mobile App Account Approved']
           ? <MainNavigator />
           : <AuthNavigation />
       }

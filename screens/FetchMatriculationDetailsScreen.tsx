@@ -62,11 +62,14 @@ const FetchMatriculationDetailsScreen = (props: any) => {
             const dob = moment(`${date}-${month}-${year}`, "D-M-YYYY")
             navigation.navigate('enterContactInformation', {
                 accId: userBasicInfo?.searchResults[0]["Account ID"],
-                phoneNumber: userBasicInfo?.searchResults[0]["Phone 1 Number"]?.split('-').join('').split(' ').join(''),
+                phoneNumber: userBasicInfo?.searchResults[0]["Phone 1 Full Number (F)"]?.split('-').join('').split(' ').join(''),
                 callingCode: userBasicInfo?.searchResults[0]["Phone 1 Area Code"],
                 email: userBasicInfo?.searchResults[0]["Email 1"],
                 dob: dob.unix() * 1000,
                 address: userBasicInfo?.searchResults[0]["Full Street Address (F)"],
+                state: userBasicInfo?.searchResults[0]["State/Province"],
+                city: userBasicInfo?.searchResults[0].City,
+                zipCode: userBasicInfo?.searchResults[0]["Full Zip Code (F)"]?.split('-').join('').split(' ').join('')
             })
         } catch (err: any) {
             console.log('[nextPressHandler] Error : ', err?.message)

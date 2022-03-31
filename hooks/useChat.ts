@@ -4,9 +4,6 @@ import firestore from '@react-native-firebase/firestore'
 import appConstants from '../constants/appConstants'
 import { getCurrFirestoreTimeStamp } from './useFirebase'
 
-type useChatProps = {
-}
-
 const useChat = () => {
     // **States
     const [isLoading, setLoading] = useState(false)
@@ -49,7 +46,11 @@ const useChat = () => {
                     channelId,
                     createdAt: getCurrFirestoreTimeStamp(),
                     updatedAt: getCurrFirestoreTimeStamp(),
-                    isDeleted: false 
+                    isDeleted: false,
+                    lastMessage: '',
+                    lastMessageType: 'text',
+                    memberIds: [userId, chatId],
+                    senderId: userId
                 }
                 await firestore().collection(appConstants.privateChannel).doc(channelId).set(data)
                 await firestore()
@@ -89,7 +90,7 @@ const useChat = () => {
         officialChats,
         toggleLoaderHandler,
         getAllOfficialChannelsHandler,
-        createChannelIdDoesNotExist
+        createChannelIdDoesNotExist,
     }
 }
 

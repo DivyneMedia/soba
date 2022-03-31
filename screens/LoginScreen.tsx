@@ -244,7 +244,7 @@ const LoginScreen = (props: any) => {
                                 resizeMode="contain"
                             />
                             <View style={{ flex: 1, padding: 20 }}>
-                                <BoldText style={{ textAlign: 'center' }}>{`Hello, ${userData["Mobile App Username"]}!`}</BoldText>
+                                <BoldText style={{ textAlign: 'center' }}>{`Hello, ${userData?.["Mobile App Username"] ?? "User"}!`}</BoldText>
                                 <RegularText style={{ textAlign: 'center', marginVertical: 10 }}>
                                     {"It's great to have you on board.\nNotify us for approval"}
                                 </RegularText>

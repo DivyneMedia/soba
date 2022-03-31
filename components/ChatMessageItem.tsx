@@ -4,6 +4,7 @@ import {View} from 'react-native';
 import colors from '../constants/colors';
 import BoldText from './BoldText';
 import RegularText from './RegularText';
+import moment from 'moment'
 
 type ChatMessageItemProps = {
     currUserId: string
@@ -46,7 +47,7 @@ const ChatMessageItem = (props: ChatMessageItemProps) => {
               </RegularText>
                 <View style={{alignSelf: 'flex-end', marginTop: 5}}>
                     <RegularText style={{fontSize: 10}}>
-                        {"08:30"}
+                        {moment(messageTime * 1000).format("hh:mm A")}
                     </RegularText>
                 </View>
             </View>
@@ -75,7 +76,7 @@ const ChatMessageItem = (props: ChatMessageItemProps) => {
                 </RegularText>
                 <View style={{alignSelf: 'flex-end', marginTop: 5}}>
                     <RegularText style={{fontSize: 10, color: colors.white}}>
-                        {"08:30"}
+                        {moment(messageTime * 1000).format("hh:mm A")}
                     </RegularText>
                 </View>
               </View>
