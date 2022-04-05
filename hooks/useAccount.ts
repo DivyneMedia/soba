@@ -59,8 +59,8 @@ const useAccount = () => {
                         },
                         {
                             "field": "Mobile App Account Claimed",
-                            "operator": "EQUAL",
-                            "value": false
+                            "operator": "NOT_EQUAL",
+                            "value": "true"
                         }
                     ]
                 })

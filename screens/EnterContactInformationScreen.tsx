@@ -40,7 +40,7 @@ type RouteParams = {
 const EnterContactInformation = (props: any) => {
     const { navigation, route } = props
     const params: RouteParams = route.params
-    console.log(params)
+    // console.log(params)
 
     // **States
     const [callingCode, setCallingCode] = useState(__DEV__ ? '+91' : '+1') // useState(params?.callingCode ? `+${params?.callingCode}` : '+91')
@@ -101,7 +101,7 @@ const EnterContactInformation = (props: any) => {
                 return
             }
 
-            setLoading(true)
+            // setLoading(true)
             // if (
             //     params.address !== address ||
             //     params.city !== city ||
@@ -120,17 +120,19 @@ const EnterContactInformation = (props: any) => {
             //         throw new Error("Error at updating profile")
             //     }
             // }
-            const confirmation = await auth().signInWithPhoneNumber(`${callingCode} ${phone}`)
+            // const confirmation = await auth().signInWithPhoneNumber(`${callingCode} ${phone}`)
             navigation.navigate("otpScreen", {
                 accId: params?.accId,
-                confirmation
+                callingCode,
+                phone,
             })
         } catch (err: any) {
+            console.log(err.message)
             ErrorToast(appConstants.SOMETHING_WENT_WRONG)
         } finally {
             mountedRef.current && setLoading(false)
         }
-    }, [navigation, isDataValid, callingCode, phone, params, address, city, ])
+    }, [navigation, isDataValid, callingCode, phone, params])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {

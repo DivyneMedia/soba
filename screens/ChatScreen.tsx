@@ -127,7 +127,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                     id={id}
                     lastSeen={lastSeen}
                     name={name}
-                    profile={profile || images.ic_user}
+                    profile={profile || images.ic_soba_america}
                     onOpen={openChatHandler.bind(null, chat)}
                     onFavPress={isGroup ? favoriteChatHander.bind(null, chat) : null}
                 />

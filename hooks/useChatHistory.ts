@@ -2,11 +2,15 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import firestore from '@react-native-firebase/firestore'
 import appConstants from '../constants/appConstants'
 
+var unsubscribeChat: any = null
+var lastMessageTime: any = null
+
 const useChatHistory = (channelId: string, senderId: string) => {
     // **States
     const [isLoading, setLoading] = useState(false)
     const [endReached, setEndReached] = useState(true)
     const [messages, setMessages] = useState<any[]>([])
+    const [init, setInit] = useState(false)
 
     // **Refs
     const mountedRef = useRef(false)
@@ -16,12 +20,53 @@ const useChatHistory = (channelId: string, senderId: string) => {
         mountedRef.current && setLoading(status)
     }, [])
 
+    const setListener = useCallback(() => {
+        unsubscribeChat = firestore()
+            .collection(appConstants.privateChannel)
+            .doc(channelId)
+            .collection(appConstants.chatMessages)
+            .orderBy('messageTime', 'desc')
+            .where("messageTime", ">", lastMessageTime)
+            .onSnapshot((snapShot) => {
+                let newMessage: any[] = []
+                snapShot.docs.forEach(doc => {
+                    if (doc.exists) {
+                        const docData = doc.data()
+                        if (docData?.senderId !== senderId){
+                            newMessage.push(docData)
+                            lastMessageTime = docData.messageTime
+                        }
+                    }
+                })
+                setMessages(prevState => {
+                    return [...newMessage, ...prevState]
+                })
+            })
+    }, [channelId, senderId])
+
+    const removeListener = useCallback(() => {
+        if (unsubscribeChat) {
+            unsubscribeChat()
+        }
+    }, [])
+
     useEffect(() => {
         mountedRef.current = true
         return () => {
             mountedRef.current = false
         }
     }, [])
+
+    useEffect(() => {
+        return removeListener
+    }, [removeListener])
+
+    useEffect(() => {
+        if(messages.length) {
+            removeListener()
+            setListener()
+        }
+    }, [messages])
 
     const getChatHistory = useCallback(async () => {
         try {
@@ -41,14 +86,17 @@ const useChatHistory = (channelId: string, senderId: string) => {
                 } else {
                     paginationRef.current = null
                 }
-                setMessages(getHistoryRes.docs.map(chat => chat.data()))
+                const messagesObj = getHistoryRes.docs.map(chat => chat.data())
+                lastMessageTime = messagesObj[0].messageTime+1
+                setMessages(messagesObj)
+                setListener()
             }
         } catch (err: any) {
             console.log('[getChatHistory] Error : ', err.message)
         } finally {
             toggleLoader(false)
         }
-    }, [])
+    }, [setListener])
 
     const fetchMore = useCallback(async () => {
         try {
@@ -93,13 +141,18 @@ const useChatHistory = (channelId: string, senderId: string) => {
             const messageData = {
                 chatId: newDocId,
                 isDeleted: false,
-                message: messageText,
+                message: messageText.trim(),
                 messageType: 'text',
                 messageTime: Math.floor(new Date().getTime() / 1000),
                 senderId
             }
 
             await chatMessagesRef.doc(newDocId).set(messageData)
+
+            await firestore().collection(appConstants.privateChannel).doc(channelId).update({
+                lastMessage: messageText.trim(),
+                updatedAt: firestore.FieldValue.serverTimestamp()
+            })
 
             setMessages(prevState => [messageData, ...prevState])
 

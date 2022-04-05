@@ -8,6 +8,7 @@ import images from "../assets/images";
 import { promiseAlertHandler } from "../utils/AlertHandler";
 import { useDispatch } from "react-redux";
 import { logout } from '../store/actions/AuthActions'
+import AccApproveRequest from "../screens/AccApproveRequest";
 
 const Stack = createNativeStackNavigator()
 
@@ -53,23 +54,31 @@ const UserAccountApproveNavigator = (props: any) => {
 
     return (
         <Stack.Navigator
-          initialRouteName={"chatScreen"}
+          initialRouteName={"accApproveRequest"}
         >
-            <Stack.Screen
-              name="chatScreen"
-              component={ChatScreen}
-              options={{
-                headerTitle: 'Approve Request',
-                headerRight: () => <HeaderLogoutButton onLogout={logoutHandler} />
-              }}
-            />
-            <Stack.Screen
-              name="chattingScreen"
-              component={ChattingScreen}
-              options={{
-                headerTitle: 'Chat',
-              }}
-            />
+          <Stack.Screen
+            name="accApproveRequest"
+            component={AccApproveRequest}
+            options={{
+              headerTitle: 'Approve Request',
+              headerRight: () => <HeaderLogoutButton onLogout={logoutHandler} />
+            }}
+          />
+          <Stack.Screen
+            name="chatScreen"
+            component={ChatScreen}
+            options={{
+              headerTitle: 'Approve Request',
+              headerRight: () => <HeaderLogoutButton onLogout={logoutHandler} />
+            }}
+          />
+          <Stack.Screen
+            name="chattingScreen"
+            component={ChattingScreen}
+            options={{
+              headerTitle: 'Chat',
+            }}
+          />
         </Stack.Navigator>
     )
 }

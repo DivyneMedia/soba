@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { FlatList, StyleSheet, View } from 'react-native'
 import ChatTile from '../components/ChatTile'
 import colors from '../constants/colors'
@@ -7,6 +7,8 @@ import firestore from '@react-native-firebase/firestore'
 import appConstants from '../constants/appConstants'
 import images from '../assets/images'
 import AppLoader from '../components/AppLoader'
+import { ErrorToast } from '../utils/ToastUtils'
+import BoldText from '../components/BoldText'
 
 type RouteProps = {
     params: {
@@ -63,26 +65,33 @@ const ChatRequestsScreen = (props: ChatRequestsScreenProps) => {
 
     const getAvailableChatsHandler = useCallback(async () => {
         try {
+            setLoading(true)
             const channels = await firestore()
                 .collection(appConstants.privateChannel)
                 .where("memberIds", "array-contains", id)
                 .where("isDeleted", "!=", true)
                 .get()
 
-            const tempData = channels.docs.map((channel: any) => channel.data())
-            const dataWithUserName = await Promise.all(
-                await tempData.map(async (item) => {
-                    const userId = item.memberIds.filter((mid: string) => mid !== id)[0]
-                    const userName = await getUserName(userId)
-                    return {
-                        ...item,
-                        userName
-                    }
-                })
-            )
-            setData(dataWithUserName)
+
+            if (channels.docs.length) {
+                const tempData = channels.docs.map((channel: any) => channel.data())
+                const dataWithUserName = await Promise.all(
+                    await tempData.map(async (item) => {
+                        const userId = item.memberIds.filter((mid: string) => mid !== id)[0]
+                        const userName = await getUserName(userId)
+                        return {
+                            ...item,
+                            userName
+                        }
+                    })
+                )
+                setData(dataWithUserName)
+            }
         } catch (err: any) {
             console.log('[getAvailableChatsHandler] Error : ', err.message)
+            ErrorToast(appConstants.SOMETHING_WENT_WRONG)
+        } finally {
+            setLoading(false)
         }
     }, [id])
 
@@ -103,8 +112,8 @@ const ChatRequestsScreen = (props: ChatRequestsScreenProps) => {
             const { item, index }: { item: ChatChannel, index: number } = obj
             return (
                 <ChatTile
-                    id={+item.channelId}
-                    lastSeen={""}
+                    id={item.channelId}
+                    lastSeen={item.lastMessage}
                     name={item?.userName ?? "No Name"}
                     onFavPress={null}
                     onOpen={openChatHistoryHandler.bind(null, item.userName, item.channelId, id)}
@@ -119,6 +128,14 @@ const ChatRequestsScreen = (props: ChatRequestsScreenProps) => {
         }
     }, [])
 
+    const renderListEmptyComponent = useMemo(() => {
+        return (
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <BoldText>{isLoading ? "Syncing data..." : "No chats available."}</BoldText>
+            </View>
+        )
+    }, [isLoading])
+
     return (
         <View style={styles.root}>
             <AppLoader isVisible={isLoading} />
@@ -126,6 +143,9 @@ const ChatRequestsScreen = (props: ChatRequestsScreenProps) => {
                 data={data}
                 renderItem={renderChatsHandler}
                 keyExtractor={keyExtractorHandler}
+                style={{ flex: 1 }}
+                contentContainerStyle={{ minHeight: "100%", minWidth: "100%" }}
+                ListEmptyComponent={renderListEmptyComponent}
             />
         </View>
     )

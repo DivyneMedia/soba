@@ -5,7 +5,7 @@ import BoldText from "./BoldText";
 import RegularText from "./RegularText";
 
 export type ChatTileProps = {
-    id: number
+    id: number | string
     profile: ImageRequireSource
     name: string
     lastSeen: string
@@ -32,7 +32,7 @@ const ChatTile = (props: ChatTileProps) => {
                 resizeMode="contain" />
             <View style={{ flex: 1, marginLeft: 10, alignItems: 'flex-start', justifyContent: 'center' }}>
                 <BoldText style={{ fontSize: 12 }}>{name}</BoldText>
-                <RegularText style={{ fontSize: 10 }}>{lastSeen}</RegularText>
+                {lastSeen ? <RegularText style={{ fontSize: 10 }}>{lastSeen}</RegularText> : null}
             </View>
             {
                 typeof onFavPress === "function"

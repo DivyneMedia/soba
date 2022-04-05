@@ -18,20 +18,20 @@ const RootNavigator = () => {
 
   return (
     <NavigationContainer>
-      {/* {
+      {
         userData?.['Account ID']
         ? userData?.['Account ID'] && !userData?.['Mobile App Account Approved']
           ? <UserAccountApproveNavigator />
           : <MainNavigator />
         : <AuthNavigation />
-      } */}
-      {
+      }
+      {/* {
         userData?.['Email 1'] === "admin@gmail.com"
         ? <AdminNavigator />
         : userData?.['Account ID'] && userData?.['Mobile App Account Approved']
           ? <MainNavigator />
           : <AuthNavigation />
-      }
+      } */}
     </NavigationContainer>
   );
 }

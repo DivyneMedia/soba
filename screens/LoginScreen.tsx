@@ -36,8 +36,8 @@ const LoginScreen = (props: any) => {
     const dispatch = useDispatch()
 
     // **States
-    const [email, setEmail] = useState('tndime')
-    const [password, setPassword] = useState('123456')
+    const [email, setEmail] = useState(__DEV__ ? 'tndime' : '')
+    const [password, setPassword] = useState(__DEV__ ? '123456' : '')
     const [isLoading, setLoading] = useState(false)
 
     // **Refs
