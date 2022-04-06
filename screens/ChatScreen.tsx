@@ -7,6 +7,7 @@ import BoldText from "../components/BoldText";
 import ChatTile, { ChatTileProps } from "../components/ChatTile";
 import RegularText from "../components/RegularText";
 import SearchBar from "../components/SearchBar";
+import TextButton from "../components/TextButton";
 import colors from "../constants/colors";
 import useChat from "../hooks/useChat";
 import { USER } from "../types/UserResponse";
@@ -92,6 +93,7 @@ const ChatScreen = (props: ChatScreenProps) => {
     } = useChat()
     
     const [searchText, setSearchText] = useState('')
+    const [approvals, setApprovals] = useState(false)
 
     const filterButtonPressHandler = useCallback(() => {}, [])
 
@@ -152,6 +154,18 @@ const ChatScreen = (props: ChatScreenProps) => {
                 onChangeText={setSearchText}
                 onFilterButtonPress={filterButtonPressHandler}
             />
+            <View style={styles.newsFeedEventButtonContainer}>
+                <TextButton
+                    isSelected={!approvals}
+                    text="Chats"
+                    onPress={setApprovals.bind(null, false)}
+                />
+                <TextButton
+                    isSelected={approvals}
+                    text="Approvals"
+                    onPress={setApprovals.bind(null, true)}
+                />
+            </View>
             <FlatList
                 data={isAdmin ? officialChats : chatList}
                 keyExtractor={keyExtractHandler}
@@ -165,7 +179,16 @@ const styles = StyleSheet.create({
     root: {
         flex: 1,
         backgroundColor: colors.white
-    }
+    },
+    newsFeedEventButtonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colors.grey,
+        height: 50,
+        marginHorizontal: 10,
+        borderRadius: 10,
+        overflow: 'hidden'
+    },
 })
 
 export default ChatScreen

@@ -1,10 +1,16 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Platform, Pressable, StyleSheet, TextInput, View }  from 'react-native';
+import { useSelector } from "react-redux";
 import images from "../assets/images";
 import AppLoader from "../components/AppLoader";
 import ChatMessageItem from "../components/ChatMessageItem";
+import RegularText from "../components/RegularText";
+import appConstants from "../constants/appConstants";
 import colors from "../constants/colors";
+import useAccount from "../hooks/useAccount";
 import useChatHistory from "../hooks/useChatHistory";
+import { USER } from "../types/UserResponse";
+import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
 
 type ChatItem = {
     chatId: string,
@@ -99,9 +105,12 @@ type ChattingScreenProps = {
 const ChattingScreen = (props: ChattingScreenProps) => {
     const { navigation, route } = useMemo(() => props, [props]) 
     const { params } = useMemo(() => route, [route])
+    const showApproveBtn = useMemo(() => params?.showApproveBtn, [params])
     const chatName = useMemo(() => params?.name, [params])
     const chatChannelId = useMemo(() => params?.channelId, [params])
     const chatSenderId = useMemo(() => params?.firebaseUid, [params])
+
+    const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
 
     const {
         isLoading,
@@ -113,15 +122,49 @@ const ChattingScreen = (props: ChattingScreenProps) => {
         sendMessage
     } = useChatHistory(chatChannelId, chatSenderId)
 
+    const {
+        approveUserAcc,
+        isLoading: accountLoading
+    } = useAccount()
+
+    // ** Refs
     const flatListRef = useRef(null)
 
+    // ** State
     const [message, setMessage] = useState('')
+
+    const approveAccHandler = useCallback(async () => {
+        try {
+            if (userData?.["Account ID"]) {
+                await approveUserAcc(+userData?.["Account ID"])
+                SuccessToast('Account Approved succfully.')
+            } else {
+                throw new Error('Cannot approve account please try again.')
+            }
+        } catch (err: any)  {
+            console.log('Error : ', err?.message)
+            ErrorToast(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
+        }
+    }, [userData?.["Account ID"]])
+
+    const renderApproveBtnHandler = useCallback(() => {
+        return (
+            <Pressable
+                onPress={approveAccHandler}
+            >
+                <RegularText>
+                    {"Approve"}
+                </RegularText>
+            </Pressable>
+        )
+    }, [approveAccHandler])
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: chatName
+            headerTitle: chatName,
+            headerRight: showApproveBtn ? renderApproveBtnHandler : null
         })
-    }, [navigation])
+    }, [navigation, showApproveBtn, renderApproveBtnHandler])
 
     const renderChatHandler = useCallback((item: any) => {
         try {
@@ -160,7 +203,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
 
     return (
         <View style={styles.root}>
-            <AppLoader isVisible={isLoading} />
+            <AppLoader isVisible={isLoading || accountLoading} />
             <FlatList
                 ref={flatListRef}
                 style={{flex: 1}}

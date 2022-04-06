@@ -81,8 +81,54 @@ const useAccount = () => {
         }
     }, [])
 
+    const approveUserAcc = useCallback(async (accountId: number) => {
+        try {
+            toggleLoader(true)
+            let accUpdateRes: AxiosResponse<any>
+            try {
+                accUpdateRes =
+                    await axios.patch(`/accounts/${accountId}`, {
+                    "individualAccount": {
+                        "accountCustomFields": [
+                            {
+                                "id": "88",
+                                "name": "Mobile App Account Approved",
+                                "status": "ACTIVE",
+                                "optionValues": [
+                                    {
+                                        "id": "46",
+                                        "name": "No"
+                                    },
+                                    {
+                                        "id": "47",
+                                        "name": "Yes"
+                                    }
+                                ],
+                                "value": "Yes"
+                            }
+                        ]
+                    }
+                })
+            } catch(err: unknown | AxiosError<any, any>) {
+                // throw new Error(err.response)
+                throw new Error(appConstants.SOMETHING_WENT_WRONG)
+            }
+
+            if (!accUpdateRes.data) {
+                throw new Error("Cannot approve account.")
+            }
+            return accUpdateRes.data
+        } catch (err: any) {
+            console.log('[approveUserAcc] Error : ', err?.message)
+            throw new Error(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
+        } finally {
+            toggleLoader(false)
+        }
+    }, [])
+
     return {
         isLoading,
+        approveUserAcc,
         getUserByAccountId,
         getAvailableChapters
     }

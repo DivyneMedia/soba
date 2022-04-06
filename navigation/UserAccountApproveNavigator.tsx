@@ -9,6 +9,7 @@ import { promiseAlertHandler } from "../utils/AlertHandler";
 import { useDispatch } from "react-redux";
 import { logout } from '../store/actions/AuthActions'
 import AccApproveRequest from "../screens/AccApproveRequest";
+import RegularText from "../components/RegularText";
 
 const Stack = createNativeStackNavigator()
 
@@ -76,7 +77,10 @@ const UserAccountApproveNavigator = (props: any) => {
             name="chattingScreen"
             component={ChattingScreen}
             options={{
-              headerTitle: 'Chat',
+              headerTitle: 'Chat'
+            }}
+            initialParams={{
+              showApproveBtn: true
             }}
           />
         </Stack.Navigator>
