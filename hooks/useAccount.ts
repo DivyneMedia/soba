@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import axios from '../axios.auth'
 import appConstants from '../constants/appConstants'
-import { userPayload } from '../model/UserData'
+import { UPDATE_USER_PAYLOAD, userPayload } from '../model/UserData'
 import { BASE_CUSTOM_FIELD_RESPONSE, OPTION_VALUES, UserRespose } from '../types/UserResponse'
 
 const useAccount = () => {
@@ -126,11 +126,88 @@ const useAccount = () => {
         }
     }, [])
 
+    const getUserAccountDetails = useCallback(async (crmId: any) => {
+        try {
+            toggleLoader(true)
+            let userAccountDetails: AxiosResponse<any>
+            try {
+                userAccountDetails = await axios.get('/accounts/' + crmId)
+            } catch(err: unknown | AxiosError<any, any>) {
+                // throw new Error(err.response)
+                throw new Error(appConstants.SOMETHING_WENT_WRONG)
+            }
+
+            if (!userAccountDetails) {
+                throw new Error(appConstants.SOMETHING_WENT_WRONG)
+            }
+
+            return userAccountDetails.data
+        } catch (err: any) {
+            console.log('[getUserAccountDetails] Error : ', err?.message)
+            throw new Error(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
+        } finally {
+            toggleLoader(false)
+        }
+    }, [])
+
+    const updateUserAccountDetails = useCallback(async (crmId: any, userPayload: UPDATE_USER_PAYLOAD) => {
+        try {
+            toggleLoader(true)
+            let updateUserAccountDetailsRes: AxiosResponse<any>
+            try {
+                console.log('userPayload : ', userPayload)
+
+                updateUserAccountDetailsRes = await axios.patch('/accounts/' + crmId,  {
+                    "individualAccount": {
+                        "primaryContact": {
+                            "dob": {
+                                "day": userPayload.date,
+                                "month": userPayload.month,
+                                "year": userPayload.year
+                            },
+                            "email1": userPayload.email,
+                            "addresses": [
+                                {
+                                    "addressId": userPayload.primaryAddressId,
+                                    "addressLine1": userPayload.addressLine1,
+                                    "city": userPayload.city,
+                                    "county": userPayload.county,
+                                    "zipCode": userPayload.zipCode,
+                                    "zipCodeSuffix": "3188",
+                                    "phone1": userPayload.phone
+                                }
+                            ]
+                        }
+                    }
+                })
+
+                if (!updateUserAccountDetailsRes) {
+                    throw new Error(appConstants.SOMETHING_WENT_WRONG)
+                }
+
+                console.log('updateUserAccountDetailsRes.data : ', updateUserAccountDetailsRes.data)
+    
+                return updateUserAccountDetailsRes.data
+            } catch(err: unknown | AxiosError<any, any>) {
+                // throw new Error(err.response)
+                console.log('[updateUserAccountDetails] Error : ', err?.response?.data ?? err?.message ?? appConstants.SOMETHING_WENT_WRONG)
+                throw new Error(appConstants.SOMETHING_WENT_WRONG)
+            } finally {
+                toggleLoader(false)
+            }
+        } catch (err: any) {
+            console.log('[updateUserAccountDetails] Error : ', err?.message)
+            throw new Error(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
+        }
+    }, [])
+
     return {
         isLoading,
         approveUserAcc,
         getUserByAccountId,
-        getAvailableChapters
+        getAvailableChapters,
+        getUserAccountDetails,
+        updateUserAccountDetails
     }
 }
 

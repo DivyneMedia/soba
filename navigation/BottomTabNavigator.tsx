@@ -100,7 +100,6 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
                 options={({ navigation, route }) => {
                     // const activeRouteName = getActiveRouteName(navigation, 'home')
                     const focused = getActiveRouteName(navigation, 0)
-                    console.log(route)
                     return {
                         tabBarButton: (props: any) => {
                             return (

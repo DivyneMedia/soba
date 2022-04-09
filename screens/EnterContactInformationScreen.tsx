@@ -22,6 +22,9 @@ import { ErrorToast } from "../utils/ToastUtils";
 import moment from "moment";
 import AppLoader from "../components/AppLoader";
 import { AxiosError } from "axios";
+import useAccount from "../hooks/useAccount";
+import { useSelector } from "react-redux";
+import { USER_DETAILS } from "../model/UserData";
 
 type STRING_UNDEFINED = string | undefined
 
@@ -41,6 +44,13 @@ const EnterContactInformation = (props: any) => {
     const { navigation, route } = props
     const params: RouteParams = route.params
     // console.log(params)
+    
+    // **Hooks
+    const {
+        isLoading: accountLoading,
+        getUserAccountDetails,
+        updateUserAccountDetails
+    } = useAccount()
 
     // **States
     const [callingCode, setCallingCode] = useState(__DEV__ ? '+91' : '+1') // useState(params?.callingCode ? `+${params?.callingCode}` : '+91')
@@ -54,6 +64,8 @@ const EnterContactInformation = (props: any) => {
     
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isLoading, setLoading] = useState(false);
+
+    const [userDetails, setUserDetails] = useState<USER_DETAILS | null>(null)
 
     // **Refs
     const mountedRef = useRef(false)
@@ -70,6 +82,33 @@ const EnterContactInformation = (props: any) => {
             mountedRef.current = false
         }
     }, [])
+
+    useEffect(() => {
+        getUserAccountDetails(params.accId)
+        .then((userDetailsRes) => {
+            setUserDetails(userDetailsRes)
+        })
+        .catch((err: any) => {
+            console.log('Error : ', err.message)
+        })
+    }, [getUserAccountDetails, params.accId])
+
+    useEffect(() => {
+        if (userDetails) {
+            const userAddress = userDetails.individualAccount.primaryContact.addresses.filter(addressData => addressData.isPrimaryAddress)
+            // phone
+            // email
+            // dob
+            // address
+            // city
+            // zipcode
+            if (userAddress.length) {
+                setAddress(userAddress[0].addressLine1)
+                setCity(userAddress[0].city)
+                setZipcode(userAddress[0].zipCodeSuffix + userAddress[0].zipCode)
+            }
+        }
+    }, [userDetails])
 
     const isDataValid = useCallback((showError = false) => {
         if (!phone || !phone.trim()) {
@@ -101,26 +140,31 @@ const EnterContactInformation = (props: any) => {
                 return
             }
 
-            // setLoading(true)
-            // if (
-            //     params.address !== address ||
-            //     params.city !== city ||
-            //     params.dob !== dob ||
-            //     params.email !== email ||
-            //     params.state !== state ||
-            //     params.zipCode !== zipcode
-            //     // ||
-            //     // params.phoneNumber !== phone
-            // ) {
-            //     try {
-            //         const updateProfileRes = await axios.patch(`accounts/${params?.accId}`, {
+            if (
+                phone !== params.phoneNumber ||
+                email !== params?.email ||
+                dob !== params?.dob ||
+                address !== params?.address ||
+                city !== params?.city ||
+                zipcode !== params?.zipCode
+            ) {
 
-            //         })
-            //     } catch (err: any | AxiosError<any>) {
-            //         throw new Error("Error at updating profile")
-            //     }
-            // }
-            // const confirmation = await auth().signInWithPhoneNumber(`${callingCode} ${phone}`)
+                const formattedDate = moment(dob).format('DD/MM/YYYY').split('/')
+
+                await updateUserAccountDetails(params.accId, {
+                    addressLine1: address,
+                    city: city,
+                    county: '',
+                    email: email,
+                    phone: phone,
+                    date: formattedDate[0],
+                    month: formattedDate[1],
+                    year: formattedDate[2],
+                    primaryAddressId: userDetails?.individualAccount.primaryContact.addresses.filter(addresDetails => addresDetails.isPrimaryAddress)[0].addressId,
+                    zipCode: zipcode,
+                })
+            }
+            
             navigation.navigate("otpScreen", {
                 accId: params?.accId,
                 callingCode,
@@ -132,7 +176,19 @@ const EnterContactInformation = (props: any) => {
         } finally {
             mountedRef.current && setLoading(false)
         }
-    }, [navigation, isDataValid, callingCode, phone, params])
+    }, [
+        navigation,
+        isDataValid,
+        callingCode,
+        params,
+        phone,
+        email,
+        dob,
+        address,
+        city,
+        state,
+        zipcode
+    ])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
@@ -145,15 +201,15 @@ const EnterContactInformation = (props: any) => {
             case appConstants.ADDRESS:
                 setAddress(value)
                 break
-            // case appConstants.CITY:
-            //     setCity(value)
-            //     break
-            // case appConstants.STATE:
-            //     setState(value)
-            //     break
-            // case appConstants.ZIPCODE:
-            //     setZipcode(value)
-            //     break
+            case appConstants.CITY:
+                setCity(value)
+                break
+            case appConstants.STATE:
+                setState(value)
+                break
+            case appConstants.ZIPCODE:
+                setZipcode(value)
+                break
         }
     }, [])
 
@@ -168,7 +224,12 @@ const EnterContactInformation = (props: any) => {
             case appConstants.DOB: // on date select
             // console.log(value)
                 if (value) {
-                    setDob(moment(value).unix() * 1000)
+                    const date = moment(value).set({
+                        hours: 0,
+                        minutes: 0,
+                        seconds: 0
+                    })
+                    setDob(date.unix() * 1000)
                     setDatePickerVisibility(false)
                 }
                 addressRef.current?.focus()
@@ -176,22 +237,22 @@ const EnterContactInformation = (props: any) => {
             case appConstants.ADDRESS:
                 cityRef.current?.focus()
                 break
-            // case appConstants.CITY:
-            //     stateRef.current?.focus()
-            //     break
-            // case appConstants.STATE:
-            //     zipcodeRef.current?.focus()
-            //     break
-            // case appConstants.ZIPCODE:
-            //     Keyboard.dismiss()
-            //     break
+            case appConstants.CITY:
+                stateRef.current?.focus()
+                break
+            case appConstants.STATE:
+                zipcodeRef.current?.focus()
+                break
+            case appConstants.ZIPCODE:
+                Keyboard.dismiss()
+                break
         }
     }, [])
 
     return (
         <BackgroundImageComp>
             <View style={styles.root}>
-                <AppLoader isVisible={isLoading} />
+                <AppLoader isVisible={isLoading || accountLoading} />
                 <ScreenHeader
                     containerStyle={styles.headerContainer}
                     logo={getRegionIcon()}
@@ -299,7 +360,7 @@ const EnterContactInformation = (props: any) => {
                             returnKeyType="done"
                             blurOnSubmit={true}
                         />
-                        {/* <RoundedInput
+                        <RoundedInput
                             placeholder="City"
                             value={city}
                             onChangeText={onChangeTextHandler.bind(null, appConstants.CITY)}
@@ -324,7 +385,7 @@ const EnterContactInformation = (props: any) => {
                             ref={zipcodeRef}
                             returnKeyType="done"
                             blurOnSubmit={true}
-                        /> */}
+                        />
                     </View>
                     <RoundedButton
                         style={{ borderRadius: 0 }}

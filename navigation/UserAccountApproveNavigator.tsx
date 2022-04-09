@@ -79,9 +79,6 @@ const UserAccountApproveNavigator = (props: any) => {
             options={{
               headerTitle: 'Chat'
             }}
-            initialParams={{
-              showApproveBtn: true
-            }}
           />
         </Stack.Navigator>
     )

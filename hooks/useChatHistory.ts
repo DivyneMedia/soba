@@ -96,7 +96,7 @@ const useChatHistory = (channelId: string, senderId: string) => {
         } finally {
             toggleLoader(false)
         }
-    }, [setListener])
+    }, [setListener, channelId])
 
     const fetchMore = useCallback(async () => {
         try {

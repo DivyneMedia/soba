@@ -106,9 +106,9 @@ const ChattingScreen = (props: ChattingScreenProps) => {
     const { navigation, route } = useMemo(() => props, [props]) 
     const { params } = useMemo(() => route, [route])
     const showApproveBtn = useMemo(() => params?.showApproveBtn, [params])
-    const chatName = useMemo(() => params?.name, [params])
-    const chatChannelId = useMemo(() => params?.channelId, [params])
-    const chatSenderId = useMemo(() => params?.firebaseUid, [params])
+    const chatName = useMemo(() => params?.chatName, [params])
+    const chatChannelId = useMemo(() => params?.chatChannelId, [params])
+    const chatSenderId = useMemo(() => params?.chatSenderId, [params])
 
     const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, Image, ImageRequireSource, Pressable, StyleSheet, View }  from 'react-native';
-import { useSelector } from "react-redux";
+import { AnyIfEmpty, useSelector } from "react-redux";
 import images from "../assets/images";
 import AppLoader from "../components/AppLoader";
 import BoldText from "../components/BoldText";
@@ -11,6 +11,7 @@ import TextButton from "../components/TextButton";
 import colors from "../constants/colors";
 import useChat from "../hooks/useChat";
 import { USER } from "../types/UserResponse";
+import { keyExtractHandler } from "../utils/MiscUtils";
 import { SuccessToast } from "../utils/ToastUtils";
 
 const chatList = [
@@ -77,18 +78,20 @@ type ChatScreenProps = {
     route: any
 }
 
-const keyExtractHandler = (item: any, index: number) => index.toString()
-
 const ChatScreen = (props: ChatScreenProps) => {
     const { navigation } = props
 
     const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
-    const isAdmin = useMemo(() => userData?.["Email 1"] === "admin@gmail.com", [userData?.["Email 1"]])
+    // const isAdmin = useMemo(() => userData?.["Email 1"] === "admin@gmail.com", [userData?.["Email 1"]])
 
     const {
-        getAllOfficialChannelsHandler,
         isLoading,
         officialChats,
+        adminChats,
+        getAdminOfficialChannelsHandler,
+        getAllOfficialChannelsHandler,
+        userChats,
+        getUserChatsHandler,
         toggleLoaderHandler
     } = useChat()
     
@@ -97,24 +100,33 @@ const ChatScreen = (props: ChatScreenProps) => {
 
     const filterButtonPressHandler = useCallback(() => {}, [])
 
-    const openChatHandler = useCallback((chatPayload: any) => {
-        console.log(chatPayload)
-        const { id, name, phone, profile } = chatPayload
-        navigation.navigate('chatRequestsScreen', {
-            id,
-            name,
-            phone,
-            profile
-        })
-        // return
-        // const { id, lastSeen, name, profile, isGroup } = chatPayload
-        // navigation.navigate('chattingScreen', {
+    const openChatHandler = useCallback((chatPayload: any, name: string) => {
+        // console.log(chatPayload)
+        // const { id, name, phone, profile } = chatPayload
+        // navigation.navigate('chatRequestsScreen', {
         //     id,
-        //     lastSeen,
         //     name,
+        //     phone,
         //     profile
         // })
-    }, [navigation])
+        // return
+        const {
+            channelId,
+            createdAt,
+            isDeleted,
+            lastMessage,
+            lastMessageType,
+            memberIds,
+            senderId,
+            updatedAt
+        } = chatPayload
+        navigation.navigate('chattingScreen', {
+            showApproveBtn: approvals,
+            chatName: name || 'No Name',
+            chatChannelId: channelId,
+            chatSenderId: senderId
+        })
+    }, [navigation, approvals])
 
     const favoriteChatHander = useCallback((chatPayload: any) => {
        SuccessToast('Coming Soon')
@@ -123,14 +135,14 @@ const ChatScreen = (props: ChatScreenProps) => {
     const renderChatListHandler = useCallback((item: any) => {
         try {
             const {item: chat, index}: { item: ChatTileProps, index: number } = item
-            const { id, lastSeen, name, profile, isGroup } = chat
+            const { id, lastMessage, name, profile, isGroup } = chat
             return (
                 <ChatTile
                     id={id}
-                    lastSeen={lastSeen}
-                    name={name}
+                    lastSeen={lastMessage}
+                    name={name || 'No Name'}
                     profile={profile || images.ic_soba_america}
-                    onOpen={openChatHandler.bind(null, chat)}
+                    onOpen={openChatHandler.bind(null, chat, name)}
                     onFavPress={isGroup ? favoriteChatHander.bind(null, chat) : null}
                 />
             )
@@ -138,13 +150,41 @@ const ChatScreen = (props: ChatScreenProps) => {
             console.log('Error : ', err.message)
             return null
         }
-    }, [])
+    }, [openChatHandler, favoriteChatHander])
 
     useEffect(() => {
-        if (isAdmin) {
-            getAllOfficialChannelsHandler()
+        getAdminOfficialChannelsHandler()
+        getUserChatsHandler()
+    }, [getAdminOfficialChannelsHandler, getUserChatsHandler])
+
+    const renderAdminChats = useMemo(() => {
+        if (!approvals) {
+            return null
         }
-    }, [isAdmin])
+        return (
+            <FlatList
+                data={adminChats}
+                // contentContainerStyle={{ height: approvals ? "100%" : 0 }}
+                keyExtractor={keyExtractHandler}
+                renderItem={renderChatListHandler}
+            />
+        )
+    }, [approvals, adminChats])
+
+    const renderUserChats = useMemo(() => {
+        if (approvals) {
+            return null
+        }
+        return (
+            <FlatList
+                data={userChats}
+                // style={{ flex: approvals ? -1 : 1 }}
+                // contentContainerStyle={{ height: approvals ? 0 : "100%" }}
+                keyExtractor={keyExtractHandler}
+                renderItem={renderChatListHandler}
+            />
+        )
+    }, [approvals, userChats])
 
     return (
         <View style={styles.root}>
@@ -154,23 +194,26 @@ const ChatScreen = (props: ChatScreenProps) => {
                 onChangeText={setSearchText}
                 onFilterButtonPress={filterButtonPressHandler}
             />
-            <View style={styles.newsFeedEventButtonContainer}>
-                <TextButton
-                    isSelected={!approvals}
-                    text="Chats"
-                    onPress={setApprovals.bind(null, false)}
-                />
-                <TextButton
-                    isSelected={approvals}
-                    text="Approvals"
-                    onPress={setApprovals.bind(null, true)}
-                />
-            </View>
-            <FlatList
-                data={isAdmin ? officialChats : chatList}
-                keyExtractor={keyExtractHandler}
-                renderItem={renderChatListHandler}
-            />
+            {
+                adminChats && adminChats?.length
+                ? (
+                    <View style={styles.newsFeedEventButtonContainer}>
+                        <TextButton
+                            isSelected={!approvals}
+                            text="Chats"
+                            onPress={setApprovals.bind(null, false)}
+                        />
+                        <TextButton
+                            isSelected={approvals}
+                            text="Approvals"
+                            onPress={setApprovals.bind(null, true)}
+                        />
+                    </View>
+                )
+                : null
+            }
+            {renderAdminChats}
+            {renderUserChats}
         </View>
     )
 }

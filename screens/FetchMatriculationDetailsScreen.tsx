@@ -59,7 +59,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
             const month = userBasicInfo?.searchResults[0]["DOB Month"]
             const year = userBasicInfo?.searchResults[0]["DOB Year"]
     
-            const dob = moment(`${date}-${month}-${year}`, "D-M-YYYY")
+            const dob = moment(`${date}/${month}/${year} 00:00:00`, "D/M/YYYY hh:mm:ss")
             navigation.navigate('enterContactInformation', {
                 accId: userBasicInfo?.searchResults[0]["Account ID"],
                 phoneNumber: userBasicInfo?.searchResults[0]["Phone 1 Full Number (F)"]?.split('-').join('').split(' ').join(''),

@@ -3,14 +3,21 @@ import firestore from '@react-native-firebase/firestore'
 
 import appConstants from '../constants/appConstants'
 import { getCurrFirestoreTimeStamp } from './useFirebase'
+import { USER } from '../types/UserResponse'
+import { useSelector } from 'react-redux'
 
 const useChat = () => {
     // **States
     const [isLoading, setLoading] = useState(false)
     const [officialChats, setOfficialChats] = useState<any>([])
+    const [userChats, setUserChats] = useState<any>([])
+    const [adminChats, setAdminChats] = useState<any>([])
 
     // **Refs
     const mountedRef = useRef(false)
+
+    // **Redux
+    const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
 
     useEffect(() => {
         mountedRef.current = true
@@ -23,12 +30,75 @@ const useChat = () => {
         mountedRef.current && setLoading(prevState => !prevState)
     }, [])
 
+    const getAdminOfficialChannelsHandler = useCallback(async () => {
+        try {
+            toggleLoaderHandler(true)
+            const defaultChannels =
+                await firestore()
+                .collection(appConstants.defaultChannels)
+                .where("admins", "array-contains", userData?.['Mobile App Firebase UID'])
+                .where("isDeleted", "!=", true)
+                .get()
+
+            const adminChannelIds = [...defaultChannels.docs.map(doc => doc.data().id)]
+
+            if (adminChannelIds.length) {
+                const officialChatsRes =
+                    await firestore()
+                        .collection(appConstants.privateChannel)
+                        .where("memberIds", "array-contains-any", adminChannelIds)
+                        .where("isDeleted", "!=", true)
+                        .get()
+
+                const allChats = officialChatsRes.docs.map(doc => ({ ...doc.data() }))
+
+                const names = await Promise.all(allChats.map(async chat => {
+                    const {
+                        channelId,
+                        createdAt,
+                        isDeleted,
+                        lastMessage,
+                        lastMessageType,
+                        memberIds,
+                        senderId,
+                        updatedAt
+                    } = chat
+
+                    const ind = adminChannelIds.findIndex((id: string) => channelId.includes(id))
+                    const memberId = channelId.split('_').filter((id: string) => id !== adminChannelIds[ind])[0]
+
+                    const dataRes = await firestore()
+                        .collection(appConstants.users)
+                        .doc(memberId)
+                        .get()
+    
+                    return {
+                        name: dataRes.data()?.username,
+                        ...chat
+                    }
+                }))
+
+                setAdminChats(names)
+            }
+
+            toggleLoaderHandler(false)
+        } catch (err: any) {
+            console.log('Error : ', err.message)
+            toggleLoaderHandler(false)
+        }
+    }, [toggleLoaderHandler, userData?.['Mobile App Firebase UID']])
+
     const getAllOfficialChannelsHandler = useCallback(async () => {
         try {
             toggleLoaderHandler(true)
-            const defaultChannels = await firestore().collection(appConstants.defaultChannels).get()
+            const defaultChannels =
+                await firestore()
+                .collection(appConstants.defaultChannels)
+                .get()
+
+            const adminChannelIds = [...defaultChannels.docs.map(doc => doc.data())]
+            setOfficialChats(adminChannelIds)   
             toggleLoaderHandler(false)
-            setOfficialChats([...defaultChannels.docs.map(doc => doc.data())])
         } catch (err: any) {
             toggleLoaderHandler(false)
         }
@@ -85,12 +155,62 @@ const useChat = () => {
         }
     }, [])
 
+    const getUserChatsHandler = useCallback(async () => {
+        try {
+            toggleLoaderHandler(true)
+
+            const userChannels =
+                await firestore()
+                .collection(appConstants.privateChannel)
+                .where("memberIds", "array-contains", userData?.['Mobile App Firebase UID'])
+                .where("isDeleted", "!=", true)
+                .get()
+
+            const allChats = [...userChannels.docs.map(doc => doc.data())]
+
+            const names = await Promise.all(allChats.map(async chat => {
+                const {
+                    channelId,
+                    createdAt,
+                    isDeleted,
+                    lastMessage,
+                    lastMessageType,
+                    memberIds,
+                    senderId,
+                    updatedAt
+                } = chat
+
+                const id = channelId.split('_').filter((id: string) => id !== userData['Mobile App Firebase UID'])[0]
+
+                const dataRes = await firestore()
+                    .collection(appConstants.defaultChannels)
+                    .doc(id)
+                    .get()
+
+                    return {
+                        name: dataRes.data()?.name,
+                        ...chat
+                    }
+            }))
+
+            setUserChats(names)
+            toggleLoaderHandler(false)
+        } catch (err: any) {
+            console.log(err.message)
+            toggleLoaderHandler(false)
+        }
+    }, [toggleLoaderHandler, userData?.['Mobile App Firebase UID']])
+
     return {
         isLoading,
         officialChats,
+        userChats,
+        adminChats,
+        getAdminOfficialChannelsHandler,
         toggleLoaderHandler,
         getAllOfficialChannelsHandler,
         createChannelIdDoesNotExist,
+        getUserChatsHandler,
     }
 }
 

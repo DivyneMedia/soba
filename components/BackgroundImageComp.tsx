@@ -6,7 +6,7 @@ import Root from "./RootComponent";
 const BackgroundImageComp = (props: any) => {
     const { dismissKeyboardAvoiding, children } = props
     return (
-        <Root dismissKeyboardAvoiding={dismissKeyboardAvoiding} >
+        <Root dismissKeyboardAvoiding={dismissKeyboardAvoiding}>
             <ImageBackground
                 source={images.bg_soba}
                 style={{
