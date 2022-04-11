@@ -60,7 +60,7 @@ const EnterContactInformation = (props: any) => {
     const [address, setAddress] = useState(params?.address ?? '')
     const [city, setCity] = useState(params?.city ?? '')
     const [state, setState] = useState(params?.state ?? '')
-    const [zipcode, setZipcode] = useState(params?.zipCode ?? '')
+    const [zipcode, setZipcode] = useState(params?.zipCode?.substring(0, 15) ?? '')
     
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isLoading, setLoading] = useState(false);
@@ -333,6 +333,7 @@ const EnterContactInformation = (props: any) => {
                             maxLength={12}
                             ref={phoneRef}
                             returnKeyType="next"
+                            keyboardType="number-pad"
                             blurOnSubmit={false}
                         />
                         <RoundedInput
@@ -342,6 +343,8 @@ const EnterContactInformation = (props: any) => {
                             onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.EMAIL)}
                             maxLength={50}
                             ref={emailRef}
+                            textContentType="emailAddress"
+                            keyboardType="email-address"
                             returnKeyType="done"
                             blurOnSubmit={true}
                         />
@@ -381,10 +384,11 @@ const EnterContactInformation = (props: any) => {
                             value={zipcode}
                             onChangeText={onChangeTextHandler.bind(null, appConstants.ZIPCODE)}
                             onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.ZIPCODE)}
-                            maxLength={10}
+                            maxLength={20}
                             ref={zipcodeRef}
                             returnKeyType="done"
                             blurOnSubmit={true}
+                            keyboardType="numeric"
                         />
                     </View>
                     <RoundedButton

@@ -20,7 +20,7 @@ const RootNavigator = () => {
     <NavigationContainer>
       {
         userData?.['Account ID']
-        ? userData?.['Account ID'] && !userData?.['Mobile App Account Approved']
+        ? userData?.['Account ID'] && userData?.['Mobile App Account Approved'] !== 'true'
           ? <UserAccountApproveNavigator />
           : <MainNavigator />
         : <AuthNavigation />

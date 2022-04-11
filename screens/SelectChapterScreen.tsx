@@ -17,7 +17,8 @@ import { setChapter } from "../store/actions/AuthActions";
 import { OPTION_VALUES } from "../types/UserResponse";
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
-import { height, isIos, width } from "../utils/MiscUtils";
+import { height } from "../utils/MiscUtils";
+import appConstants from "../constants/appConstants";
 
 const SelectChapterScreen = (props: any) => {
     const { navigation } = props
@@ -46,6 +47,7 @@ const SelectChapterScreen = (props: any) => {
             }
         } catch (err: any) {
             console.log('initHandler : ', err?.message)
+            ErrorToast(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
         }
     }, [])
 

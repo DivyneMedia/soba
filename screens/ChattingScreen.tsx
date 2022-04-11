@@ -108,7 +108,11 @@ const ChattingScreen = (props: ChattingScreenProps) => {
     const showApproveBtn = useMemo(() => params?.showApproveBtn, [params])
     const chatName = useMemo(() => params?.chatName, [params])
     const chatChannelId = useMemo(() => params?.chatChannelId, [params])
-    const chatSenderId = useMemo(() => params?.chatSenderId, [params])
+    const chatSenderId = useMemo(() =>
+        params?.showApproveBtn
+            ? params?.chatChannelId.split('_').filter((id: string) => id !== params?.chatSenderId)[0]
+            : params?.chatSenderId
+    , [params])
 
     const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
 

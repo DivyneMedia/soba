@@ -57,7 +57,13 @@ const AccApproveRequest = (props: AccApproveRequestType) => {
                         name,
                         channelId,
                         firebaseUid
-                    })   
+                    })
+                    navigation.navigate('chattingScreen', {
+                        showApproveBtn: false,
+                        chatName: name || 'No Name',
+                        chatChannelId: channelId,
+                        chatSenderId: userData['Mobile App Firebase UID']
+                    })
                 } else {
                     ErrorToast(appConstants.SOMETHING_WENT_WRONG)
                 }
