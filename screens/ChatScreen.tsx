@@ -118,13 +118,15 @@ const ChatScreen = (props: ChatScreenProps) => {
             lastMessageType,
             memberIds,
             senderId,
-            updatedAt
+            updatedAt,
+            crmAccId
         } = chatPayload
         navigation.navigate('chattingScreen', {
             showApproveBtn: approvals,
             chatName: name || 'No Name',
             chatChannelId: channelId,
-            chatSenderId: senderId
+            chatSenderId: senderId,
+            crmAccId
         })
     }, [navigation, approvals])
 

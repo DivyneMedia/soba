@@ -71,9 +71,10 @@ const useChat = () => {
                         .collection(appConstants.users)
                         .doc(memberId)
                         .get()
-    
+
                     return {
                         name: dataRes.data()?.username,
+                        crmAccId: dataRes.data()?.crmAccId,
                         ...chat
                     }
                 }))

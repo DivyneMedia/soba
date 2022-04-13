@@ -113,6 +113,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
             ? params?.chatChannelId.split('_').filter((id: string) => id !== params?.chatSenderId)[0]
             : params?.chatSenderId
     , [params])
+    const userCrmId = useMemo(() => params?.crmAccId, [params])
 
     const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
 
@@ -139,8 +140,8 @@ const ChattingScreen = (props: ChattingScreenProps) => {
 
     const approveAccHandler = useCallback(async () => {
         try {
-            if (userData?.["Account ID"]) {
-                await approveUserAcc(+userData?.["Account ID"])
+            if (userCrmId) {
+                await approveUserAcc(+userCrmId)
                 SuccessToast('Account Approved succfully.')
             } else {
                 throw new Error('Cannot approve account please try again.')
@@ -149,7 +150,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
             console.log('Error : ', err?.message)
             ErrorToast(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
         }
-    }, [userData?.["Account ID"]])
+    }, [userCrmId])
 
     const renderApproveBtnHandler = useCallback(() => {
         return (

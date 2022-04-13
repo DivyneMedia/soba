@@ -97,14 +97,14 @@ const useAccount = () => {
                                 "optionValues": [
                                     {
                                         "id": "46",
-                                        "name": "No"
+                                        "name": "false"
                                     },
                                     {
                                         "id": "47",
-                                        "name": "Yes"
+                                        "name": "true"
                                     }
                                 ],
-                                "value": "Yes"
+                                "value": "true"
                             }
                         ]
                     }
