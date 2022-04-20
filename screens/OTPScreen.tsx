@@ -69,14 +69,20 @@ const OTPScreen = (props: any) => {
                 return
             }
             if (isVarified && userObj) {
-                // const { additionalUserInfo, user } = userObj
-                // const { isNewUser } = additionalUserInfo
+                const { additionalUserInfo, user } = userObj
+                const { isNewUser } = additionalUserInfo
                 const { uid, phoneNumber } = userObj
-                navigation.navigate('confirmRegistration', {
-                    uid,
-                    accId,
-                    phoneNumber
-                })
+                if (isNewUser) {
+                    // create new user in firestore
+                    navigation.navigate('confirmRegistration', {
+                        uid,
+                        accId,
+                        phoneNumber
+                    })
+                } else {
+                    // will think on it
+                    ErrorToast('User already exist with same phone number.')
+                }
             } else {
                 setLoading(true)
                 const res = await confirmation?.confirm(otp)
@@ -84,23 +90,17 @@ const OTPScreen = (props: any) => {
                     const { additionalUserInfo, user } = res
                     const { isNewUser } = additionalUserInfo
                     const { uid, phoneNumber } = user
-        
-                    navigation.navigate('confirmRegistration', {
-                        uid,
-                        accId,
-                        phoneNumber
-                    })
-                    // if (isNewUser) {
-                    //     // create new user in firestore
-                    //     navigation.navigate('confirmRegistration', {
-                    //         isNewUser,
-                    //         uid,
-                    //         phoneNumber
-                    //     })
-                    // } else {
-                    //     // will think on it
-                    //     ErrorToast('User already exist with same phone number.')
-                    // }
+                    if (isNewUser) {
+                        // create new user in firestore
+                        navigation.navigate('confirmRegistration', {
+                            uid,
+                            accId,
+                            phoneNumber
+                        })
+                    } else {
+                        // will think on it
+                        ErrorToast('User already exist with same phone number.')
+                    }
                 }
             }
         } catch (err: any) {

@@ -148,7 +148,6 @@ const EnterContactInformation = (props: any) => {
                 city !== params?.city ||
                 zipcode !== params?.zipCode
             ) {
-
                 const formattedDate = moment(dob).format('DD/MM/YYYY').split('/')
 
                 await updateUserAccountDetails(params.accId, {
