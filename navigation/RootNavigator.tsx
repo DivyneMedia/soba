@@ -25,13 +25,6 @@ const RootNavigator = () => {
           : <MainNavigator />
         : <AuthNavigation />
       }
-      {/* {
-        userData?.['Email 1'] === "admin@gmail.com"
-        ? <AdminNavigator />
-        : userData?.['Account ID'] && userData?.['Mobile App Account Approved']
-          ? <MainNavigator />
-          : <AuthNavigation />
-      } */}
     </NavigationContainer>
   );
 }

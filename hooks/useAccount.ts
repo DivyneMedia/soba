@@ -207,7 +207,8 @@ const useAccount = () => {
         getUserByAccountId,
         getAvailableChapters,
         getUserAccountDetails,
-        updateUserAccountDetails
+        updateUserAccountDetails,
+        toggleLoader
     }
 }
 

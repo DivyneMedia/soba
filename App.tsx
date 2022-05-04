@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import KeyboardManager from 'react-native-keyboard-manager';
 import { isIos } from './utils/MiscUtils';
 import { LogBox } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state.'])
 
 const App = () => {
@@ -38,14 +39,16 @@ const App = () => {
   }
   
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Provider store={store}>
-        <PersistGate persistor={persistor} loading={null}>
-          <RootNavigator />
-          <Toast ref={setInitialToastRef} />
-        </PersistGate>
-      </Provider>
-    </GestureHandlerRootView>
+    <Provider store={store}>
+      <PersistGate persistor={persistor} loading={null}>
+        <SafeAreaProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <RootNavigator />
+            <Toast ref={setInitialToastRef} />
+          </GestureHandlerRootView>
+        </SafeAreaProvider>
+      </PersistGate>
+    </Provider>
   );
 };
 

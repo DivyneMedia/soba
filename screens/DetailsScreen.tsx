@@ -3,6 +3,7 @@ import { View, StyleSheet, Image } from 'react-native'
 import images from '../assets/images';
 import BoldText from '../components/BoldText'
 import RegularText from '../components/RegularText';
+import Root from '../components/RootComponent';
 import colors from '../constants/colors'
 
 type DetailsScreenProps = {
@@ -17,7 +18,7 @@ const DetailsScreen = (props: DetailsScreenProps) => {
     const { comments, createdAt, description, id, imageUri, likes, title} = data
 
     return (
-        <View style={styles.container}>
+        <Root style={styles.container}>
             <Image
                 style={{ 
                     height: 200,
@@ -48,7 +49,7 @@ const DetailsScreen = (props: DetailsScreenProps) => {
             <View style={{ paddingHorizontal: 10 }}>
                 <RegularText style={{ marginTop: 10 }}>{description}</RegularText>
             </View>
-        </View>
+        </Root>
     )
 }
 

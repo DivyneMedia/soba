@@ -49,7 +49,8 @@ const EnterContactInformation = (props: any) => {
     const {
         isLoading: accountLoading,
         getUserAccountDetails,
-        updateUserAccountDetails
+        updateUserAccountDetails,
+        toggleLoader
     } = useAccount()
 
     // **States
@@ -140,6 +141,41 @@ const EnterContactInformation = (props: any) => {
                 return
             }
 
+            let confirmation = null
+
+            try {
+                toggleLoader(true)
+                confirmation = await auth()
+                    .signInWithPhoneNumber(`${callingCode} ${phone}`)
+            } catch(err: any) {
+                console.log('[auth - signInWithPhoneNumber] Error : ', err)
+                toggleLoader(false)
+                let errorMessage = 'Something went wrong at sending OTP.'
+                switch (err?.code) {
+                    case 'auth/invalid-phone-number':
+                        errorMessage = 'Enter a valid phone number.'
+                        break
+                    case 'auth/phone-number-already-exists':
+                        errorMessage = 'Phone number already exist.'
+                        break
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Limit exceeded for sending verification codes, please try after some time.'
+                        break
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Check your network connection.'
+                        break
+                    default:
+                        errorMessage = 'Something went wrong at sending OTP.'
+                        break
+                }
+                ErrorToast(errorMessage)
+                return
+            }
+
+            if (!confirmation) {
+                return
+            }
+
             if (
                 phone !== params.phoneNumber ||
                 email !== params?.email ||
@@ -163,11 +199,12 @@ const EnterContactInformation = (props: any) => {
                     zipCode: zipcode,
                 })
             }
-            
+            auth().signOut()
             navigation.navigate("otpScreen", {
                 accId: params?.accId,
                 callingCode,
                 phone,
+                verificationId: confirmation.verificationId
             })
         } catch (err: any) {
             console.log(err.message)

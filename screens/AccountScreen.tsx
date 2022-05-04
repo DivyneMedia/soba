@@ -29,6 +29,7 @@ import { useDispatch } from "react-redux";
 import * as authActions from '../store/actions/AuthActions'
 import { SuccessToast } from "../utils/ToastUtils";
 import CustomBackdrop from "../components/CustomBackdrop";
+import Root from "../components/RootComponent";
 
 type AccountScreenProps = {
     navigation: any
@@ -104,7 +105,7 @@ const AccountScreen = (props: AccountScreenProps) => {
 
     return (
         <BottomSheetModalProvider>
-            <View style={styles.container}>
+            <Root style={styles.container}>
                 <ScrollView style={styles.root}>
                     <View style={styles.headerContainer} >
                         <ProfileButton
@@ -196,7 +197,7 @@ const AccountScreen = (props: AccountScreenProps) => {
                         />
                     </View>
                 </BottomSheetModal>
-            </View>
+            </Root>
         </BottomSheetModalProvider>
     )
 }

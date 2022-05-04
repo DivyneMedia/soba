@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, Image, ImageRequireSource, Pressable, StyleSheet, View }  from 'react-native';
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AnyIfEmpty, useSelector } from "react-redux";
 import images from "../assets/images";
 import AppLoader from "../components/AppLoader";
@@ -189,7 +190,7 @@ const ChatScreen = (props: ChatScreenProps) => {
     }, [approvals, userChats])
 
     return (
-        <View style={styles.root}>
+        <SafeAreaView style={styles.root}>
             <AppLoader isVisible={isLoading} />
             <SearchBar
                 value={searchText}
@@ -216,7 +217,7 @@ const ChatScreen = (props: ChatScreenProps) => {
             }
             {renderAdminChats}
             {renderUserChats}
-        </View>
+        </SafeAreaView>
     )
 }
 

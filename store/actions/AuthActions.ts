@@ -12,14 +12,19 @@ export const SET_CHAPTERS = "SET_CHAPTERS"
 
 const loginWithUserNameRequest = (username: string, password: string) => [
     {
-        "field": "Mobile App Username",
-        "operator": "EQUAL",
-        "value": username
+        field: "Mobile App Username",
+        operator: "EQUAL",
+        value: username
     },
     {
-        "field": "Mobile App Password",
-        "operator": "EQUAL",
-        "value": password
+        field: "Mobile App Password",
+        operator: "EQUAL",
+        value: password
+    },
+    {
+        field: "Mobile App Account Claimed",
+        operator: "EQUAL",
+        value: true
     }
 ]
 

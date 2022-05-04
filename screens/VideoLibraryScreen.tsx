@@ -5,6 +5,7 @@ import images from "../assets/images";
 import BoldText from "../components/BoldText";
 import LiveBroadcast from "../components/LiveBroadcast";
 import RegularText from "../components/RegularText";
+import Root from "../components/RootComponent";
 import colors from "../constants/colors";
 import { SuccessToast } from "../utils/ToastUtils";
 
@@ -101,90 +102,90 @@ const VideoLibraryScreen = (props: VideoLibraryScreenProps) => {
     }, [])
     
     return (
-        <View style={styles.root}>
-            <ScrollView>
+        <Root style={styles.root}>
+            <View
+                style={{
+                    paddingHorizontal: 20,
+                }}
+            >
+                <LiveBroadcast onPress={onLiveBroadcast} />
+                <ImageBackground
+                    style={{
+                        height: 200,
+                        width: '100%',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        alignSelf: 'center'
+                    }}
+                    imageStyle={{
+                        height: 200,
+                        width: '100%',
+                        borderRadius: 10,
+                        opacity: 0.75,
+                    }}
+                    resizeMode="cover"
+                    source={imageFiles.banner}
+                >
+                    <Image
+                        source={images.ic_play_button}
+                        style={{
+                            height: 48,
+                            width: 48
+                        }}
+                    />
+                </ImageBackground>
                 <View
                     style={{
-                        paddingHorizontal: 20,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginVertical: 15,
                     }}
                 >
-                    <LiveBroadcast onPress={onLiveBroadcast} />
-                    <ImageBackground
-                        style={{
-                            height: 200,
-                            width: '100%',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            alignSelf: 'center'
-                        }}
-                        imageStyle={{
-                            height: 200,
-                            width: '100%',
-                            borderRadius: 10,
-                            opacity: 0.75,
-                        }}
-                        resizeMode="cover"
-                        source={imageFiles.banner}
-                    >
-                        <Image
-                            source={images.ic_play_button}
-                            style={{
-                                height: 48,
-                                width: 48
-                            }}
-                        />
-                    </ImageBackground>
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            marginVertical: 15,
-                        }}
-                    >
-                        <Image
-                            style={{ height: 38, width: 38 }}
-                            source={images.ic_logo}
-                            resizeMode="contain" />
-                        <View style={{ flex: 1, marginLeft: 10, alignItems: 'flex-start', justifyContent: 'center' }}>
-                            <BoldText style={{ fontSize: 12 }}>{'Man. United 0 - 5 Liverpool'}</BoldText>
-                            <RegularText style={{ fontSize: 10 }}>{'SOBA America TV - SPORTS'}</RegularText>
-                        </View>
-                        <Pressable
-                            onPress={() => { }}
-                        >
-                            <Image
-                                style={{
-                                    height: 24,
-                                    width: 22
-                                }}
-                                source={images.ic_forward}
-                                resizeMode="contain" />
-                        </Pressable>
+                    <Image
+                        style={{ height: 38, width: 38 }}
+                        source={images.ic_logo}
+                        resizeMode="contain" />
+                    <View style={{ flex: 1, marginLeft: 10, alignItems: 'flex-start', justifyContent: 'center' }}>
+                        <BoldText style={{ fontSize: 12 }}>{'Man. United 0 - 5 Liverpool'}</BoldText>
+                        <RegularText style={{ fontSize: 10 }}>{'SOBA America TV - SPORTS'}</RegularText>
                     </View>
-                    <BoldText style={{ color: 'grey' }}>{"Other Videos"}</BoldText>
+                    <Pressable
+                        onPress={() => { }}
+                    >
+                        <Image
+                            style={{
+                                height: 24,
+                                width: 22
+                            }}
+                            source={images.ic_forward}
+                            resizeMode="contain" />
+                    </Pressable>
                 </View>
-                <FlatList
-                    data={videoData}
-                    horizontal
-                    renderItem={renderItemHandler}
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{
-                        paddingRight: 10
-                    }}
-                />
-                <FlatList
-                    data={videoData}
-                    horizontal
-                    renderItem={renderItemHandler}
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{
-                        marginTop: 10,
-                        paddingRight: 10,
-                        marginBottom: 20
-                    }}
-                />
-            </ScrollView>
-        </View>
+                <BoldText style={{ color: 'grey' }}>{"Other Videos"}</BoldText>
+            </View>
+            <FlatList
+                data={videoData}
+                horizontal
+                renderItem={renderItemHandler}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{
+                    paddingRight: 10,
+                    marginLeft: 10,
+                }}
+            />
+            <FlatList
+                data={videoData}
+                horizontal
+                renderItem={renderItemHandler}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{
+                    marginTop: 10,
+                    marginLeft: 10,
+                    paddingRight: 10,
+                    marginBottom: 20
+                }}
+            />
+        </Root>
     )
 }
 

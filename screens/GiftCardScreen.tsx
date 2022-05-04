@@ -1,11 +1,13 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { FlatList, Image, ImageRequireSource, Pressable, StyleSheet, View }  from 'react-native';
+import { SafeAreaView } from "react-native-safe-area-context";
 import images from "../assets/images";
 import BoldText from "../components/BoldText";
 import DonationItem from "../components/DonationItem";
 import RegularText from "../components/RegularText";
 import TextButton from "../components/TextButton";
 import colors from "../constants/colors";
+import { keyExtractHandler } from "../utils/MiscUtils";
 
 const data = [
     {
@@ -81,37 +83,42 @@ const GiftCardScreen = (props: GiftCardScreenProps) => {
     }, [])
 
     return (
-        <View style={styles.root}>
-            <View style={styles.titleContainer}>
-                <BoldText style={{ marginLeft: 10 }}>{"Financial & Drives"}</BoldText>
-            </View>
-            <RegularText style={{color: 'grey', alignSelf: 'center', fontSize: 10, marginVertical: 5}}>{"SOBA Dallas related content"}</RegularText>
-            <View style={styles.donationTypeContainer}>
-                <TextButton
-                    isSelected={mandatory}
-                    text="Mandatory"
-                    onPress={setMandatory.bind(null, true)}
-                    textStyle={{ fontSize: 12 }}
-                    style={{ paddingVertical: 5 }}
+        <SafeAreaView style={styles.rootContainer}>
+            <View style={styles.root}>
+                <View style={styles.titleContainer}>
+                    <BoldText style={styles.title}>{"Financial & Drives"}</BoldText>
+                </View>
+                <RegularText style={styles.sobaText}>{"SOBA Dallas related content"}</RegularText>
+                <View style={styles.donationTypeContainer}>
+                    <TextButton
+                        isSelected={mandatory}
+                        text="Mandatory"
+                        onPress={setMandatory.bind(null, true)}
+                        textStyle={styles.btnText}
+                        style={styles.btnStyle}
+                    />
+                    <TextButton
+                        isSelected={!mandatory}
+                        text="Voluntary"
+                        onPress={setMandatory.bind(null, false)}
+                        textStyle={styles.btnText}
+                        style={styles.btnStyle}
+                    />
+                </View>
+                <FlatList
+                    data={data}
+                    renderItem={renderItemHandler}
+                    keyExtractor={keyExtractHandler}
                 />
-                <TextButton
-                    isSelected={!mandatory}
-                    text="Voluntary"
-                    onPress={setMandatory.bind(null, false)}
-                    textStyle={{ fontSize: 12 }}
-                    style={{ paddingVertical: 5 }}
-                />
             </View>
-            <FlatList
-                data={data}
-                renderItem={renderItemHandler}
-                keyExtractor={(item, index) => index.toString()}
-            />
-        </View>
+        </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
+    rootContainer: {
+        flex: 1
+    },
     root: {
         flex: 1,
         backgroundColor: colors.white
@@ -122,6 +129,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: colors.grey
     },
+    title: { marginLeft: 10 },
+    sobaText: {color: 'grey', alignSelf: 'center', fontSize: 10, marginVertical: 5},
+    btnText: { fontSize: 12 },
+    btnStyle: { paddingVertical: 5 },
     donationTypeContainer: {
         flexDirection: 'row',
         alignItems: 'center',

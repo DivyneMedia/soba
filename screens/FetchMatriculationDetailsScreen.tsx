@@ -23,7 +23,7 @@ import AppLoader from "../components/AppLoader";
 import { UserRespose } from "../types/UserResponse";
 import moment from "moment";
 
-var userBasicInfo: UserRespose | undefined = undefined
+let userBasicInfo: UserRespose | undefined = undefined
 
 const FetchMatriculationDetailsScreen = (props: any) => {
     const { navigation } = props
@@ -89,6 +89,9 @@ const FetchMatriculationDetailsScreen = (props: any) => {
             }
             const data: UserRespose | undefined = await getUserByAccountId(+matriculationNumber)
             if (data && typeof data !== "undefined") {
+
+                console.log('data : ', data)
+
                 userBasicInfo = data
     
                 const confirmationData = {

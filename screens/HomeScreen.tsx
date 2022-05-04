@@ -10,6 +10,7 @@ import SearchBar from "../components/SearchBar";
 import BoldText from "../components/BoldText";
 import TextButton from "../components/TextButton";
 import NewsFeedItem from "../components/NewsFeedItem";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type HomeScreenProps = {
     navigation: any
@@ -124,7 +125,7 @@ const HomeScreen = (props: HomeScreenProps) => {
     }, [upcomingEventSelected])
 
     return (
-        <View style={styles.root}>
+        <SafeAreaView style={styles.root}>
             <SearchBar
                 value={searchText}
                 onChangeText={setSearchText}
@@ -144,7 +145,7 @@ const HomeScreen = (props: HomeScreenProps) => {
             </View>
             <BoldText style={styles.contentText}>{"SOBBA Dallas related content"}</BoldText>
             {newsFeedSelected ? NewsFeed : Event}
-        </View>
+        </SafeAreaView>
     )
 }
 

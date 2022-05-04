@@ -107,7 +107,7 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
                                     activeIcon={images.ic_home_selected}
                                     focused={focused}
                                     inActiveIcon={images.ic_home}
-                                    onPress={() => navigation.navigate('home')}
+                                    onPress={navigation.navigate.bind(null, 'home')}
                                 />
                             )
                         }
@@ -129,7 +129,7 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
                                     activeIcon={images.ic_chat_selected}
                                     focused={focused}
                                     inActiveIcon={images.ic_chat}
-                                    onPress={() => navigation.navigate('chat')}
+                                    onPress={navigation.navigate.bind(null, 'chat')}
                                 />
                             )
                         }
@@ -150,7 +150,7 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
                                     activeIcon={images.ic_video_library_selected}
                                     focused={focused}
                                     inActiveIcon={images.ic_video_library}
-                                    onPress={() => navigation.navigate('videoLibrary')}
+                                    onPress={navigation.navigate.bind(null, 'videoLibrary')}
                                 />
                             )
                         }
@@ -172,7 +172,7 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
                                     activeIcon={images.ic_card_giftcard_selected}
                                     focused={focused}
                                     inActiveIcon={images.ic_card_giftcard}
-                                    onPress={() => navigation.navigate('giftCard')}
+                                    onPress={navigation.navigate.bind(null, 'giftCard')}
                                 />
                             )
                         }
@@ -194,7 +194,7 @@ const BottomTabNavigator = (props: BottomTabNavigatorProps) => {
                                     activeIcon={images.ic_account_selected}
                                     focused={focused}
                                     inActiveIcon={images.ic_account_primary}
-                                    onPress={() => navigation.navigate('account')}
+                                    onPress={navigation.navigate.bind(null, 'account')}
                                 />
                             )
                         }

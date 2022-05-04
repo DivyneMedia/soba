@@ -13,6 +13,7 @@ import appConstants from '../constants/appConstants'
 import { ErrorToast } from '../utils/ToastUtils'
 import { USER } from "../types/UserResponse";
 import { keyExtractHandler } from '../utils/MiscUtils'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 type AccApproveRequestType = {
     navigation: any
@@ -112,7 +113,7 @@ const AccApproveRequest = (props: AccApproveRequestType) => {
     }
 
     return (
-        <View style={styles.root}>
+        <SafeAreaView style={styles.root}>
             <Image
                 source={images.ic_done}
                 style={styles.topImage}
@@ -139,7 +140,7 @@ const AccApproveRequest = (props: AccApproveRequestType) => {
                 onPress={onBtnPress}
                 style={styles.bottomBtn}
             />
-        </View>
+        </SafeAreaView>
     )
 }
 

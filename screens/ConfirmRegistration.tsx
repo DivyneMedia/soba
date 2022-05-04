@@ -1,8 +1,5 @@
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import React, { useCallback, useRef, useState } from "react";
 import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
-import { useSelector } from "react-redux";
-import images from "../assets/images";
 import AppLoader from "../components/AppLoader";
 
 import BackgroundImageComp from "../components/BackgroundImageComp";
@@ -17,33 +14,6 @@ import colors from "../constants/colors";
 import useFirebase from "../hooks/useFirebase";
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
-
-const data = [
-    {
-        id: 0,
-        profile: images.ic_account,
-        title: "SOBA Dallas Vice President",
-        phone: '+1 (888) 504-SOBA(7622)',
-    },
-    {
-        id: 1,
-        profile: images.ic_account,
-        title: "SOBA America Vice President",
-        phone: '+1 (888) 504-SOBA(7622)',
-    },
-    {
-        id: 2,
-        profile: images.ic_account,
-        title: "SOBA America Czar",
-        phone: '+1 (888) 504-SOBA(7622)',
-    },
-    {
-        id: 3,
-        profile: images.ic_account,
-        title: "Your Class President",
-        phone: '+1 (888) 504-SOBA(7622)',
-    },
-]
 
 const ConfirmRegistrationScreen = (props: any) => {
     const { navigation, route } = props
@@ -89,6 +59,8 @@ const ConfirmRegistrationScreen = (props: any) => {
             if (!isDataValid(true)) {
                 return
             }
+    
+            console.log(params)
     
             const createAccRes = await createUserAcc({
                 accId,
@@ -139,198 +111,60 @@ const ConfirmRegistrationScreen = (props: any) => {
         }
     }, [])
 
-    // // ref
-    // const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    // const bottomSheetOpenStatusRef = useRef(false)
-
-    // // variables
-    // const snapPoints = useMemo(() => ['85%'], []);
-
-    // // callbacks
-    // const handlePresentModalPress = useCallback(() => {
-    //     bottomSheetModalRef.current?.present();
-    // }, []);
-
-    // const closeBottomSheetHandler = useCallback(() => {
-    //     // bottomSheetModalRef.current?.close();
-    // }, [])
-
-    // const handleSheetChanges = useCallback((index: number) => {
-    //     bottomSheetOpenStatusRef.current = index !== -1
-    // }, []);
-
-    // const openChatHandler = useCallback((data: any) => {
-    //     try {
-    //         const { id, profile, title, phone } = data
-    //         navigation.navigate('chattingScreen', {
-    //             name: title
-    //         })
-    //     } catch (err: any) {
-    //         console.log('[openChatHandler] Error : ', err.message)
-    //     }
-    // }, [navigation])
-
-    // const renderItemHandler = useCallback((user) => {
-    //     try {
-    //         const {item, index} = user
-    //         const { id, profile, title, phone } = item
-    //         return (
-    //             <Pressable
-    //                 onPress={openChatHandler.bind(null, item)}
-    //                 style={{
-    //                     flexDirection: 'row',
-    //                     alignItems: 'center',
-    //                     marginTop: 10,
-    //                     backgroundColor: colors.grey,
-    //                     borderRadius: 30,
-    //                     paddingVertical: 10,
-    //                     paddingHorizontal: 10
-    //                 }}
-    //             >
-    //                 <Image
-    //                     source={profile}
-    //                     style={{
-    //                         height: 36,
-    //                         width: 36
-    //                     }}
-    //                     resizeMode="contain"
-    //                 />
-    //                 <View style={{ marginLeft: 10 }}>
-    //                     <BoldText style={{ fontSize: 14 }}>{title}</BoldText>
-    //                     <RegularText style={{ fontSize: 11 }}>{phone}</RegularText>
-    //                 </View>
-    //             </Pressable>
-    //         )
-    //     } catch (err: any) {
-    //         console.log('Error : ', err.message)
-    //         return null
-    //     }
-    // }, [openChatHandler])
-
-    // const forceCloseBottomSheet = useCallback(() => {
-    //     bottomSheetModalRef.current?.close();
-    // }, [])
-
-    // const androidBackButtonPressHandler = useCallback(() => {
-    //     if (bottomSheetOpenStatusRef.current) {
-    //         forceCloseBottomSheet()
-    //         return true
-    //     } else {
-    //         return false
-    //     }
-    // }, [])
-
-    // useEffect(() => {
-    //     const backHandlerEvent = BackHandler.addEventListener("hardwareBackPress", androidBackButtonPressHandler)
-    //     return () => backHandlerEvent.remove()
-    // }, [androidBackButtonPressHandler])
-
-    // const renderSuccessDialog = useMemo(() => {
-    //     return (
-    //         <BottomSheetModal
-    //             ref={bottomSheetModalRef}
-    //             index={0}
-    //             snapPoints={snapPoints}
-    //             onChange={handleSheetChanges}
-    //             // backdropComponent={CustomBackdrop}
-    //             backdropComponent={(props) => <CustomBackdrop {...props} onPress={forceCloseBottomSheet} />}
-    //             enablePanDownToClose={false}
-    //         >
-    //             <View   
-    //                 style={{
-    //                     flex: 1,
-    //                     minHeight: '100%',
-    //                 }}
-    //             >
-    //                 <Image
-    //                     source={images.ic_done}
-    //                     style={{
-    //                         height: 80,
-    //                         width: 80,
-    //                         alignSelf: 'center',
-    //                         marginVertical: 10
-    //                     }}
-    //                     resizeMode="contain"
-    //                 />
-    //                 <View style={{ flex: 1, padding: 20 }}>
-    //                     <BoldText style={{ textAlign: 'center' }}>{"Welcome, Soban 7443!"}</BoldText>
-    //                     <RegularText style={{ textAlign: 'center', marginVertical: 10 }}>
-    //                         {"It's great to have you on board.\nNotify us for approval"}
-    //                     </RegularText>
-    //                     <FlatList
-    //                         data={data}
-    //                         renderItem={renderItemHandler}
-    //                         keyExtractor={(item, index) => index.toString()}
-    //                     />
-    //                 </View>
-    //                 <RegularText style={{ fontSize: 11, textAlign: 'center' }}>{"Approval make take between up to 72 hours"}</RegularText>
-    //                 <RoundedButton
-    //                     text={"Fides * Quarrens * Intellectum"}
-    //                     onPress={closeBottomSheetHandler}
-    //                     style={{ borderRadius: 0 }}
-    //                 />
-    //             </View>
-    //         </BottomSheetModal>
-    //     )
-    // }, [renderItemHandler, forceCloseBottomSheet])
-
     return (
-        // <BottomSheetModalProvider>
-        //    {/* {renderSuccessDialog} */}
-            <BackgroundImageComp>
-                <AppLoader isVisible={isLoading} />
-                <View style={styles.root}>
-                    <ScreenHeader
-                        containerStyle={styles.headerContainer}
-                        logo={getRegionIcon()}
-                        logoStyle={styles.logoStyle}
-                        onBackPress={navigation.goBack}
-                    />
-                    <View style={styles.detailsContainer}>
-                        <View style={{ flex: 1, paddingHorizontal: 35 }}>
-                            <BoldText style={{ fontSize: 22, alignSelf: 'center' }}>
-                                {"Hey, you are almost done!"}
-                            </BoldText>
-                            <RegularText style={{ textAlign: 'center', marginVertical: 10 }}>
-                                {"To complete your account setup, please\ncreate your username and password"}
-                            </RegularText>
-                            <RoundedInput
-                                placeholder="username"
-                                value={username}
-                                onChangeText={onChangeTextHandler.bind(null, appConstants.USERNAME)}
-                                onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.USERNAME)}
-                                maxLength={25}
-                                ref={usernameRef}
-                            />
-                            <RoundedInput
-                                placeholder="password"
-                                value={password}
-                                onChangeText={onChangeTextHandler.bind(null, appConstants.PASSWORD)}
-                                onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.PASSWORD)}
-                                maxLength={15}
-                                password
-                                ref={passwordRef}
-                            />
-                            <RoundedInput
-                                placeholder="confirm password"
-                                value={confirmPassword}
-                                onChangeText={onChangeTextHandler.bind(null, appConstants.CONF_PASSWORD)}
-                                onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.CONF_PASSWORD)}
-                                maxLength={15}
-                                ref={confirmPasswordRef}
-                                password
-                            />
-                        </View>
-                        <RoundedButton
-                            style={{ borderRadius: 0 }}
-                            onPress={nextPressHandler}
-                            text={"Finish"}
-                            // disabled={!isDataValid()}
+        <BackgroundImageComp>
+            <AppLoader isVisible={isLoading} />
+            <View style={styles.root}>
+                <ScreenHeader
+                    containerStyle={styles.headerContainer}
+                    logo={getRegionIcon()}
+                    logoStyle={styles.logoStyle}
+                    onBackPress={navigation.goBack}
+                />
+                <View style={styles.detailsContainer}>
+                    <View style={{ flex: 1, paddingHorizontal: 35 }}>
+                        <BoldText style={{ fontSize: 22, alignSelf: 'center' }}>
+                            {"Hey, you are almost done!"}
+                        </BoldText>
+                        <RegularText style={{ textAlign: 'center', marginVertical: 10 }}>
+                            {"To complete your account setup, please\ncreate your username and password"}
+                        </RegularText>
+                        <RoundedInput
+                            placeholder="username"
+                            value={username}
+                            onChangeText={onChangeTextHandler.bind(null, appConstants.USERNAME)}
+                            onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.USERNAME)}
+                            maxLength={25}
+                            ref={usernameRef}
+                        />
+                        <RoundedInput
+                            placeholder="password"
+                            value={password}
+                            onChangeText={onChangeTextHandler.bind(null, appConstants.PASSWORD)}
+                            onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.PASSWORD)}
+                            maxLength={15}
+                            password
+                            ref={passwordRef}
+                        />
+                        <RoundedInput
+                            placeholder="confirm password"
+                            value={confirmPassword}
+                            onChangeText={onChangeTextHandler.bind(null, appConstants.CONF_PASSWORD)}
+                            onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.CONF_PASSWORD)}
+                            maxLength={15}
+                            ref={confirmPasswordRef}
+                            password
                         />
                     </View>
+                    <RoundedButton
+                        style={{ borderRadius: 0 }}
+                        onPress={nextPressHandler}
+                        text={"Finish"}
+                        // disabled={!isDataValid()}
+                    />
                 </View>
-            </BackgroundImageComp>
-        // </BottomSheetModalProvider>
+            </View>
+        </BackgroundImageComp>
     )
 }
 

@@ -26,41 +26,12 @@ const OTPScreen = (props: any) => {
     const { params } = route
     const {
         accId,
-        callingCode,
-        phone,
-        // confirmation
+        verificationId
     } = params
 
     const [otp, setOtp] = useState('')
     const [otpViaPhone, setOtpViaPhone] = useState(true)
     const [isLoading, setLoading] = useState(false)
-    const [isVarified, setVarified] = useState(false)
-    const [userObj, setUserObj] = useState<any>(null)
-
-    useEffect(() => {
-        setLoading(true)
-        auth().signInWithPhoneNumber(`${callingCode} ${phone}`)
-        .then(res => {
-            confirmation = res
-        })
-        .catch(err => {
-            ErrorToast("Something went wrong at sending OTP.")
-        })
-        .finally(() => {
-            setLoading(false)
-        })
-    }, [])
-
-    useEffect(() => {
-        const unsubscribe = auth().onAuthStateChanged(userData => {
-            if (userData) {
-                console.log('userData', userData)
-                setUserObj(userData)
-                setVarified(true)
-            }
-        })
-        return unsubscribe
-    }, [])
 
     const nextPressHandler = useCallback(async () => {
         try {
@@ -68,47 +39,38 @@ const OTPScreen = (props: any) => {
                 ErrorToast("Enter OTP to continue.")
                 return
             }
-            if (isVarified && userObj) {
-                const { additionalUserInfo, user } = userObj
-                const { isNewUser } = additionalUserInfo
-                const { uid, phoneNumber } = userObj
-                if (isNewUser) {
-                    // create new user in firestore
-                    navigation.navigate('confirmRegistration', {
-                        uid,
-                        accId,
-                        phoneNumber
-                    })
-                } else {
-                    // will think on it
-                    ErrorToast('User already exist with same phone number.')
-                }
-            } else {
-                setLoading(true)
-                const res = await confirmation?.confirm(otp)
-                if (res) {
-                    const { additionalUserInfo, user } = res
-                    const { isNewUser } = additionalUserInfo
-                    const { uid, phoneNumber } = user
-                    if (isNewUser) {
-                        // create new user in firestore
-                        navigation.navigate('confirmRegistration', {
-                            uid,
-                            accId,
-                            phoneNumber
-                        })
-                    } else {
-                        // will think on it
-                        ErrorToast('User already exist with same phone number.')
-                    }
-                }
+
+            if (otp.length < 4 && otp.length > 8) {
+                ErrorToast("Enter a valid OTP to continue.")
+                return
             }
+
+            const credential = auth.PhoneAuthProvider.credential(verificationId, otp);
+            const myUserData: any = await auth().signInWithCredential(credential)
+            const { additionalUserInfo, user } = myUserData
+            const { uid, phoneNumber } = user
+
+            navigation.navigate('confirmRegistration', {
+                uid,
+                accId,
+                phoneNumber
+            })
         } catch (err: any) {
-            ErrorToast(appConstants.SOMETHING_WENT_WRONG)
+            console.log('Error : ', err)
+            let errorMessage = appConstants.SOMETHING_WENT_WRONG
+            switch (err?.code) {
+                case 'auth/session-expired':
+                    errorMessage = 'The sms code has expired. Please re-send the verification code to try again.'
+                    break
+                default:
+                    errorMessage = 'Something went wrong at verifying OTP.'
+                    break
+            }
+            ErrorToast(errorMessage)
         } finally {
             setLoading(false)
         }
-    }, [otp, confirmation, navigation, accId, userObj, isVarified])
+    }, [otp, confirmation, navigation, accId])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
@@ -127,7 +89,6 @@ const OTPScreen = (props: any) => {
     }, [])
     
     const onResendHandler = useCallback(() => {
-
     }, [])
 
     return (

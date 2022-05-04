@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Platform, Pressable, StyleSheet, TextInput, View }  from 'react-native';
-import { useSelector } from "react-redux";
+import { SafeAreaView } from "react-native-safe-area-context";
 import images from "../assets/images";
 import AppLoader from "../components/AppLoader";
 import ChatMessageItem from "../components/ChatMessageItem";
@@ -9,7 +9,6 @@ import appConstants from "../constants/appConstants";
 import colors from "../constants/colors";
 import useAccount from "../hooks/useAccount";
 import useChatHistory from "../hooks/useChatHistory";
-import { USER } from "../types/UserResponse";
 import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
 
 type ChatItem = {
@@ -21,81 +20,6 @@ type ChatItem = {
     senderId: string,
     serverTime: any,
 }
-
-const chatHistory = [
-    {
-        chatId: "3TbogHvVv2MdeAAkoVDf",
-        isDeleted: false,
-        message: "Great! Keep working on it and don't give up yet",
-        messageTime: 1615819501025,
-        messageType: "text",
-        senderId: "M4nChx1GjNdhDo2CXUhjDaZE9El11",
-        serverTime: "March 15, 2021 at 8:15:01 PM UTC+5:30",
-    },
-    {
-        chatId: "3TbogHvVv2MdsdeAAsskoVDf",
-        isDeleted: false,
-        message: "Okay sir, I'll try not to give up :)",
-        messageTime: 1615819501025,
-        messageType: "text",
-        senderId: "M4nChx1GjNdhDo2CXUhjDaZE9El1",
-        serverTime: "March 15, 2021 at 8:15:01 PM UTC+5:30",
-    },
-    {
-        chatId: "3TbogHvVv2MdeAAkoVDf",
-        isDeleted: false,
-        message: "Great! Keep working on it and don't give up yet",
-        messageTime: 1615819501025,
-        messageType: "text",
-        senderId: "M4nChx1GjNdhDo2CXUhjDaZE9El11",
-        serverTime: "March 15, 2021 at 8:15:01 PM UTC+5:30",
-    },
-    {
-        chatId: "3TbogHvVv2MdsdeAAsskoVDf",
-        isDeleted: false,
-        message: "Okay sir, I'll try not to give up :)",
-        messageTime: 1615819501025,
-        messageType: "text",
-        senderId: "M4nChx1GjNdhDo2CXUhjDaZE9El1",
-        serverTime: "March 15, 2021 at 8:15:01 PM UTC+5:30",
-    },
-    {
-        chatId: "3TbogHvVv2MdeAAkoVDf",
-        isDeleted: false,
-        message: "Great! Keep working on it and don't give up yet",
-        messageTime: 1615819501025,
-        messageType: "text",
-        senderId: "M4nChx1GjNdhDo2CXUhjDaZE9El11",
-        serverTime: "March 15, 2021 at 8:15:01 PM UTC+5:30",
-    },
-    {
-        chatId: "3TbogHvVv2MdsdeAAsskoVDf",
-        isDeleted: false,
-        message: "Okay sir, I'll try not to give up :)",
-        messageTime: 1615819501025,
-        messageType: "text",
-        senderId: "M4nChx1GjNdhDo2CXUhjDaZE9El1",
-        serverTime: "March 15, 2021 at 8:15:01 PM UTC+5:30",
-    },
-    {
-        chatId: "3TbogHvVv2MdeAAkoVDf",
-        isDeleted: false,
-        message: "Great! Keep working on it and don't give up yet",
-        messageTime: 1615819501025,
-        messageType: "text",
-        senderId: "M4nChx1GjNdhDo2CXUhjDaZE9El11",
-        serverTime: "March 15, 2021 at 8:15:01 PM UTC+5:30",
-    },
-    {
-        chatId: "3TbogHvVv2MdsdeAAsskoVDf",
-        isDeleted: false,
-        message: "Okay sir, I'll try not to give up :)",
-        messageTime: 1615819501025,
-        messageType: "text",
-        senderId: "M4nChx1GjNdhDo2CXUhjDaZE9El1",
-        serverTime: "March 15, 2021 at 8:15:01 PM UTC+5:30",
-    },
-]
 
 type ChattingScreenProps = {
     navigation: any
@@ -114,8 +38,6 @@ const ChattingScreen = (props: ChattingScreenProps) => {
             : params?.chatSenderId
     , [params])
     const userCrmId = useMemo(() => params?.crmAccId, [params])
-
-    const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
 
     const {
         isLoading,
@@ -207,7 +129,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
     }, [sendMessage, message])
 
     return (
-        <View style={styles.root}>
+        <SafeAreaView style={styles.root}>
             <AppLoader isVisible={isLoading || accountLoading} />
             <FlatList
                 ref={flatListRef}
@@ -293,7 +215,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
                     </Pressable>
                 </View>
             </View>
-        </View>
+        </SafeAreaView>
     )
 }
 

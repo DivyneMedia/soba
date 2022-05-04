@@ -14,6 +14,7 @@ import RoundedInput from "../components/RoundedInput";
 import appConstants from "../constants/appConstants";
 import RoundedInputButton from "../components/RoundedInputButton";
 import RoundedButton from "../components/RoundedButton";
+import Root from "../components/RootComponent";
 
 type EditProfileScreenProps = {
     navigation: any
@@ -99,7 +100,7 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
     }, [navigation])
 
     return (
-        <ScrollView style={styles.root}>
+        <Root style={styles.root}>
             <DateTimePickerModal
                 isVisible={isDatePickerVisible}
                 mode="date"
@@ -191,7 +192,7 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
                 style={{ borderRadius: 0 }}
                 onPress={updateProfileHandler}
             />
-        </ScrollView>
+        </Root>
     )
 }
 

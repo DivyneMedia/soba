@@ -44,6 +44,8 @@ const useFirebase = () => {
                 password,
                 phoneNumber
             } = userAccDetails
+
+            console.log('userAccDetails : ', userAccDetails)
             
             toggleLoader(true)
             try {

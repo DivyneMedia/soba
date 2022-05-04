@@ -11,6 +11,7 @@ import colors from "../constants/colors";
 import { ErrorToast } from "../utils/ToastUtils";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import images from "../assets/images";
+import Root from "../components/RootComponent";
 
 
 type DonationDetailsScreenProps = {
@@ -270,50 +271,48 @@ const DonationDetailsScreen = (props: DonationDetailsScreenProps) => {
                 }}
                 onCancel={setShowDatePicker.bind(null, false)}
             />
-        <ScrollView style={styles.root} contentContainerStyle={{ minHeight: '100%' }}>
-            <View style={styles.topContent}>
-                <Image
-                    style={{ height: 34, width: 34, borderRadius: 30, overflow: 'hidden' }}
-                    source={logo}
-                    resizeMode="contain" />
-                <View style={{ flex: 1, marginLeft: 10, alignItems: 'flex-start', justifyContent: 'center' }}>
-                    <BoldText style={{ fontSize: 12 }}>{title}</BoldText>
-                    <RegularText style={{ fontSize: 10 }}>{origin}</RegularText>
-
-                    <RegularText style={{ marginTop: 15 }}>
-                        {
-                            "This is a mandatory condolence drive for Soban 4901, William Etta (aka Ben Mabrouk), of SOBA ’85 and SOBA Dallas, who lost his mother on Wednesday, September 22, 2021, in the UK. The window for this drive is Thursday, October 28, 2021 to Saturday, November 27, 2021"
-                        }
-                    </RegularText>
-                    <RegularText style={{  }}>{"Per bylaws, membership contribution is $125"}</RegularText>
-
-                    <RegularText style={{ marginTop: 20 }}>{"Sobanly,"}</RegularText>
-                    <RegularText style={{  }}>{"Financial Team"}</RegularText>
+            <Root style={styles.root}>
+                <View style={styles.topContent}>
+                    <Image
+                        style={{ height: 34, width: 34, borderRadius: 30, overflow: 'hidden' }}
+                        source={logo}
+                        resizeMode="contain" />
+                    <View style={{ flex: 1, marginLeft: 10, alignItems: 'flex-start', justifyContent: 'center' }}>
+                        <BoldText style={{ fontSize: 12 }}>{title}</BoldText>
+                        <RegularText style={{ fontSize: 10 }}>{origin}</RegularText>
+                        <RegularText style={{ marginTop: 15 }}>
+                            {
+                                "This is a mandatory condolence drive for Soban 4901, William Etta (aka Ben Mabrouk), of SOBA ’85 and SOBA Dallas, who lost his mother on Wednesday, September 22, 2021, in the UK. The window for this drive is Thursday, October 28, 2021 to Saturday, November 27, 2021"
+                            }
+                        </RegularText>
+                        <RegularText style={{  }}>{"Per bylaws, membership contribution is $125"}</RegularText>
+                        <RegularText style={{ marginTop: 20 }}>{"Sobanly,"}</RegularText>
+                        <RegularText style={{  }}>{"Financial Team"}</RegularText>
+                    </View>
                 </View>
-            </View>
-            <View style={styles.bottomContent}>
-                <View style={{ flex: 1, paddingHorizontal: 25 }}>
-                    <BoldText style={{ alignSelf: 'center', textAlign: 'center' }}>{"Amount of Payment"}</BoldText>
-                    <RegularText style={{ marginTop: 5 }}>
-                        {"Please input the amount you want to make for this donation."}
-                    </RegularText>
-                    <RoundedInput
-                        placeholder="Amount"
-                        value={amount}
-                        onChangeText={enteredText => setAmount(enteredText)}
-                        onSubmitEditing={() => {}}
-                        maxLength={10}
-                        style={{  }}
-                        keyboardType="number-pad"
-                    />
+                <View style={styles.bottomContent}>
+                    <View style={{ flex: 1, paddingHorizontal: 25 }}>
+                        <BoldText style={{ alignSelf: 'center', textAlign: 'center' }}>{"Amount of Payment"}</BoldText>
+                        <RegularText style={{ marginTop: 5 }}>
+                            {"Please input the amount you want to make for this donation."}
+                        </RegularText>
+                        <RoundedInput
+                            placeholder="Amount"
+                            value={amount}
+                            onChangeText={enteredText => setAmount(enteredText)}
+                            onSubmitEditing={() => {}}
+                            maxLength={10}
+                            style={{  }}
+                            keyboardType="number-pad"
+                        />
+                    </View>
                 </View>
-            </View>
-        </ScrollView>
-        <RoundedButton
-            text="Make Payment"
-            onPress={makePamentPressHandler}
-            style={{ borderRadius: 0 }}
-        />
+            </Root>
+            <RoundedButton
+                text="Make Payment"
+                onPress={makePamentPressHandler}
+                style={{ borderRadius: 0 }}
+            />
         </BottomSheetModalProvider>
     )
 }
