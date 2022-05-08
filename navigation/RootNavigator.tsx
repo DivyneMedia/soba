@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 
 import AuthNavigation from './AuthNavigator';
@@ -15,6 +15,10 @@ type UserPayload = {
 
 const RootNavigator = () => {
   const { userData }: UserPayload = useSelector((state: any) => state?.auth)
+
+  useEffect(() => {
+    
+  }, [])
 
   return (
     <NavigationContainer>

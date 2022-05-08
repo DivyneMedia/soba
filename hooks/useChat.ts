@@ -40,7 +40,7 @@ const useChat = () => {
                 .where("isDeleted", "!=", true)
                 .get()
 
-            const adminChannelIds = [...defaultChannels.docs.map(doc => doc.data().id)]
+            const adminChannelIds = defaultChannels.docs.map(doc => doc.data().id)
 
             if (adminChannelIds.length) {
                 const officialChatsRes =
@@ -78,10 +78,8 @@ const useChat = () => {
                         ...chat
                     }
                 }))
-
                 setAdminChats(names)
             }
-
             toggleLoaderHandler(false)
         } catch (err: any) {
             console.log('Error : ', err.message)
@@ -121,7 +119,9 @@ const useChat = () => {
                     lastMessage: '',
                     lastMessageType: 'text',
                     memberIds: [userId, chatId],
-                    senderId: userId
+                    senderId: userId,
+                    isApproved: false,
+                    isPinned: false
                 }
                 await firestore().collection(appConstants.privateChannel).doc(channelId).set(data)
                 await firestore()
@@ -165,9 +165,10 @@ const useChat = () => {
                 .collection(appConstants.privateChannel)
                 .where("memberIds", "array-contains", userData?.['Mobile App Firebase UID'])
                 .where("isDeleted", "!=", true)
+                .where("isApproved", "==", false)
                 .get()
 
-            const allChats = [...userChannels.docs.map(doc => doc.data())]
+            const allChats = userChannels.docs.map(doc => doc.data())
 
             const names = await Promise.all(allChats.map(async chat => {
                 const {

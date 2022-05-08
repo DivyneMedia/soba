@@ -1,78 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { FlatList, Image, ImageRequireSource, Pressable, StyleSheet, View }  from 'react-native';
+import { FlatList, StyleSheet, View }  from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AnyIfEmpty, useSelector } from "react-redux";
-import images from "../assets/images";
+
+import useChat from "../hooks/useChat";
+
 import AppLoader from "../components/AppLoader";
-import BoldText from "../components/BoldText";
-import ChatTile, { ChatTileProps } from "../components/ChatTile";
-import RegularText from "../components/RegularText";
 import SearchBar from "../components/SearchBar";
 import TextButton from "../components/TextButton";
+import ChatTile, { ChatTileProps } from "../components/ChatTile";
+
 import colors from "../constants/colors";
-import useChat from "../hooks/useChat";
-import { USER } from "../types/UserResponse";
+import images from "../assets/images";
+
 import { keyExtractHandler } from "../utils/MiscUtils";
 import { SuccessToast } from "../utils/ToastUtils";
-
-const chatList = [
-    {
-        id: 0,
-        profile: images.ic_soba_uk,
-        name: 'SOBA Dallas Business',
-        lastSeen: 'Active 2 minutes ago',
-        isGroup: true
-    },
-    {
-        id: 1,
-        profile: images.ic_soba_america,
-        name: 'SOBA Dallas Social',
-        lastSeen: 'Active',
-        isGroup: true
-    },
-    {
-        id: 2,
-        profile: images.ic_soba_uk,
-        name: 'SOBA Dallas Executive (Restricted)',
-        lastSeen: 'Active',
-        isGroup: true
-    },
-    {
-        id: 3,
-        profile: images.ic_soba_america,
-        name: 'SOBA Convention Committee',
-        lastSeen: 'Active',
-        isGroup: true
-    },
-    {
-        id: 4,
-        profile: images.ic_logo,
-        name: 'SOBA 2000 USA',
-        lastSeen: 'Active 2 minutes ago',
-        isGroup: true
-    },
-    {
-        id: 5,
-        profile: images.ic_logo,
-        name: 'SOBA 2000 General',
-        lastSeen: 'Active 2 minutes ago',
-        isGroup: true
-    },
-    {
-        id: 6,
-        profile: images.ic_soba_uk,
-        name: 'Mola Ndoko',
-        lastSeen: 'Active 5 minutes ago',
-        isGroup: true
-    },
-    {
-        id: 7,
-        profile: images.ic_account,
-        name: 'Edwin Eselem',
-        lastSeen: 'Active 5 minutes ago',
-        isGroup: false
-    },
-]
 
 type ChatScreenProps = {
     navigation: any
@@ -82,18 +23,18 @@ type ChatScreenProps = {
 const ChatScreen = (props: ChatScreenProps) => {
     const { navigation } = props
 
-    const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
+    // const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
     // const isAdmin = useMemo(() => userData?.["Email 1"] === "admin@gmail.com", [userData?.["Email 1"]])
 
     const {
         isLoading,
-        officialChats,
+        // officialChats,
         adminChats,
         getAdminOfficialChannelsHandler,
-        getAllOfficialChannelsHandler,
+        // getAllOfficialChannelsHandler,
         userChats,
         getUserChatsHandler,
-        toggleLoaderHandler
+        // toggleLoaderHandler
     } = useChat()
     
     const [searchText, setSearchText] = useState('')
@@ -102,15 +43,6 @@ const ChatScreen = (props: ChatScreenProps) => {
     const filterButtonPressHandler = useCallback(() => {}, [])
 
     const openChatHandler = useCallback((chatPayload: any, name: string) => {
-        // console.log(chatPayload)
-        // const { id, name, phone, profile } = chatPayload
-        // navigation.navigate('chatRequestsScreen', {
-        //     id,
-        //     name,
-        //     phone,
-        //     profile
-        // })
-        // return
         const {
             channelId,
             createdAt,
@@ -189,6 +121,25 @@ const ChatScreen = (props: ChatScreenProps) => {
         )
     }, [approvals, userChats])
 
+    const renderHeaderHandler = useMemo(() => {
+        return adminChats && adminChats?.length
+        ? (
+            <View style={styles.newsFeedEventButtonContainer}>
+                <TextButton
+                    isSelected={!approvals}
+                    text="Chats"
+                    onPress={setApprovals.bind(null, false)}
+                />
+                <TextButton
+                    isSelected={approvals}
+                    text="Approvals"
+                    onPress={setApprovals.bind(null, true)}
+                />
+            </View>
+        )
+        : null
+    }, [adminChats?.length, approvals])
+
     return (
         <SafeAreaView style={styles.root}>
             <AppLoader isVisible={isLoading} />
@@ -197,24 +148,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                 onChangeText={setSearchText}
                 onFilterButtonPress={filterButtonPressHandler}
             />
-            {
-                adminChats && adminChats?.length
-                ? (
-                    <View style={styles.newsFeedEventButtonContainer}>
-                        <TextButton
-                            isSelected={!approvals}
-                            text="Chats"
-                            onPress={setApprovals.bind(null, false)}
-                        />
-                        <TextButton
-                            isSelected={approvals}
-                            text="Approvals"
-                            onPress={setApprovals.bind(null, true)}
-                        />
-                    </View>
-                )
-                : null
-            }
+            {renderHeaderHandler}
             {renderAdminChats}
             {renderUserChats}
         </SafeAreaView>

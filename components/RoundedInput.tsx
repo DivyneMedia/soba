@@ -68,8 +68,8 @@ const RoundedInput = forwardRef((props: RoundedInputProps & TextInputProps, ref:
                             <Image
                                 source={images.ic_visibility}
                                 style={{
-                                    height: 24,
-                                    width: 24
+                                    height: 20,
+                                    width: 20
                                 }}
                                 resizeMode="contain"
                             />

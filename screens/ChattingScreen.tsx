@@ -39,6 +39,8 @@ const ChattingScreen = (props: ChattingScreenProps) => {
     , [params])
     const userCrmId = useMemo(() => params?.crmAccId, [params])
 
+    console.log('params : ', params)
+
     const {
         isLoading,
         toggleLoader,

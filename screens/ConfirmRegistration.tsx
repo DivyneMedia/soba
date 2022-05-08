@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
 import AppLoader from "../components/AppLoader";
 
@@ -22,13 +22,21 @@ const ConfirmRegistrationScreen = (props: any) => {
 
     const { isLoading, createUserAcc } = useFirebase()
 
-    const [username, setUsername] = useState('tndime')
-    const [password, setPassword] = useState('123456')
-    const [confirmPassword, setConfirmPassword] = useState('123456')
+    const [username, setUsername] = useState(__DEV__ ? 'tndime' : '')
+    const [password, setPassword] = useState(__DEV__ ? '123456' : '')
+    const [confirmPassword, setConfirmPassword] = useState(__DEV__ ? '123456' : '')
 
     const usernameRef = useRef<TextInput>(null)
     const passwordRef = useRef<TextInput>(null)
     const confirmPasswordRef = useRef<TextInput>(null)
+    const mounterRef = useRef(false)
+
+    useEffect(() => {
+        mounterRef.current = true
+        return () => {
+            mounterRef.current = false
+        }
+    }, [])
 
     const isDataValid = useCallback((showError = false) => {
         if (!username || !username.trim()) {
@@ -59,8 +67,6 @@ const ConfirmRegistrationScreen = (props: any) => {
             if (!isDataValid(true)) {
                 return
             }
-    
-            console.log(params)
     
             const createAccRes = await createUserAcc({
                 accId,

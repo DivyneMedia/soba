@@ -1,5 +1,6 @@
 import { AxiosError, AxiosResponse } from 'axios'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import firestore from '@react-native-firebase/firestore'
 
 import axios from '../axios.auth'
 import appConstants from '../constants/appConstants'

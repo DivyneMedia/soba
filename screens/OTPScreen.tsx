@@ -1,21 +1,18 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Keyboard, StyleSheet, View } from 'react-native';
-import { useSelector } from "react-redux";
-
-import images from "../assets/images";
-import AppLoader from "../components/AppLoader";
-import BackgroundImageComp from "../components/BackgroundImageComp";
-
-import BoldText from "../components/BoldText";
-import HeaderComponent from "../components/HeaderComponent";
-import RegularText from "../components/RegularText";
-import RoundedButton from "../components/RoundedButton";
-import RoundedInput from "../components/RoundedInput";
-import ScreenHeader from "../components/ScreenHeader";
-import appConstants from "../constants/appConstants";
 import auth from '@react-native-firebase/auth'
 
+import BoldText from "../components/BoldText";
+import AppLoader from "../components/AppLoader";
+import RegularText from "../components/RegularText";
+import RoundedInput from "../components/RoundedInput";
+import ScreenHeader from "../components/ScreenHeader";
+import RoundedButton from "../components/RoundedButton";
+import BackgroundImageComp from "../components/BackgroundImageComp";
+
 import colors from "../constants/colors";
+import appConstants from "../constants/appConstants";
+
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
 
@@ -26,12 +23,16 @@ const OTPScreen = (props: any) => {
     const { params } = route
     const {
         accId,
-        verificationId
+        callingCode,
+        phone,
+        verificationId: phoneVerificationId
     } = params
 
+    const mountefRef = useRef(false)
+
     const [otp, setOtp] = useState('')
-    const [otpViaPhone, setOtpViaPhone] = useState(true)
     const [isLoading, setLoading] = useState(false)
+    const [verificationId, setVerificationId] = useState(phoneVerificationId)
 
     const nextPressHandler = useCallback(async () => {
         try {
@@ -70,7 +71,7 @@ const OTPScreen = (props: any) => {
         } finally {
             setLoading(false)
         }
-    }, [otp, confirmation, navigation, accId])
+    }, [verificationId, otp, confirmation, navigation, accId])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
@@ -87,9 +88,52 @@ const OTPScreen = (props: any) => {
                 break
         }
     }, [])
-    
-    const onResendHandler = useCallback(() => {
+
+    useEffect(() => {
+        mountefRef.current = true
+        return () => {
+            mountefRef.current = false
+        }
     }, [])
+    
+    const toggleLoader = useCallback((visibility) => {
+        if (mountefRef.current) {
+            setLoading(visibility)
+        }
+    }, [])
+
+    const onResendHandler = useCallback(async () => {
+        try {
+            toggleLoader(true)
+            const confirmation = await auth()
+                .signInWithPhoneNumber(`${callingCode} ${phone}`)
+            console.log('confirmation : ', confirmation.verificationId)
+            toggleLoader(false)
+            setVerificationId(confirmation.verificationId)
+        } catch(err: any) {
+            console.log('[onResendHandler - signInWithPhoneNumber] Error : ', err)
+            toggleLoader(false)
+            let errorMessage = 'Something went wrong at sending OTP.'
+            switch (err?.code) {
+                case 'auth/invalid-phone-number':
+                    errorMessage = 'Enter a valid phone number.'
+                    break
+                case 'auth/phone-number-already-exists':
+                    errorMessage = 'Phone number already exist.'
+                    break
+                case 'auth/too-many-requests':
+                    errorMessage = 'Limit exceeded for sending verification codes, please try after some time.'
+                    break
+                case 'auth/network-request-failed':
+                    errorMessage = 'Check your network connection.'
+                    break
+                default:
+                    errorMessage = 'Something went wrong at sending OTP.'
+                    break
+            }
+            ErrorToast(errorMessage)
+        }
+    }, [callingCode, phone])
 
     return (
         <BackgroundImageComp>
@@ -107,7 +151,7 @@ const OTPScreen = (props: any) => {
                             {"Sending You an OTP"}
                         </BoldText>
                         <RegularText style={{ textAlign: 'center', marginTop: 10 }}>
-                            {`Check your ${otpViaPhone ? 'phone' : 'email'} inbox to read your OTP.\nand fill it to the box below`}
+                            {`Check your phone inbox to read your OTP.\nand fill it to the box below`}
                         </RegularText>
                         <View
                             style={{
@@ -144,7 +188,7 @@ const OTPScreen = (props: any) => {
                                 </RegularText>
                             </RegularText>
                         </View>
-                        <RegularText
+                        {/* <RegularText
                             onPress={setOtpViaPhone.bind(null, !otpViaPhone)}
                             style={{
                                 fontSize: 12,
@@ -155,7 +199,7 @@ const OTPScreen = (props: any) => {
                             }}
                         >
                             {`Send my OTP via ${otpViaPhone ? 'phone' : 'email'} instead`}
-                        </RegularText>
+                        </RegularText> */}
                     </View>
                     <RoundedButton
                         style={{ borderRadius: 0 }}

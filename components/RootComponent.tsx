@@ -1,7 +1,7 @@
 import * as React from "react"
 import { View, TouchableWithoutFeedback, ViewStyle, Keyboard } from "react-native"
-import SafeAreaView from 'react-native-safe-area-view'
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import { SafeAreaView } from "react-native-safe-area-context"
 import colors from "../constants/colors"
 
 type RootProps = {
