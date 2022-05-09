@@ -7,7 +7,7 @@ import appConstants from '../constants/appConstants'
 import { UPDATE_USER_PAYLOAD, userPayload } from '../model/UserData'
 import { BASE_CUSTOM_FIELD_RESPONSE, OPTION_VALUES, UserRespose } from '../types/UserResponse'
 
-const useAccount = () => {
+const useAccount = (chatChannelId: string) => {
     const [isLoading, setLoading] = useState(false)
     const mountedRef = useRef(false)
 
@@ -85,6 +85,14 @@ const useAccount = () => {
     const approveUserAcc = useCallback(async (accountId: number) => {
         try {
             toggleLoader(true)
+
+            await firestore()
+            .collection(appConstants.privateChannel)
+            .doc(chatChannelId)
+            .update({
+                isApproved: true
+            })
+
             let accUpdateRes: AxiosResponse<any>
             try {
                 accUpdateRes =

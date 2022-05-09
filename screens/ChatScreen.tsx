@@ -12,8 +12,9 @@ import ChatTile, { ChatTileProps } from "../components/ChatTile";
 import colors from "../constants/colors";
 import images from "../assets/images";
 
-import { keyExtractHandler } from "../utils/MiscUtils";
+import { height, keyExtractHandler } from "../utils/MiscUtils";
 import { SuccessToast } from "../utils/ToastUtils";
+import BoldText from "../components/BoldText";
 
 type ChatScreenProps = {
     navigation: any
@@ -21,7 +22,8 @@ type ChatScreenProps = {
 }
 
 const ChatScreen = (props: ChatScreenProps) => {
-    const { navigation } = props
+    const { navigation, route } = props
+    console.log('route : ', route)
 
     // const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
     // const isAdmin = useMemo(() => userData?.["Email 1"] === "admin@gmail.com", [userData?.["Email 1"]])
@@ -92,6 +94,17 @@ const ChatScreen = (props: ChatScreenProps) => {
         getUserChatsHandler()
     }, [getAdminOfficialChannelsHandler, getUserChatsHandler])
 
+    const renderListFoorter = useMemo(() => {
+        if (isLoading) {
+            return null
+        }
+        return (
+            <View style={{ height: height - 100, alignItems: 'center', justifyContent: 'center' }}>
+                <BoldText>No Data Available</BoldText>
+            </View>
+        )
+    }, [])
+
     const renderAdminChats = useMemo(() => {
         if (!approvals) {
             return null
@@ -102,6 +115,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                 // contentContainerStyle={{ height: approvals ? "100%" : 0 }}
                 keyExtractor={keyExtractHandler}
                 renderItem={renderChatListHandler}
+                ListEmptyComponent={renderListFoorter}
             />
         )
     }, [approvals, adminChats])
@@ -117,6 +131,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                 // contentContainerStyle={{ height: approvals ? 0 : "100%" }}
                 keyExtractor={keyExtractHandler}
                 renderItem={renderChatListHandler}
+                ListEmptyComponent={renderListFoorter}
             />
         )
     }, [approvals, userChats])

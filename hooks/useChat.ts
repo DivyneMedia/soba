@@ -48,6 +48,7 @@ const useChat = () => {
                         .collection(appConstants.privateChannel)
                         .where("memberIds", "array-contains-any", adminChannelIds)
                         .where("isDeleted", "!=", true)
+                        .where("isApproved", "==", false)
                         .get()
 
                 const allChats = officialChatsRes.docs.map(doc => ({ ...doc.data() }))
