@@ -15,6 +15,7 @@ import images from "../assets/images";
 import { height, keyExtractHandler } from "../utils/MiscUtils";
 import { SuccessToast } from "../utils/ToastUtils";
 import BoldText from "../components/BoldText";
+import { useFocusEffect } from "@react-navigation/native";
 
 type ChatScreenProps = {
     navigation: any
@@ -23,7 +24,7 @@ type ChatScreenProps = {
 
 const ChatScreen = (props: ChatScreenProps) => {
     const { navigation, route } = props
-    console.log('route : ', route)
+    // console.log('route : ', route)
 
     // const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
     // const isAdmin = useMemo(() => userData?.["Email 1"] === "admin@gmail.com", [userData?.["Email 1"]])
@@ -41,6 +42,13 @@ const ChatScreen = (props: ChatScreenProps) => {
     
     const [searchText, setSearchText] = useState('')
     const [approvals, setApprovals] = useState(false)
+
+    useFocusEffect(() => {
+        if (route?.params?.refresh) {
+            getAdminOfficialChannelsHandler()
+            delete route?.params?.refresh
+        }
+    })
 
     const filterButtonPressHandler = useCallback(() => {}, [])
 

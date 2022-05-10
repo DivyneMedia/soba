@@ -53,50 +53,75 @@ const useFirebase = () => {
             toggleLoader(true)
 
             try {
-                await axios.patch(`/accounts/${accId}`, {
-                    "individualAccount": {
-                        "accountCustomFields": [
-                            {
-                                "id": "86",
-                                "name": "Mobile App Username",
-                                "value": username
-                            },
-                            {
-                                "id": "87",
-                                "name": "Mobile App Password",
-                                "value": password
-                            },
-                            {
-                                "id": "85",
-                                "name": "Mobile App Account Claimed",
-                                "value": true
-                            },
-                            {
-                                "id": "89",
-                                "name": "Mobile App Firebase UID",
-                                "value": uid
-                            }
-                        ]
-                    }
+                const loginRes: AxiosResponse<UserRespose> = await axios.post('/accounts/search', {
+                    ...userPayload,
+                    searchFields: [
+                        {
+                            field: "Mobile App Username",
+                            operator: "EQUAL",
+                            value: username
+                        }
+                    ]
                 })
+    
+                if (loginRes && loginRes.data) {
+                    const {searchResults} = loginRes.data
+                    if (searchResults && Array.isArray(searchResults) && searchResults.length) {
+                        throw new Error("Username already taken please try with different username.")
+                    } else {
+                        // Username not found..
+
+                        try {
+                            await axios.patch(`/accounts/${accId}`, {
+                                "individualAccount": {
+                                    "accountCustomFields": [
+                                        {
+                                            "id": "86",
+                                            "name": "Mobile App Username",
+                                            "value": username
+                                        },
+                                        {
+                                            "id": "87",
+                                            "name": "Mobile App Password",
+                                            "value": password
+                                        },
+                                        {
+                                            "id": "85",
+                                            "name": "Mobile App Account Claimed",
+                                            "value": true
+                                        },
+                                        {
+                                            "id": "89",
+                                            "name": "Mobile App Firebase UID",
+                                            "value": uid
+                                        }
+                                    ]
+                                }
+                            })
+
+                            const currFirebaseTimeStamp = getCurrFirestoreTimeStamp()
+            
+                            await usersCollection.doc(uid).set({
+                                crmAccId: accId,
+                                uid,
+                                username,
+                                phoneNumber,
+                                fcmToken: '',
+                                createdAt: currFirebaseTimeStamp,
+                                updatedAt: currFirebaseTimeStamp,
+                                isDeleted: false
+                            })
+
+                            toggleLoader(false)
+                            return true
+                        } catch (err: any) {
+                            throw new Error(appConstants.SOMETHING_WENT_WRONG)
+                        }
+                    }
+                }
             } catch (err: any) {
-                throw new Error(appConstants.SOMETHING_WENT_WRONG)
+                throw new Error(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
             }
-
-            const currFirebaseTimeStamp = getCurrFirestoreTimeStamp()
-
-            await usersCollection.doc(uid).set({
-                crmAccId: accId,
-                uid,
-                username,
-                phoneNumber,
-                fcmToken: '',
-                createdAt: currFirebaseTimeStamp,
-                updatedAt: currFirebaseTimeStamp,
-                isDeleted: false
-            })
-            toggleLoader(false)
-            return true
 
             // try {
             //     const loginRes: AxiosResponse<UserRespose> = await axios.post('/accounts/search', {

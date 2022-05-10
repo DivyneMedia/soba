@@ -65,8 +65,9 @@ const ChattingScreen = (props: ChattingScreenProps) => {
             if (userCrmId) {
                 await approveUserAcc(+userCrmId)
                 SuccessToast('Account Approved succfully.')
-                navigation.navigate('chat', {
-                    refresh: true
+                navigation.navigate('bottomTab', {
+                    screen: 'chat',
+                    params: { refresh: true },
                 })
             } else {
                 throw new Error('Cannot approve account please try again.')
