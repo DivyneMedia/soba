@@ -15,24 +15,47 @@ import appConstants from "../constants/appConstants";
 
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
+import useAccount from "../hooks/useAccount";
 
 var confirmation: any = null
+var otpVerificationId: string | null = ''
 
 const OTPScreen = (props: any) => {
     const { navigation, route } = props
+    // const routeData = route?.params ?? {
+    //     params: {
+    //         accId: '',
+    //         callingCode: '',
+    //         phone: '',
+    //         verificationId: '',
+    //         updateableDetails: ''
+    //     }
+    // }
     const { params } = route
     const {
         accId,
         callingCode,
         phone,
-        verificationId: phoneVerificationId
+        verificationId: phoneVerificationId,
+        updateableDetails
     } = params
+
+    const {
+        isLoading: accountLoading,
+        updateUserAccountDetails
+    } = useAccount()
 
     const mountefRef = useRef(false)
 
     const [otp, setOtp] = useState('')
     const [isLoading, setLoading] = useState(false)
-    const [verificationId, setVerificationId] = useState(phoneVerificationId)
+
+    useEffect(() => {
+        otpVerificationId = phoneVerificationId
+        return () => {
+            otpVerificationId = ''
+        }
+    }, [phoneVerificationId])
 
     const nextPressHandler = useCallback(async () => {
         try {
@@ -46,10 +69,14 @@ const OTPScreen = (props: any) => {
                 return
             }
 
-            const credential = auth.PhoneAuthProvider.credential(verificationId, otp);
+            const credential = auth.PhoneAuthProvider.credential(otpVerificationId, otp);
             const myUserData: any = await auth().signInWithCredential(credential)
             const { additionalUserInfo, user } = myUserData
             const { uid, phoneNumber } = user
+
+            if (updateableDetails) {
+                await updateUserAccountDetails(accId, JSON.parse(updateableDetails))
+            }
 
             navigation.navigate('confirmRegistration', {
                 uid,
@@ -64,14 +91,14 @@ const OTPScreen = (props: any) => {
                     errorMessage = 'The sms code has expired. Please re-send the verification code to try again.'
                     break
                 default:
-                    errorMessage = 'Something went wrong at verifying OTP.'
+                    errorMessage = 'Something went wrong please try again.'
                     break
             }
             ErrorToast(errorMessage)
         } finally {
             setLoading(false)
         }
-    }, [verificationId, otp, confirmation, navigation, accId])
+    }, [otp, confirmation, navigation, accId, updateableDetails])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
@@ -109,7 +136,7 @@ const OTPScreen = (props: any) => {
                 .signInWithPhoneNumber(`${callingCode} ${phone}`)
             console.log('confirmation : ', confirmation.verificationId)
             toggleLoader(false)
-            setVerificationId(confirmation.verificationId)
+            otpVerificationId = confirmation.verificationId
         } catch(err: any) {
             console.log('[onResendHandler - signInWithPhoneNumber] Error : ', err)
             toggleLoader(false)
@@ -137,7 +164,7 @@ const OTPScreen = (props: any) => {
 
     return (
         <BackgroundImageComp>
-            <AppLoader isVisible={isLoading} />
+            <AppLoader isVisible={isLoading || accountLoading} />
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}
@@ -148,10 +175,10 @@ const OTPScreen = (props: any) => {
                 <View style={styles.detailsContainer}>
                     <View style={{ flex: 1, paddingHorizontal: 35 }}>
                         <BoldText style={{ fontSize: 22, alignSelf: 'center', textAlign: 'center' }}>
-                            {"Sending You an OTP"}
+                            {"SMS OTP Verification"}
                         </BoldText>
                         <RegularText style={{ textAlign: 'center', marginTop: 10 }}>
-                            {`Check your phone inbox to read your OTP.\nand fill it to the box below`}
+                            {`Please enter the 6-digit verification code we sent via SMS. We want to make sure it your before we let you claim this account`}
                         </RegularText>
                         <View
                             style={{
@@ -170,7 +197,7 @@ const OTPScreen = (props: any) => {
                             />
                             <RegularText
                                 style={{
-                                    fontSize: 12,
+                                    fontSize: 13,
                                     alignSelf: 'center',
                                     textAlign: 'center',
                                     marginTop: 15
@@ -180,11 +207,12 @@ const OTPScreen = (props: any) => {
                                 <RegularText
                                     onPress={onResendHandler}
                                     style={{
-                                        fontSize: 12,
-                                        color: colors.primary
+                                        fontSize: 13,
+                                        color: colors.primary,
+                                        fontWeight: "bold"
                                     }}
                                 >
-                                    {"resent my OTP Code"}
+                                    {"resend my OTP code"}
                                 </RegularText>
                             </RegularText>
                         </View>

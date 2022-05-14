@@ -49,7 +49,7 @@ const EnterContactInformation = (props: any) => {
     const {
         isLoading: accountLoading,
         getUserAccountDetails,
-        updateUserAccountDetails,
+        // updateUserAccountDetails,
         toggleLoader
     } = useAccount()
 
@@ -145,6 +145,9 @@ const EnterContactInformation = (props: any) => {
 
             try {
                 toggleLoader(true)
+                if (auth().currentUser?.uid) {
+                    await auth().signOut()
+                }
                 confirmation = await auth()
                     .signInWithPhoneNumber(`${callingCode} ${phone}`)
             } catch(err: any) {
@@ -176,6 +179,8 @@ const EnterContactInformation = (props: any) => {
                 return
             }
 
+            let payload = null
+
             if (
                 phone !== params.phoneNumber ||
                 email !== params?.email ||
@@ -186,7 +191,7 @@ const EnterContactInformation = (props: any) => {
             ) {
                 const formattedDate = moment(dob).format('DD/MM/YYYY').split('/')
 
-                await updateUserAccountDetails(params.accId, {
+                payload = {
                     addressLine1: address,
                     city: city,
                     county: '',
@@ -197,14 +202,27 @@ const EnterContactInformation = (props: any) => {
                     year: formattedDate[2],
                     primaryAddressId: userDetails?.individualAccount.primaryContact.addresses.filter(addresDetails => addresDetails.isPrimaryAddress)[0].addressId,
                     zipCode: zipcode,
-                })
+                }
+
+                // await updateUserAccountDetails(params.accId, {
+                //     addressLine1: address,
+                //     city: city,
+                //     county: '',
+                //     email: email,
+                //     phone: phone,
+                //     date: formattedDate[0],
+                //     month: formattedDate[1],
+                //     year: formattedDate[2],
+                //     primaryAddressId: userDetails?.individualAccount.primaryContact.addresses.filter(addresDetails => addresDetails.isPrimaryAddress)[0].addressId,
+                //     zipCode: zipcode,
+                // })
             }
-            auth().signOut()
             navigation.navigate("otpScreen", {
                 accId: params?.accId,
                 callingCode,
                 phone,
-                verificationId: confirmation.verificationId
+                verificationId: confirmation.verificationId,
+                updateableDetails: payload ? JSON.stringify(payload) : ''
             })
         } catch (err: any) {
             console.log(err.message)

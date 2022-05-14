@@ -60,6 +60,11 @@ const useFirebase = () => {
                             field: "Mobile App Username",
                             operator: "EQUAL",
                             value: username
+                        },
+                        {
+                            field: "Account ID",
+                            operator: "NOT_EQUAL",
+                            value: accId
                         }
                     ]
                 })

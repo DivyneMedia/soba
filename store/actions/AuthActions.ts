@@ -71,8 +71,8 @@ export const login = (loginReq: LoginRequestType) => {
                 throw new Error("User not found, Please check details and try again.")
             }
         } catch (err: any) {
-            console.log('Error : ', err?.message)
-            throw new Error(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
+            console.log('Error : ', JSON.stringify(err?.response?.data ?? err?.message))
+            throw new Error(err?.response?.data ?? err?.message ?? appConstants.SOMETHING_WENT_WRONG)
         }
     }
 }

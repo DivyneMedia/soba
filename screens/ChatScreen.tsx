@@ -31,8 +31,10 @@ const ChatScreen = (props: ChatScreenProps) => {
 
     const {
         isLoading,
+        isAdmin,
         // officialChats,
         adminChats,
+        approvedChats,
         getAdminOfficialChannelsHandler,
         // getAllOfficialChannelsHandler,
         userChats,
@@ -62,13 +64,15 @@ const ChatScreen = (props: ChatScreenProps) => {
             memberIds,
             senderId,
             updatedAt,
-            crmAccId
+            crmAccId,
+            isAdmin
         } = chatPayload
+        const msgSenderId = isAdmin ? channelId.split('_').filter((id: string) => id !== senderId)[0] : senderId
         navigation.navigate('chattingScreen', {
             showApproveBtn: approvals,
-            chatName: name || 'No Name',
+            chatName: name || 'Messages',
             chatChannelId: channelId,
-            chatSenderId: senderId,
+            chatSenderId: msgSenderId,
             crmAccId
         })
     }, [navigation, approvals])
@@ -134,7 +138,7 @@ const ChatScreen = (props: ChatScreenProps) => {
         }
         return (
             <FlatList
-                data={userChats}
+                data={[...userChats, ...approvedChats]}
                 // style={{ flex: approvals ? -1 : 1 }}
                 // contentContainerStyle={{ height: approvals ? 0 : "100%" }}
                 keyExtractor={keyExtractHandler}
@@ -142,10 +146,10 @@ const ChatScreen = (props: ChatScreenProps) => {
                 ListEmptyComponent={renderListFoorter}
             />
         )
-    }, [approvals, userChats])
+    }, [approvals, userChats, approvedChats])
 
     const renderHeaderHandler = useMemo(() => {
-        return adminChats && adminChats?.length
+        return isAdmin
         ? (
             <View style={styles.newsFeedEventButtonContainer}>
                 <TextButton
@@ -161,7 +165,7 @@ const ChatScreen = (props: ChatScreenProps) => {
             </View>
         )
         : null
-    }, [adminChats?.length, approvals])
+    }, [approvals, isAdmin])
 
     return (
         <SafeAreaView style={styles.root}>

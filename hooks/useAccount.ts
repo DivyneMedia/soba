@@ -6,8 +6,9 @@ import axios from '../axios.auth'
 import appConstants from '../constants/appConstants'
 import { UPDATE_USER_PAYLOAD, userPayload } from '../model/UserData'
 import { BASE_CUSTOM_FIELD_RESPONSE, OPTION_VALUES, UserRespose } from '../types/UserResponse'
+import { ErrorToast } from '../utils/ToastUtils'
 
-const useAccount = (chatChannelId: string) => {
+const useAccount = (chatChannelId?: string) => {
     const [isLoading, setLoading] = useState(false)
     const mountedRef = useRef(false)
 
@@ -28,9 +29,9 @@ const useAccount = (chatChannelId: string) => {
             let availableChaptersRes: AxiosResponse<BASE_CUSTOM_FIELD_RESPONSE<OPTION_VALUES>>
             try {
                 availableChaptersRes = await axios.get('/customFields/75')
-            } catch(err: unknown | AxiosError<any, any>) {
+            } catch(err: unknown | AxiosError<any, any> | any) {
                 // throw new Error(err.response)
-                throw new Error(appConstants.SOMETHING_WENT_WRONG)
+                throw new Error(err?.response?.data ?? err?.message ?? appConstants.SOMETHING_WENT_WRONG)
             }
 
             if (!availableChaptersRes.data.optionValues.length) {
@@ -40,6 +41,7 @@ const useAccount = (chatChannelId: string) => {
             return availableChaptersRes.data.optionValues
         } catch (err: any) {
             console.log('[getAvailableChapters] Error : ', err?.message)
+            ErrorToast(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
         } finally {
             toggleLoader(false)
         }
@@ -65,9 +67,9 @@ const useAccount = (chatChannelId: string) => {
                         }
                     ]
                 })
-            } catch(err: unknown | AxiosError<any, any>) {
+            } catch(err: any | unknown | AxiosError<any, any>) {
                 // throw new Error(err.response)
-                throw new Error(appConstants.SOMETHING_WENT_WRONG)
+                throw new Error(err?.response?.data ?? err?.message ?? appConstants.SOMETHING_WENT_WRONG)
             }
 
             if (!accDetailsRes.data.searchResults.length) {
@@ -84,6 +86,9 @@ const useAccount = (chatChannelId: string) => {
 
     const approveUserAcc = useCallback(async (accountId: number) => {
         try {
+            if (!accountId) {
+                throw new Error(appConstants.SOMETHING_WENT_WRONG)
+            }
             toggleLoader(true)
 
             await firestore()

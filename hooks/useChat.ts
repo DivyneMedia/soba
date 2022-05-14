@@ -12,6 +12,8 @@ const useChat = () => {
     const [officialChats, setOfficialChats] = useState<any>([])
     const [userChats, setUserChats] = useState<any>([])
     const [adminChats, setAdminChats] = useState<any>([])
+    const [isAdmin, setIsAdmin] = useState<boolean>(false)
+    const [approvedChats, setApprovedChats] = useState<any>([])
 
     // **Refs
     const mountedRef = useRef(false)
@@ -25,6 +27,74 @@ const useChat = () => {
             mountedRef.current = false
         }
     }, [])
+
+    const onSnapshotHandler = useCallback((snap) => {
+        try {
+            snap.docChanges().forEach((changes: any) => {
+                const data = changes.doc.data()
+                switch (changes.type) {
+                    case 'added':
+                        break
+                    case 'modified':
+                        const updatedAt = data?.updatedAt
+                        const channelId = data?.channelId
+                        if (updatedAt !== null && !!channelId) {
+                            const userChatsUpdateInd = userChats.findIndex((chat: any) => chat.channelId === channelId)
+                            const adminChatsUpdateInd = adminChats.findIndex((chat: any) => chat.channelId === channelId)
+                            const approvedChatsUpdateInd = approvedChats.findIndex((chat: any) => chat.channelId === channelId)
+                            if (userChatsUpdateInd !== -1 || adminChatsUpdateInd !== -1 || approvedChatsUpdateInd !== -1) {
+                                if (userChatsUpdateInd !== -1) {
+                                    setUserChats((prevState: any) => {
+                                        const existingChats = [...prevState]
+                                        existingChats[userChatsUpdateInd] = {
+                                            ...existingChats[userChatsUpdateInd],
+                                            lastMessage: data?.lastMessage,
+                                            lastMessageType: data?.lastMessageType,
+                                        }
+                                        return existingChats
+                                    })
+                                }
+                                if (adminChatsUpdateInd !== -1) {
+                                    setAdminChats((prevState: any) => {
+                                        const existingChats = [...prevState]
+                                        existingChats[adminChatsUpdateInd] = {
+                                            ...existingChats[adminChatsUpdateInd],
+                                            lastMessage: data?.lastMessage,
+                                            lastMessageType: data?.lastMessageType,
+                                        }
+                                        return existingChats
+                                    })
+                                }
+                                if (approvedChatsUpdateInd !== -1) {
+                                    setApprovedChats((prevState: any) => {
+                                        const existingChats = [...prevState]
+                                        existingChats[approvedChatsUpdateInd] = {
+                                            ...existingChats[approvedChatsUpdateInd],
+                                            lastMessage: data?.lastMessage,
+                                            lastMessageType: data?.lastMessageType,
+                                        }
+                                        return existingChats
+                                    })
+                                }
+                            }
+                        }
+                        break
+                    case 'removed':
+                        break
+                }
+            })
+        } catch (err: any) {
+            console.log('[onSnapshotHandler] Error : ', err?.message)
+        }
+    }, [userChats, adminChats, approvedChats])
+
+    useEffect(() => {
+        const subscribe = firestore()
+            .collection(appConstants.privateChannel)
+            .onSnapshot(onSnapshotHandler)
+
+        return subscribe
+    }, [onSnapshotHandler])
 
     const toggleLoaderHandler = useCallback((status: boolean) => {
         mountedRef.current && setLoading(prevState => !prevState)
@@ -43,12 +113,13 @@ const useChat = () => {
             const adminChannelIds = defaultChannels.docs.map(doc => doc.data().id)
 
             if (adminChannelIds.length) {
+                setIsAdmin(true)
                 const officialChatsRes =
                     await firestore()
                         .collection(appConstants.privateChannel)
                         .where("memberIds", "array-contains-any", adminChannelIds)
                         .where("isDeleted", "!=", true)
-                        .where("isApproved", "==", false)
+                        // .where("isApproved", "==", false)
                         .get()
 
                 const allChats = officialChatsRes.docs.map(doc => ({ ...doc.data() }))
@@ -62,7 +133,9 @@ const useChat = () => {
                         lastMessageType,
                         memberIds,
                         senderId,
-                        updatedAt
+                        updatedAt,
+                        isApproved,
+                        isPinned
                     } = chat
 
                     const ind = adminChannelIds.findIndex((id: string) => channelId.includes(id))
@@ -79,7 +152,13 @@ const useChat = () => {
                         ...chat
                     }
                 }))
-                setAdminChats(names)
+
+                const unApprovedChats = names.filter((chat: any) => chat?.isApproved === false)
+                const approvedChats = names.filter((chat: any) => chat?.isApproved === true)
+
+                // console.log('approvedChats : ', approvedChats)
+                setApprovedChats(approvedChats.map((res: any) => ({ ...res, isAdmin: true })))
+                setAdminChats(unApprovedChats)
             }
             toggleLoaderHandler(false)
         } catch (err: any) {
@@ -166,10 +245,12 @@ const useChat = () => {
                 .collection(appConstants.privateChannel)
                 .where("memberIds", "array-contains", userData?.['Mobile App Firebase UID'])
                 .where("isDeleted", "!=", true)
-                .where("isApproved", "==", false)
+                // .where("isApproved", "==", true)
                 .get()
 
             const allChats = userChannels.docs.map(doc => doc.data())
+
+            console.log('allChats : ', allChats)
 
             const names = await Promise.all(allChats.map(async chat => {
                 const {
@@ -180,7 +261,9 @@ const useChat = () => {
                     lastMessageType,
                     memberIds,
                     senderId,
-                    updatedAt
+                    updatedAt,
+                    isApproved,
+                    isPinned
                 } = chat
 
                 const id = channelId.split('_').filter((id: string) => id !== userData['Mobile App Firebase UID'])[0]
@@ -206,9 +289,11 @@ const useChat = () => {
 
     return {
         isLoading,
+        isAdmin,
         officialChats,
         userChats,
         adminChats,
+        approvedChats,
         getAdminOfficialChannelsHandler,
         toggleLoaderHandler,
         getAllOfficialChannelsHandler,

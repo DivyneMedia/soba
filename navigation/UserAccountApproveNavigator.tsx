@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import ChattingScreen from "../screens/ChattingScreen";

@@ -20,12 +20,6 @@ import * as authActions from '../store/actions/AuthActions'
 const LoginScreen = (props: any) => {
     const { navigation } = props
 
-    const [data] = useState(() => {
-        console.log('hello')
-    })
-
-    console.log('data : ', data)
-
     // **Hooks
     const dispatch = useDispatch()
 
