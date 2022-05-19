@@ -119,6 +119,7 @@ const LoginScreen = (props: any) => {
                             returnKeyType="done"
                             maxLength={15}
                             ref={passwordRef}
+                            password
                         />
                         <RegularText
                             onPress={onForgotPasswordPress}

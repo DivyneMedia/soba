@@ -24,6 +24,7 @@ const RoundedInput = forwardRef((props: RoundedInputProps & TextInputProps, ref:
                 borderRadius: 30,
                 borderWidth: 1,
                 marginTop: 20,
+                minHeight: 50,
                 ...style
             }}
         >
@@ -53,7 +54,12 @@ const RoundedInput = forwardRef((props: RoundedInputProps & TextInputProps, ref:
                     secureTextEntry={password ? showPassword : false}
                     placeholder=""
                     ref={ref}
-                    style={{ flex: 1, paddingHorizontal: 20, ...props.inputStyle }}
+                    style={{
+                        flex: 1,
+                        minHeight: 50,
+                        paddingHorizontal: 20,
+                        ...props.inputStyle
+                    }}
                 />
                 {
                     password

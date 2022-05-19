@@ -14,7 +14,8 @@ const HeaderComponent = (props: HeaderComponentProps) => {
                 position: 'absolute',
                 height: 56,
                 paddingHorizontal: 10,
-                justifyContent: 'center'
+                justifyContent: 'center',
+                zIndex: 1
             }}
         >
             <Pressable

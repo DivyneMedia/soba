@@ -178,7 +178,7 @@ const OTPScreen = (props: any) => {
                             {"SMS OTP Verification"}
                         </BoldText>
                         <RegularText style={{ textAlign: 'center', marginTop: 10 }}>
-                            {`Please enter the 6-digit verification code we sent via SMS. We want to make sure it your before we let you claim this account`}
+                            {`Please enter the 6-digit verification code we sent via SMS. We want to make sure it your's before we let you claim this account`}
                         </RegularText>
                         <View
                             style={{
