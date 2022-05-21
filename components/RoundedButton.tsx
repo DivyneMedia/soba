@@ -24,7 +24,7 @@ const RoundedButton = (props: RoundedButtonProps) => {
                 justifyContent: 'center',
                 backgroundColor: disabled ? colors.grey : colors.primary,
                 width: '100%',
-                paddingVertical: 15,
+                // paddingVertical: 15,
                 marginTop: 10,
                 ...style
             }}

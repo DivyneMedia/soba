@@ -4,6 +4,8 @@ export default {
     apiKey: '8d87d28de4dfd6eaaf1a1d89fd00050c',
     SOMETHING_WENT_WRONG: 'Something went wrong please try again.',
 
+    NEW_PASSWORD: 'NEW_PASSWORD',
+
     EMAIL: 'EMAIL',
     PASSWORD: 'PASSWORD',
     MATRICULATION_INPUT: 'MATRICULATION_INPUT',
@@ -30,5 +32,7 @@ export default {
     users: 'users',
     chatMembersData: 'chatMembersData',
     chatMessages: 'chatMessages',
+    chapters: 'chapters',
+    executives: 'executives',
     chatMessagesFetchLimit: 15
 }

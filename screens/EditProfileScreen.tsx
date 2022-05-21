@@ -15,6 +15,8 @@ import appConstants from "../constants/appConstants";
 import RoundedInputButton from "../components/RoundedInputButton";
 import RoundedButton from "../components/RoundedButton";
 import Root from "../components/RootComponent";
+import { useSelector } from "react-redux";
+import { USER } from "../types/UserResponse";
 
 type EditProfileScreenProps = {
     navigation: any
@@ -24,26 +26,28 @@ type EditProfileScreenProps = {
 const EditProfileScreen = (props: EditProfileScreenProps) => {
     const { navigation, route } = props
 
-    const [showImagePicker, setShowImagePicker] = useState(false)
+    const userData: USER = useSelector((state: any) => state?.auth?.userData)
+
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
-    
+
+    const [userName, setUserName] = useState('petchu87@yahoo.com')
     const [email, setEmail] = useState('petchu87@yahoo.com')
     const [phoneNumber, setPhoneNumber] = useState('+1 (804) 605-3051')
     const [dob, setDob] = useState('July 26, 1987')
     const [address, setAddress] = useState('11788 Culebra Rd, San Antonio, TX 78253')
     const [baseChapter, setBaseChapter] = useState('SOBA Dallas')
-    const [password, setPassword] = useState('')
-    const [confPassword, setConfPassword] = useState('')
     
+    const userNameRef = useRef(null)
     const emailRef = useRef(null)
     const phoneRef = useRef(null) 
     const addressRef = useRef(null) 
     const baseChapterRef = useRef(null) 
-    const passwordRef = useRef(null) 
-    const confirmPasswordRef = useRef(null)
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
+            case appConstants.USERNAME:
+                setUserName(value)
+                break
             case appConstants.EMAIL:
                 setEmail(value)
                 break
@@ -56,17 +60,14 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
             case appConstants.BASE_CHAPTER:
                 setBaseChapter(value)
                 break
-            case appConstants.PASSWORD:
-                setPassword(value)
-                break
-            case appConstants.CONF_PASSWORD:
-                setConfPassword(value)
-                break
         }
     }, [])
 
     const onSubmitEditingHandler = useCallback((key: any, value?: any) => {
         switch (key) {
+            case appConstants.USERNAME:
+                emailRef.current?.focus()
+                break
             case appConstants.EMAIL:
                 phoneRef.current?.focus()
                 break
@@ -79,14 +80,8 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
             case appConstants.ADDRESS:
                 baseChapterRef.current?.focus()
                 break
-            case appConstants.BASE_CHAPTER:
-                passwordRef.current?.focus()
-                break
-            case appConstants.PASSWORD:
-                confirmPasswordRef.current?.focus()
-                break
-            case appConstants.CONF_PASSWORD:
-                Keyboard.dismiss()
+                case appConstants.BASE_CHAPTER:
+                // passwordRef.current?.focus()
                 break
         }
     }, [])
@@ -108,24 +103,38 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
                 onCancel={setDatePickerVisibility.bind(null, false)}
             />
             <View style={styles.headerContainer} >
-                <ProfileButton
-                    profileImageUri={images.ic_account}
-                    onPress={setShowImagePicker.bind(null, true)}
+                <Image
+                    source={{ uri: userData?.["Photo URL"] }}
+                    style={{
+                        height: 100,
+                        width: 100,
+                        borderRadius: 50,
+                        overflow: 'hidden'
+                    }}
+                    resizeMode="contain"
                 />
-                <BoldText style={{ marginTop: 20 }}>{"Philbert Mac Etchu"}</BoldText>
-                <View style={styles.plansContainer}>
-                    <MembershipSymbol icon={images.ic_red_symbol} />
-                    <MembershipSymbol icon={images.ic_blue_symbol} />
-                    <MembershipSymbol icon={images.ic_green_symbol} />
-                    <MembershipSymbol icon={images.ic_yellow_symbol} />
-                </View>
-                <RegularText style={{ fontSize: 12 }}>{'SOBA 2000'}</RegularText>
-                <RegularText style={{ fontSize: 12 }}>{'7443'}</RegularText>
+                <RegularText
+                    style={{
+                        fontSize: 12,
+                        marginTop: 10,
+                        color: colors.primary
+                    }}
+                >
+                        {'Update Profile Image'}
+                </RegularText>
             </View>
             <HorizontalRular />
             <View style={styles.profileDetailsContainer}>
                 <RoundedInput
-                    placeholder="email or username"
+                    placeholder="Username"
+                    value={userName}
+                    onChangeText={onChangeTextHandler.bind(null, appConstants.EMAIL)}
+                    onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.EMAIL)}
+                    maxLength={50}
+                    ref={userNameRef}
+                />
+                <RoundedInput
+                    placeholder="Email"
                     value={email}
                     onChangeText={onChangeTextHandler.bind(null, appConstants.EMAIL)}
                     onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.EMAIL)}
@@ -162,34 +171,11 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
                     maxLength={50}
                     ref={addressRef}
                 />
-                <RoundedInput
-                    placeholder="password"
-                    value={password}
-                    onChangeText={onChangeTextHandler.bind(null, appConstants.PASSWORD)}
-                    onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.PASSWORD)}
-                    blurOnSubmit={true}
-                    secureTextEntry={true}
-                    maxLength={15}
-                    ref={passwordRef}
-                    password
-                />
-                <RoundedInput
-                    placeholder="confirm password"
-                    value={confPassword}
-                    onChangeText={onChangeTextHandler.bind(null, appConstants.CONF_PASSWORD)}
-                    onSubmitEditing={onSubmitEditingHandler.bind(null, appConstants.CONF_PASSWORD)}
-                    blurOnSubmit={true}
-                    secureTextEntry={true}
-                    returnKeyType="done"
-                    maxLength={15}
-                    ref={confirmPasswordRef}
-                    password
-                />
             </View>
             <HorizontalRular />
             <RoundedButton
                 text="SAVE"
-                style={{ borderRadius: 0 }}
+                style={{ borderRadius: 0, height: 50 }}
                 onPress={updateProfileHandler}
             />
         </Root>

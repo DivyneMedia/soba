@@ -43,4 +43,5 @@ export default {
     ic_email: require('./ic_email.png'),
     ic_phone: require('./ic_phone.png'),
     ic_acc_calendar: require('./ic_acc_calendar.png'),
+    ic_password: require('./ic_password.png'),
 }

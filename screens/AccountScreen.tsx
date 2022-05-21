@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { BackHandler, Button, ScrollView, StyleSheet, View }  from 'react-native';
+import { Alert, BackHandler, ScrollView, StyleSheet, View }  from 'react-native';
 import colors from "../constants/colors";
 import {
     BottomSheetBackdropProps,
@@ -18,18 +18,15 @@ import TextLogoButton from "../components/TextLogoButton";
 import ProfileButton from "../components/ProfileButton";
 import HorizontalRular from "../components/HorizontalRular";
 
-import Animated, {
-    useAnimatedStyle,
-    interpolateColor,
-    Extrapolate,
-    interpolate,
-  } from "react-native-reanimated";
-
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as authActions from '../store/actions/AuthActions'
 import { SuccessToast } from "../utils/ToastUtils";
 import CustomBackdrop from "../components/CustomBackdrop";
 import Root from "../components/RootComponent";
+import { USER } from "../types/UserResponse";
+import moment from "moment";
+import QrCodeModal, { QrCodeModalRefTypes } from "../components/QrCodeModal";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 
 type AccountScreenProps = {
     navigation: any
@@ -40,22 +37,11 @@ const AccountScreen = (props: AccountScreenProps) => {
     const { navigation, route } = props
     const dispatch = useDispatch()
 
-    // ref
-    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-    const bottomSheetOpenStatusRef = useRef(false)
+    const userData: USER = useSelector((state: any) => state.auth?.userData)
 
-    // variables
-    const snapPoints = useMemo(() => ['50%'], []);
-
-    // callbacks
-    const handlePresentModalPress = useCallback(() => {
-        bottomSheetModalRef.current?.present();
-    }, []);
-    
-    const handleSheetChanges = useCallback((index: number) => {
-        // console.log('handleSheetChanges', index);
-        bottomSheetOpenStatusRef.current = index !== -1
-    }, []);
+    // refs
+    const qrCodeModalRef = useRef<QrCodeModalRefTypes>(null)
+    const changePasswordModalRef = useRef<QrCodeModalRefTypes>(null)
 
     const editProfileHandler = useCallback(() => {
         try {
@@ -74,24 +60,55 @@ const AccountScreen = (props: AccountScreenProps) => {
 
     const showQrCodeHandler = useCallback(() => {
         try {
-            bottomSheetModalRef.current?.present();
+            qrCodeModalRef.current?.show()
         } catch (err: any) {
             console.log('[onEditPressHandler] Error : ', err?.message)
         }
+    }, [])
+
+    const changePasswordHandler = useCallback(() => {
+        changePasswordModalRef.current?.show()
     }, [])
 
     const logoutHandler = useCallback(async () => {
         try {
-            await dispatch(authActions.logout())
-            SuccessToast("Logged Successfully.")
+            Alert.alert(
+                'Are you sure?',
+                'You are about to logout from the app.',
+                [
+                    {
+                        onPress: async () => {
+                            await dispatch(authActions.logout())
+                            SuccessToast("Logged Successfully.")
+                        },
+                        style: 'destructive',
+                        text: 'LOGOUT'
+                    },
+                    {
+                        style: 'cancel',
+                        text: 'Cancel'
+                    },
+                ]
+            )
         } catch (err: any) {
             console.log('[onEditPressHandler] Error : ', err?.message)
         }
     }, [])
 
+    const onBaseChapterPressHandler = useCallback(() => {
+        navigation.navigate('executives', {
+            chapter: 'Dallas'
+        })
+    }, [navigation])
+
     const androidBackButtonPressHandler = useCallback(() => {
-        if (bottomSheetOpenStatusRef.current) {
-            bottomSheetModalRef.current?.close()
+        const qrCodeModalVisibility = qrCodeModalRef.current?.isVisible?.current
+        const changePasswordModalVisibility = changePasswordModalRef.current?.isVisible?.current
+        if (qrCodeModalVisibility) {
+            qrCodeModalRef.current?.hide()
+            return true
+        } else if (changePasswordModalVisibility) {
+            changePasswordModalRef.current?.hide()
             return true
         } else {
             return false
@@ -105,49 +122,57 @@ const AccountScreen = (props: AccountScreenProps) => {
 
     return (
         <BottomSheetModalProvider>
+            <QrCodeModal
+                ref={qrCodeModalRef}
+            />
+            <ChangePasswordModal
+                ref={changePasswordModalRef}
+            />
             <Root style={styles.container}>
                 <ScrollView style={styles.root}>
                     <View style={styles.headerContainer} >
                         <ProfileButton
-                            profileImageUri={images.ic_account}
+                            profileImageUri={userData?.["Photo URL"]}
                             onPress={editProfileHandler}
                         />
-                        <BoldText style={{ marginTop: 20 }}>{"Philbert Mac Etchu"}</BoldText>
+                        <BoldText style={{ marginTop: 20 }}>{userData?.["Full Name (F)"] ?? '-'}</BoldText>
                         <View style={styles.plansContainer}>
                             <MembershipSymbol icon={images.ic_red_symbol} />
                             <MembershipSymbol icon={images.ic_blue_symbol} />
                             <MembershipSymbol icon={images.ic_green_symbol} />
                             <MembershipSymbol icon={images.ic_yellow_symbol} />
                         </View>
-                        <RegularText style={{ fontSize: 12 }}>{'SOBA 2000'}</RegularText>
-                        <RegularText style={{ fontSize: 12 }}>{'7443'}</RegularText>
+                        <RegularText style={{ fontSize: 12 }}>{`SOBA ${userData?.["Year of Entry"]}`}</RegularText>
+                        <RegularText style={{ fontSize: 12 }}>{userData?.["Admission Number"] ?? '-'}</RegularText>
                     </View>
                     <HorizontalRular />
                     <View style={styles.profileDetailsContainer}>
                         <TitleText
                             logo={images.ic_email}
                             title={"Email address"}
-                            text={"petchu87@yahoo.com"}
+                            text={userData?.["Email 1"] ?? '-'}
                         />
                         <TitleText
                             logo={images.ic_phone}
                             title={"Phone No."}
-                            text={"+1 (804) 605-3051"}
+                            text={`+1 (${userData?.["Phone 1 Area Code"]}) ${userData?.["Phone 1 Number"]}` ?? '-'}
                         />
                         <TitleText
                             logo={images.ic_acc_calendar}
                             title={"Date of Birth"}
-                            text={"July 26, 1987"}
+                            // text={"July 26, 1987"}
+                            text={moment(`${userData?.["DOB Day"]}/${userData?.["DOB Month"]}/${userData?.["Year of Entry"]} 00:00:00`, "D/M/YYYY hh:mm:ss").format("MMMM DD, YYYY") ?? '-'}
                         />
                         <TitleText
                             logo={images.ic_address}
                             title={"Address"}
-                            text={"11788 Culebra Rd, San Antonio, TX 78253"}
+                            text={`${userData?.["Full Street Address (F)"]}, ${userData?.["State/Province"]}` ?? '-'}
                         />
                         <TitleText
                             logo={images.ic_chapter}
                             title={"Base Chapter"}
-                            text={"SOBA Dallas"}
+                            text={userData?.["Chapter Affiliate"] ?? '-'}
+                            onPress={onBaseChapterPressHandler}
                         />
                     </View>
                     <HorizontalRular />
@@ -163,40 +188,17 @@ const AccountScreen = (props: AccountScreenProps) => {
                             onPress={showQrCodeHandler}
                         />
                         <TextLogoButton
+                            icon={images.ic_password}
+                            text="Change Password"
+                            onPress={changePasswordHandler}
+                        />
+                        <TextLogoButton
                             icon={images.ic_logout}
                             text="Log out"
                             onPress={logoutHandler}
                         />
                     </View>
                 </ScrollView>
-                <BottomSheetModal
-                    ref={bottomSheetModalRef}
-                    index={0}
-                    snapPoints={snapPoints}
-                    onChange={handleSheetChanges}
-                    backdropComponent={(props: BottomSheetBackdropProps) => <CustomBackdrop {...props} onPress={() => bottomSheetModalRef.current.close()} />}
-                    enableDismissOnClose={true}
-                >
-                    <View
-                        style={{
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
-                    >
-                        <BoldText>{"Philbert Mac Etchu"}</BoldText>
-                        <View style={styles.plansContainer}>
-                            <MembershipSymbol icon={images.ic_red_symbol} />
-                            <MembershipSymbol icon={images.ic_blue_symbol} />
-                            <MembershipSymbol icon={images.ic_green_symbol} />
-                            <MembershipSymbol icon={images.ic_yellow_symbol} />
-                        </View>
-                        <QRCode
-                            value="Just some string value"
-                            size={200}
-                        />
-                    </View>
-                </BottomSheetModal>
             </Root>
         </BottomSheetModalProvider>
     )

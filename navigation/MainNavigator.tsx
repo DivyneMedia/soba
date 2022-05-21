@@ -5,6 +5,7 @@ import EditProfileScreen from "../screens/EditProfileScreen";
 import ChattingScreen from "../screens/ChattingScreen";
 import DonationDetailsScreen from "../screens/DonationDetailsScreen";
 import DetailsScreen from "../screens/DetailsScreen";
+import ExecutivesScreen from "../screens/ExecutivesScreen";
 
 const Stack = createNativeStackNavigator()
 
@@ -45,6 +46,14 @@ const MainNavigator = () => {
               options={{
                 headerShown: true,
                 headerTitle: "Dontion Details"
+              }}
+            />
+            <Stack.Screen
+              name="executives"
+              component={ExecutivesScreen}
+              options={{
+                headerShown: true,
+                headerTitle: 'Executives'
               }}
             />
         </Stack.Navigator>

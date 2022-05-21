@@ -4,18 +4,18 @@ import images from "../assets/images";
 import colors from "../constants/colors";
 
 type ProfileButtonType = {
-    profileImageUri?: ImageRequireSource
+    profileImageUri?: ImageRequireSource | any
     onPress: () => any
 }
 
-const ProfileButton = (props: ProfileButtonType) => {
+const ProfileButton = React.memo((props: ProfileButtonType) => {
     const { onPress, profileImageUri } = props
     return (
         <ImageBackground
-            source={profileImageUri || images.ic_user}
+            source={{ uri: profileImageUri }}
             style={styles.imageBackgoundStyle}
             imageStyle={styles.imageStyle}
-            resizeMode="contain"
+            resizeMode="cover"
         >
             <Pressable onPress={onPress} style={styles.editButtonContainer}>
                 <Image
@@ -26,31 +26,40 @@ const ProfileButton = (props: ProfileButtonType) => {
             </Pressable>
         </ImageBackground>
     )
-}
+})
 
 const styles = StyleSheet.create({
     imageBackgoundStyle: {
         height: 65,
         width: 65,
         justifyContent: 'flex-end',
-        alignItems: 'flex-end'
+        alignItems: 'flex-end',
+        borderWidth: 2,
+        borderRadius: 40,
+        // overflow: 'hidden'
     },
     imageStyle: {
-        height: 65,
-        width: 65,
-        opacity: 0.5
+        height: 62,
+        width: 62,
+        opacity: 0.5,
+        borderRadius: 40,
+        overflow: 'hidden'
     },
     editButtonContainer: {
-        // padding: 7,
-        // backgroundColor: colors.white,
-        borderRadius: 30,
-        marginRight: 0,
-        marginBottom: -6,
+        // position: 'absolute',
+        padding: 7,
+        // marginRight: 0,
+        // height: 35,
+        // width: 35,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: -12,
+        marginRight: -10,
         // borderWidth: 1
     },
     editLogoStyle: {
-        height: 28,
-        width: 28,
+        height: 30,
+        width: 30,
     }
 })
 
