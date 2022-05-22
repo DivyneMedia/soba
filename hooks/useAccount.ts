@@ -187,7 +187,7 @@ const useAccount = (chatChannelId?: string) => {
                                     "city": userPayload.city,
                                     "county": userPayload.county,
                                     "zipCode": userPayload.zipCode,
-                                    "zipCodeSuffix": "3188",
+                                    // "zipCodeSuffix": "3188",
                                     "phone1": userPayload.phone
                                 }
                             ]
@@ -215,6 +215,28 @@ const useAccount = (chatChannelId?: string) => {
         }
     }, [])
 
+    const changePasswordHandler = useCallback(async (crmId: any, newPassword: string) => {
+        try {
+            toggleLoader(true)
+            await axios.patch('/accounts/' + crmId, {
+                individualAccount: {
+                    accountCustomFields: [
+                        {
+                            id: "87",
+                            name: "Mobile App Password",
+                            value: newPassword
+                        }
+                    ]
+                }
+            })
+            toggleLoader(false)
+        } catch (err: any) {
+            console.log('[changePasswordHandler] Error : ', err?.message)
+            toggleLoader(false)
+            throw new Error(err?.response?.data ?? err?.message ?? appConstants.SOMETHING_WENT_WRONG)
+        }
+    }, [])
+
     return {
         isLoading,
         approveUserAcc,
@@ -222,6 +244,7 @@ const useAccount = (chatChannelId?: string) => {
         getAvailableChapters,
         getUserAccountDetails,
         updateUserAccountDetails,
+        changePasswordHandler,
         toggleLoader
     }
 }

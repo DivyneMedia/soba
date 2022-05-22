@@ -6,7 +6,7 @@ import thunk from 'redux-thunk'
 import authReducer from './reducers/AuthReducer'
 
 const rootReducer = combineReducers({
-    auth: authReducer
+  auth: authReducer
 })
 
 const persistConfig = {
@@ -14,7 +14,6 @@ const persistConfig = {
   storage: AsyncStorage,
 }
  
-
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export let store: any = createStore(persistedReducer, applyMiddleware(thunk));

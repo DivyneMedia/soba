@@ -25,6 +25,7 @@ const RoundedButton = (props: RoundedButtonProps) => {
                 backgroundColor: disabled ? colors.grey : colors.primary,
                 width: '100%',
                 // paddingVertical: 15,
+                minHeight: 50,
                 marginTop: 10,
                 ...style
             }}

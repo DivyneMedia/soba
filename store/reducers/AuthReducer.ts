@@ -1,6 +1,11 @@
+import { USER } from '../../types/UserResponse'
 import * as authActions from '../actions/AuthActions'
 
-const initialState = {
+type InitialStateType = {
+    userData: USER | null
+}
+
+const initialState: InitialStateType = {
     userData: null
 }
 
@@ -38,6 +43,14 @@ export default (state = initialState, action: ActionType) => {
             }
         case authActions.LOGOUT:
             return initialState
+        case authActions.UPDATE_CURR_PASSWORD:
+            return {
+                ...state,
+                userData: {
+                    ...state.userData,
+                    'Mobile App Password': payload
+                }
+            }
         default:
             return state
     }

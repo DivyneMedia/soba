@@ -9,6 +9,7 @@ export const SET_REGION = "SET_REGION"
 export const SET_CHAPTER = "SET_CHAPTER"
 export const LOGOUT = "LOGOUT"
 export const SET_CHAPTERS = "SET_CHAPTERS"
+export const UPDATE_CURR_PASSWORD = "UPDATE_CURR_PASSWORD"
 
 const loginWithUserNameRequest = (username: string, password: string) => [
     {
@@ -122,6 +123,15 @@ export const logout = () => {
     return async (dispatch: any, getState: any) => {
         dispatch({
             type: LOGOUT
+        })
+    }
+}
+
+export const changePassword = (newPassword: string) => {
+    return (dispatch: any) => {
+        dispatch({
+            type: UPDATE_CURR_PASSWORD,
+            payload: newPassword
         })
     }
 }

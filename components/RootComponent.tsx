@@ -24,7 +24,7 @@ const Root = (props: RootProps) => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white, ...style }}>
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps={'always'}
         contentContainerStyle={{
