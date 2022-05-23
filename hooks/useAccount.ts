@@ -4,7 +4,7 @@ import firestore from '@react-native-firebase/firestore'
 
 import axios from '../axios.auth'
 import appConstants from '../constants/appConstants'
-import { UPDATE_USER_PAYLOAD, userPayload } from '../model/UserData'
+import { UPDATE_USER_PAYLOAD, UPDATE_USER_PROFILE, userPayload } from '../model/UserData'
 import { BASE_CUSTOM_FIELD_RESPONSE, OPTION_VALUES, UserRespose } from '../types/UserResponse'
 import { ErrorToast } from '../utils/ToastUtils'
 
@@ -237,6 +237,69 @@ const useAccount = (chatChannelId?: string) => {
         }
     }, [])
 
+    const updateUserAccountHandler = useCallback(async (crmId: any, userPayload: UPDATE_USER_PROFILE) => {
+        try {
+            toggleLoader(true)
+            let updateUserAccountDetailsRes: AxiosResponse<any>
+            try {
+                updateUserAccountDetailsRes = await axios.patch('/accounts/' + crmId,  {
+                    "individualAccount": {
+                        "accountCustomFields": [
+                            {
+                                "id": "75",
+                                "name": "Chapter Affiliate",
+                                "status": null,
+                                "value": null,
+                                "optionValues": [
+                                    {
+                                        "id": userPayload.chapterId,
+                                        "name": userPayload.chapterName,
+                                        "status": null
+                                    }
+                                ]
+                            }
+                        ],
+                        "primaryContact": {
+                            "dob": {
+                                "day": userPayload.date,
+                                "month": userPayload.month,
+                                "year": userPayload.year
+                            },
+                            "email1": userPayload.email,
+                            "addresses": [
+                                {
+                                    "addressId": userPayload.primaryAddressId,
+                                    "addressLine1": userPayload.addressLine1,
+                                    // "city": userPayload.city,
+                                    // "county": userPayload.county,
+                                    // "zipCode": userPayload.zipCode,
+                                    "phone1": userPayload.phone
+                                }
+                            ]
+                        }
+                    }
+                })
+
+                if (!updateUserAccountDetailsRes) {
+                    throw new Error(appConstants.SOMETHING_WENT_WRONG)
+                }
+
+                console.log('updateUserAccountDetailsRes.data : ', updateUserAccountDetailsRes.data)
+    
+                return updateUserAccountDetailsRes.data
+            } catch(err: unknown | AxiosError<any, any>) {
+                // throw new Error(err.response)
+                console.log('[updateUserAccountDetails] Error : ', err?.response?.data ?? err?.message ?? appConstants.SOMETHING_WENT_WRONG)
+                throw new Error(appConstants.SOMETHING_WENT_WRONG)
+            } finally {
+                toggleLoader(false)
+            }
+        } catch (err: any) {
+            console.log('[updateUserAccountDetails] Error : ', err?.message)
+            throw new Error(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
+        }
+    }, [])
+
     return {
         isLoading,
         approveUserAcc,
@@ -244,6 +307,7 @@ const useAccount = (chatChannelId?: string) => {
         getAvailableChapters,
         getUserAccountDetails,
         updateUserAccountDetails,
+        updateUserAccountHandler,
         changePasswordHandler,
         toggleLoader
     }

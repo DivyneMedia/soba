@@ -161,7 +161,7 @@ const AccountScreen = (props: AccountScreenProps) => {
                             logo={images.ic_acc_calendar}
                             title={"Date of Birth"}
                             // text={"July 26, 1987"}
-                            text={moment(`${userData?.["DOB Day"]}/${userData?.["DOB Month"]}/${userData?.["Year of Entry"]} 00:00:00`, "D/M/YYYY hh:mm:ss").format("MMMM DD, YYYY") ?? '-'}
+                            text={moment(`${userData?.["DOB Day"]}/${userData?.["DOB Month"]}/${userData?.["DOB Year"]} 00:00:00`, "D/M/YYYY hh:mm:ss").format("MMMM DD, YYYY") ?? '-'}
                         />
                         <TitleText
                             logo={images.ic_address}

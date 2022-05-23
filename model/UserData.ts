@@ -113,3 +113,18 @@ export type UPDATE_USER_PAYLOAD = {
     zipCode: string,
     phone: string
 }
+
+export type UPDATE_USER_PROFILE = {
+    date: string,
+    month: string,
+    year: string,
+    email: string,
+    primaryAddressId: string,
+    addressLine1: string,
+    // city: string,
+    // county: string,
+    // zipCode: string,
+    phone: string,
+    chapterId: string
+    chapterName: string
+}

@@ -61,10 +61,11 @@ const ExecutivesItem = (props: ExecutivesItemProps) => {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 10,
-        borderWidth: 1,
+        padding: 15,
+        borderWidth: 2,
         marginHorizontal: 10,
         marginBottom: 10,
+        borderRadius: 10
     },
     chatBtn: {
         borderRadius: 0,

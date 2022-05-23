@@ -1,10 +1,12 @@
-import React, { useCallback, useLayoutEffect } from 'react'
-import { StyleSheet, FlatList } from 'react-native'
+import React, { useCallback, useLayoutEffect, useMemo } from 'react'
+import { StyleSheet, FlatList, View, ActivityIndicator } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import AppLoader from '../components/AppLoader'
 
 import ExecutivesItem from '../components/ExecutivesItem'
 
 import colors from '../constants/colors'
+import useExecutives, { ExecutiveItemType } from '../hooks/useExecutives'
 import { keyExtractHandler } from '../utils/MiscUtils'
 
 type ExecutivesScreenProps = {
@@ -61,6 +63,16 @@ const ExecutivesScreen = (props: ExecutivesScreenProps) => {
     const { navigation, route } = props
     const params = route?.params
 
+    const {
+        isLoading,
+        endReached,
+        executives,
+        getExecutives,
+        fetchMore
+    } = useExecutives({
+        fetchOnMount: true
+    })
+
     // console.log('params : ', params?.chapter)
     
     useLayoutEffect(() => {
@@ -70,13 +82,13 @@ const ExecutivesScreen = (props: ExecutivesScreenProps) => {
     }, [navigation])
 
     const renderExecutivesHandler = useCallback((itemObj) => {
-        const { item, index } = itemObj
+        const { item, index }: { item: ExecutiveItemType, index: number } = itemObj
         const {
             id,
             name,
             role,
             email,
-            phone
+            phoneNo
         } = item
         try {
             return (
@@ -86,7 +98,7 @@ const ExecutivesScreen = (props: ExecutivesScreenProps) => {
                     name={name}
                     role={role}
                     email={email}
-                    phoneNumber={phone}
+                    phoneNumber={phoneNo}
                     onChat={() => {}}
                 />
             )
@@ -96,19 +108,24 @@ const ExecutivesScreen = (props: ExecutivesScreenProps) => {
         }
     }, [])
 
+    const listFooterComponent = useMemo(() => {
+        return !endReached
+        ? <View style={{ height: 50, alignItems: 'center', justifyContent: 'center' }}>
+            <ActivityIndicator size={"large"} color={colors.primary} />
+        </View>
+        : null
+    }, [endReached])
+
     return (
         <SafeAreaView style={styles.root}>
+            <AppLoader isVisible={isLoading} />
             <FlatList
-                data={tempData}
+                data={executives}
                 renderItem={renderExecutivesHandler}
                 keyExtractor={keyExtractHandler}
-                style={{
-                    flex: 1,
-                }}
-                contentContainerStyle={{
-                    marginTop: 10,
-                    paddingBottom: 10
-                }}
+                style={styles.listStyle}
+                contentContainerStyle={styles.listContainerStyle}
+                ListFooterComponent={listFooterComponent}
             />
         </SafeAreaView>
     )
@@ -118,6 +135,13 @@ const styles = StyleSheet.create({
     root: {
         flex: 1,
         backgroundColor: colors.white
+    },
+    listStyle: {
+        flex: 1,
+    },
+    listContainerStyle: {
+        marginTop: 10,
+        paddingBottom: 10
     }
 })
 

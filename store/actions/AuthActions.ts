@@ -10,6 +10,7 @@ export const SET_CHAPTER = "SET_CHAPTER"
 export const LOGOUT = "LOGOUT"
 export const SET_CHAPTERS = "SET_CHAPTERS"
 export const UPDATE_CURR_PASSWORD = "UPDATE_CURR_PASSWORD"
+export const UPDATE_PROFILE = "UPDATE_PROFILE"
 
 const loginWithUserNameRequest = (username: string, password: string) => [
     {

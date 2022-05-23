@@ -42,7 +42,23 @@ const RoundedInputButton = (props: RoundedInputButtonProps) => {
             {
                 hideIcon
                 ?
-                    null
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: 'center',
+                        paddingHorizontal: 20,
+                        paddingVertical: 12
+                    }}
+                >
+                    <RegularText
+                        style={{
+                            fontSize: 14,
+                            marginLeft: 5
+                        }}
+                    >
+                        {value}
+                    </RegularText>
+                </View>
                 :
                     <View
                         style={{
