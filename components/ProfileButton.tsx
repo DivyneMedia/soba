@@ -34,28 +34,23 @@ const styles = StyleSheet.create({
         width: 65,
         justifyContent: 'flex-end',
         alignItems: 'flex-end',
-        borderWidth: 2,
+        // borderWidth: 2,
         borderRadius: 40,
         // overflow: 'hidden'
     },
     imageStyle: {
-        height: 62,
-        width: 62,
+        height: 65,
+        width: 65,
         opacity: 0.5,
         borderRadius: 40,
         overflow: 'hidden'
     },
     editButtonContainer: {
-        // position: 'absolute',
         padding: 7,
-        // marginRight: 0,
-        // height: 35,
-        // width: 35,
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: -12,
         marginRight: -10,
-        // borderWidth: 1
     },
     editLogoStyle: {
         height: 30,

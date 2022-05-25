@@ -5,6 +5,7 @@ import TextLogoButton from '../components/TextLogoButton'
 import RoundedButton from '../components/RoundedButton'
 import images from "../assets/images";
 import TitleText from "./TitleText";
+import colors from "../constants/colors";
 
 type ExecutivesItemProps = {
     id: string
@@ -63,6 +64,7 @@ const styles = StyleSheet.create({
     container: {
         padding: 15,
         borderWidth: 2,
+        borderColor: colors.grey,
         marginHorizontal: 10,
         marginBottom: 10,
         borderRadius: 10

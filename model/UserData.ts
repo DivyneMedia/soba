@@ -125,6 +125,6 @@ export type UPDATE_USER_PROFILE = {
     // county: string,
     // zipCode: string,
     phone: string,
-    chapterId: string
-    chapterName: string
+    // chapterId: string
+    // chapterName: string
 }

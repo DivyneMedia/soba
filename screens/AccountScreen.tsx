@@ -97,9 +97,9 @@ const AccountScreen = (props: AccountScreenProps) => {
 
     const onBaseChapterPressHandler = useCallback(() => {
         navigation.navigate('executives', {
-            chapter: 'Dallas'
+            chapter: userData?.["Chapter Affiliate"]
         })
-    }, [navigation])
+    }, [navigation, userData])
 
     const androidBackButtonPressHandler = useCallback(() => {
         const qrCodeModalVisibility = qrCodeModalRef.current?.isVisible?.current

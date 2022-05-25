@@ -244,21 +244,6 @@ const useAccount = (chatChannelId?: string) => {
             try {
                 updateUserAccountDetailsRes = await axios.patch('/accounts/' + crmId,  {
                     "individualAccount": {
-                        "accountCustomFields": [
-                            {
-                                "id": "75",
-                                "name": "Chapter Affiliate",
-                                "status": null,
-                                "value": null,
-                                "optionValues": [
-                                    {
-                                        "id": userPayload.chapterId,
-                                        "name": userPayload.chapterName,
-                                        "status": null
-                                    }
-                                ]
-                            }
-                        ],
                         "primaryContact": {
                             "dob": {
                                 "day": userPayload.date,

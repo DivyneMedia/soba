@@ -9,14 +9,15 @@ import images from "../assets/images"
 type RoundedInputButtonProps = {
     placeholder: string
     value: string
-    onPress: () => any
+    onPress?: () => any
     style?: ViewStyle
     icon?: ImageRequireSource
     hideIcon?: boolean
+    disabled?: boolean
 }
 
 const RoundedInputButton = (props: RoundedInputButtonProps) => {
-    const { placeholder, value, onPress, style, icon, hideIcon } = props
+    const { placeholder, value, onPress, style, icon, hideIcon, disabled } = props
     return (
         <Pressable
             style={{
@@ -26,6 +27,7 @@ const RoundedInputButton = (props: RoundedInputButtonProps) => {
                 minHeight: 50,
                 ...style
             }}
+            disabled={!!disabled}
             onPress={onPress}
         >
             <RegularText

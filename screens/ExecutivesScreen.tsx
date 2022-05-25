@@ -72,14 +72,12 @@ const ExecutivesScreen = (props: ExecutivesScreenProps) => {
     } = useExecutives({
         fetchOnMount: true
     })
-
-    // console.log('params : ', params?.chapter)
     
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: "SOBA Dallas Executives"
+            headerTitle: `${params?.chapter} Executives`
         })
-    }, [navigation])
+    }, [navigation, params])
 
     const renderExecutivesHandler = useCallback((itemObj) => {
         const { item, index }: { item: ExecutiveItemType, index: number } = itemObj

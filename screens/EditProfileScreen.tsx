@@ -21,6 +21,8 @@ import SelectChapterModal from "../components/SelectChapterModal";
 import { USER_DETAILS } from "../model/UserData";
 import AppLoader from "../components/AppLoader";
 import { login } from "../store/actions/AuthActions";
+import ScreenHeader from "../components/ScreenHeader";
+import HeaderComponent from "../components/HeaderComponent";
 
 type EditProfileScreenProps = {
     navigation: any
@@ -47,9 +49,9 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
     const [phoneNumber, setPhoneNumber] = useState(userData?.["Phone 1 Full Number (F)"] ?? '')
     const [dob, setDob] = useState<any>(moment(`${userData?.["DOB Year"]}/${userData?.["DOB Month"]}/${userData?.["DOB Day"]} 00:00:00`, 'YYYY/MM/DD hh:mm:ss') ?? null)
     const [address, setAddress] = useState(userData?.["Full Street Address (F)"] ?? '')
-    const [baseChapter, setBaseChapter] = useState<OPTION_VALUES>()
+    // const [baseChapter, setBaseChapter] = useState<OPTION_VALUES>()
 
-    const [chapters, setChapters] = useState<OPTION_VALUES[]>([])
+    // const [chapters, setChapters] = useState<OPTION_VALUES[]>([])
     const [userDetails, setUserDetails] = useState<USER_DETAILS | null>(null)
 
     const dispatch = useDispatch()
@@ -61,21 +63,21 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
     const baseChapterRef = useRef<TextInput>(null)
     const selectChapterModalRef = useRef<any>(null)
 
-    useEffect(() => {
-        getAvailableChapters()
-        .then(res => {
-            if (res && Array.isArray(res) && res.length) {
-                setChapters(res)
-                const userChapter = res.find((chapter: OPTION_VALUES) => {
-                    return chapter.name.toLowerCase().includes(userData?.["Chapter Affiliate"]?.toLowerCase());
-                })
-                setBaseChapter(userChapter)
-            }
-        })
-        .catch((err: any) => {
-            console.log('Error : ', err.message)
-        })
-    }, [])
+    // useEffect(() => {
+    //     getAvailableChapters()
+    //     .then(res => {
+    //         if (res && Array.isArray(res) && res.length) {
+    //             setChapters(res)
+    //             const userChapter = res.find((chapter: OPTION_VALUES) => {
+    //                 return chapter.name.toLowerCase().includes(userData?.["Chapter Affiliate"]?.toLowerCase());
+    //             })
+    //             setBaseChapter(userChapter)
+    //         }
+    //     })
+    //     .catch((err: any) => {
+    //         console.log('Error : ', err.message)
+    //     })
+    // }, [])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
@@ -91,9 +93,9 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
             case appConstants.ADDRESS:
                 setAddress(value)
                 break
-            case appConstants.BASE_CHAPTER:
-                setBaseChapter(value)
-                break
+            // case appConstants.BASE_CHAPTER:
+            //     setBaseChapter(value)
+            //     break
         }
     }, [])
 
@@ -142,10 +144,10 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
                 ErrorToast('Date of birth required.')
                 return
             }
-            if (!baseChapter) {
-                ErrorToast('Select base chapter to continue.')
-                return
-            }
+            // if (!baseChapter) {
+            //     ErrorToast('Select base chapter to continue.')
+            //     return
+            // }
 
             const fullDob = moment(dob).format('YYYY-MM-DD')
 
@@ -165,8 +167,8 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
                 addressLine1: address.trim(),
                 phone: phoneNumber,
                 primaryAddressId: addressId,
-                chapterId: baseChapter.id,
-                chapterName: baseChapter.name
+                // chapterId: baseChapter.id,
+                // chapterName: baseChapter.name
             })
             toggleLoader(true)
             await dispatch(login({
@@ -174,7 +176,7 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
                 password: userData?.["Mobile App Password"]
             }))
             toggleLoader(false)
-
+            navigation.goBack()
             SuccessToast('Profile updated successfully')
         } catch (err: any) {
             toggleLoader(false)
@@ -188,7 +190,6 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
         phoneNumber,
         dob,
         address,
-        baseChapter,
         userDetails
     ])
 
@@ -204,6 +205,9 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
 
     return (
         <Root style={styles.root}>
+            <HeaderComponent
+                onBack={navigation.goBack}
+            />
             <AppLoader isVisible={isLoading} />
             <DateTimePickerModal
                 isVisible={isDatePickerVisible}
@@ -211,7 +215,7 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
                 onConfirm={onSubmitEditingHandler.bind(null, appConstants.DOB)}
                 onCancel={setDatePickerVisibility.bind(null, false)}
             />
-            <SelectChapterModal
+            {/* <SelectChapterModal
                 ref={selectChapterModalRef}
                 chapters={chapters}
                 onSelect={(selected: OPTION_VALUES) => {
@@ -219,14 +223,14 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
                     setBaseChapter(selected)
                     selectChapterModalRef.current.hide()
                 }}
-            />
+            /> */}
             <View style={styles.headerContainer} >
                 <Image
                     source={{ uri: userData?.["Photo URL"] }}
                     style={{
                         height: 100,
                         width: 100,
-                        borderRadius: 50,
+                        borderRadius: 100,
                         overflow: 'hidden'
                     }}
                     resizeMode="contain"
@@ -293,10 +297,11 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
                 <RoundedInputButton
                     placeholder="Base Chapter"
                     hideIcon
-                    onPress={() => {
-                        selectChapterModalRef.current.show()
-                    }}
-                    value={baseChapter?.name ? baseChapter.name :  '-'}
+                    disabled={true}
+                    // onPress={() => {
+                    //     selectChapterModalRef.current.show()
+                    // }}
+                    value={userData?.["Chapter Affiliate"] ??  '-'}
                 />
             </View>
             <HorizontalRular />
