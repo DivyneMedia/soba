@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from "react-redux";
 import AppLoader from "../components/AppLoader";
@@ -19,6 +19,7 @@ import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
 import { height } from "../utils/MiscUtils";
 import appConstants from "../constants/appConstants";
+import { LoaderContext } from "../context/LoaderContextProvider";
 
 const SelectChapterScreen = (props: any) => {
     const { navigation } = props
@@ -55,7 +56,7 @@ const SelectChapterScreen = (props: any) => {
         initHandler()
     }, [])
 
-    const renderChapterHandler = (chapterObj: any) => {
+    const renderChapterHandler = useCallback((chapterObj: any) => {
         try {
             const { id, name, code } = chapterObj
             return (
@@ -70,11 +71,16 @@ const SelectChapterScreen = (props: any) => {
             console.log('[renderChapterHandler] Error : ', err.message)
             return null
         }
-    }
+    }, [selectedOption])
+
+    const loaderContext = useContext(LoaderContext)
+
+    useEffect(() => {
+        loaderContext.toggleLoader(isLoading)
+    }, [isLoading, loaderContext])
 
     return (
         <BackgroundImageComp dismissKeyboardAvoiding={true} >
-            <AppLoader isVisible={isLoading} />
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}

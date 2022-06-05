@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Image, Keyboard, StyleSheet, TextInput, View }  from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
@@ -23,6 +23,7 @@ import AppLoader from "../components/AppLoader";
 import { login } from "../store/actions/AuthActions";
 import ScreenHeader from "../components/ScreenHeader";
 import HeaderComponent from "../components/HeaderComponent";
+import { LoaderContext } from "../context/LoaderContextProvider";
 
 type EditProfileScreenProps = {
     navigation: any
@@ -203,12 +204,17 @@ const EditProfileScreen = (props: EditProfileScreenProps) => {
         })
     }, [getUserAccountDetails])
 
+    const loaderContext = useContext(LoaderContext)
+
+    useEffect(() => {
+        loaderContext.toggleLoader(isLoading)
+    }, [isLoading, loaderContext])
+
     return (
         <Root style={styles.root}>
             <HeaderComponent
                 onBack={navigation.goBack}
             />
-            <AppLoader isVisible={isLoading} />
             <DateTimePickerModal
                 isVisible={isDatePickerVisible}
                 mode="date"

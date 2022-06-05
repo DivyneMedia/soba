@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
 import { useDispatch } from "react-redux";
 
@@ -16,6 +16,7 @@ import colors from "../constants/colors";
 import images from "../assets/images";
 import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
 import * as authActions from '../store/actions/AuthActions'
+import { LoaderContext } from "../context/LoaderContextProvider";
 
 const LoginScreen = (props: any) => {
     const { navigation } = props
@@ -51,12 +52,12 @@ const LoginScreen = (props: any) => {
                 username: email,
                 password: password
             }))
+            setLoading(false)
             SuccessToast("Login Successfully.")
         } catch (err: any) {
+            setLoading(false)
             console.log('[signInHandler] Error : ', err?.message)
             ErrorToast(err.message)
-        } finally {
-            mountedRef.current && setLoading(false)
         }
     }, [dispatch, email, password])
 
@@ -87,9 +88,14 @@ const LoginScreen = (props: any) => {
         }
     }, [signInHandler])
 
+    const loaderContext = useContext(LoaderContext)
+
+    useEffect(() => {
+        loaderContext.toggleLoader(isLoading)
+    }, [isLoading])
+
     return (
         <BackgroundImageComp>
-            <AppLoader isVisible={isLoading} />
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useContext, useEffect } from "react";
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import ChattingScreen from "../screens/ChattingScreen";
@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { logout } from '../store/actions/AuthActions'
 import AccApproveRequest from "../screens/AccApproveRequest";
 import RegularText from "../components/RegularText";
+import { LoaderContext } from "../context/LoaderContextProvider";
 
 const Stack = createNativeStackNavigator()
 
@@ -52,6 +53,12 @@ const UserAccountApproveNavigator = (props: any) => {
         await dispatch(logout())
       }
     }, [])
+
+    const loaderContext = useContext(LoaderContext)
+
+    useEffect(() => {
+      loaderContext.toggleLoader(false)
+    }, [loaderContext])
 
     return (
         <Stack.Navigator

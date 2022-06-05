@@ -9,6 +9,7 @@ import images from '../assets/images'
 import AppLoader from '../components/AppLoader'
 import { ErrorToast } from '../utils/ToastUtils'
 import BoldText from '../components/BoldText'
+import { LoaderContext } from '../context/LoaderContextProvider'
 
 type RouteProps = {
     params: {
@@ -59,6 +60,8 @@ const ChatRequestsScreen = (props: ChatRequestsScreenProps) => {
     const { navigation, route } = props
     const { params } = route
     const { id, name, phone, profile } = params
+
+    const loaderContext = useContext(LoaderContext)
 
     const [isLoading, setLoading] = useState(false)
     const [data, setData] = useState<ChatChannel[]>([])
@@ -136,9 +139,12 @@ const ChatRequestsScreen = (props: ChatRequestsScreenProps) => {
         )
     }, [isLoading])
 
+    useEffect(() => {
+        loaderContext.toggleLoader(isLoading)
+    }, [isLoading, loaderContext])
+
     return (
         <View style={styles.root}>
-            <AppLoader isVisible={isLoading} />
             <FlatList
                 data={data}
                 renderItem={renderChatsHandler}

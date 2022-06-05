@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
 import AppLoader from "../components/AppLoader";
 
@@ -11,6 +11,7 @@ import ScreenHeader from "../components/ScreenHeader";
 import appConstants from "../constants/appConstants";
 
 import colors from "../constants/colors";
+import { LoaderContext } from "../context/LoaderContextProvider";
 import useFirebase from "../hooks/useFirebase";
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
@@ -117,9 +118,14 @@ const ConfirmRegistrationScreen = (props: any) => {
         }
     }, [])
 
+    const loaderContext = useContext(LoaderContext)
+
+    useEffect(() => {
+        loaderContext.toggleLoader(isLoading)
+    }, [loaderContext, isLoading])
+
     return (
         <BackgroundImageComp>
-            <AppLoader isVisible={isLoading} />
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}

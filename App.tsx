@@ -11,6 +11,7 @@ import KeyboardManager from 'react-native-keyboard-manager';
 import { isIos } from './utils/MiscUtils';
 import { LogBox, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import LoaderContextProvider from './context/LoaderContextProvider';
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state.'])
 
 const App = () => {
@@ -43,8 +44,10 @@ const App = () => {
       <PersistGate persistor={persistor} loading={null}>
         <SafeAreaProvider style={styles.container}>
           <GestureHandlerRootView style={styles.container}>
-            <RootNavigator />
-            <Toast ref={setInitialToastRef} />
+            <LoaderContextProvider>
+              <RootNavigator />
+              <Toast ref={setInitialToastRef} />
+            </LoaderContextProvider>
           </GestureHandlerRootView>
         </SafeAreaProvider>
       </PersistGate>

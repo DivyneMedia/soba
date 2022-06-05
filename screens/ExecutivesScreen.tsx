@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useMemo } from 'react'
+import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo } from 'react'
 import { StyleSheet, FlatList, View, ActivityIndicator } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AppLoader from '../components/AppLoader'
@@ -6,6 +6,7 @@ import AppLoader from '../components/AppLoader'
 import ExecutivesItem from '../components/ExecutivesItem'
 
 import colors from '../constants/colors'
+import { LoaderContext } from '../context/LoaderContextProvider'
 import useExecutives, { ExecutiveItemType } from '../hooks/useExecutives'
 import { keyExtractHandler } from '../utils/MiscUtils'
 
@@ -114,9 +115,14 @@ const ExecutivesScreen = (props: ExecutivesScreenProps) => {
         : null
     }, [endReached])
 
+    const loaderContext = useContext(LoaderContext)
+
+    useEffect(() => {
+        loaderContext.toggleLoader(isLoading)
+    }, [isLoading, loaderContext])
+
     return (
         <SafeAreaView style={styles.root}>
-            <AppLoader isVisible={isLoading} />
             <FlatList
                 data={executives}
                 renderItem={renderExecutivesHandler}

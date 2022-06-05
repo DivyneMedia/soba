@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Platform, Pressable, StyleSheet, TextInput, View }  from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import images from "../assets/images";
@@ -7,6 +7,7 @@ import ChatMessageItem from "../components/ChatMessageItem";
 import RegularText from "../components/RegularText";
 import appConstants from "../constants/appConstants";
 import colors from "../constants/colors";
+import { LoaderContext } from "../context/LoaderContextProvider";
 import useAccount from "../hooks/useAccount";
 import useChatHistory from "../hooks/useChatHistory";
 import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
@@ -132,9 +133,14 @@ const ChattingScreen = (props: ChattingScreenProps) => {
         setMessage('')
     }, [sendMessage, message])
 
+    const loaderContext = useContext(LoaderContext)
+
+    useEffect(() => {
+        loaderContext.toggleLoader(isLoading || accountLoading)
+    }, [isLoading, accountLoading, loaderContext])
+
     return (
         <SafeAreaView style={styles.root}>
-            <AppLoader isVisible={isLoading || accountLoading} />
             <FlatList
                 ref={flatListRef}
                 style={{flex: 1}}

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Image, Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSelector } from "react-redux";
 
@@ -22,6 +22,7 @@ import useAccount from "../hooks/useAccount";
 import AppLoader from "../components/AppLoader";
 import { UserRespose } from "../types/UserResponse";
 import moment from "moment";
+import { LoaderContext } from "../context/LoaderContextProvider";
 
 let userBasicInfo: UserRespose | undefined = undefined
 
@@ -147,9 +148,14 @@ const FetchMatriculationDetailsScreen = (props: any) => {
         }
     }, [details])
 
+    const loaderContext = useContext(LoaderContext)
+
+    useEffect(() => {
+        loaderContext.toggleLoader(isLoading)
+    }, [isLoading, loaderContext])
+
     return (
         <BackgroundImageComp>
-            <AppLoader isVisible={isLoading} />
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}

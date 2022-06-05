@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Image, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 // import { useSelector } from "react-redux";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -25,6 +25,7 @@ import { AxiosError } from "axios";
 import useAccount from "../hooks/useAccount";
 import { useSelector } from "react-redux";
 import { USER_DETAILS } from "../model/UserData";
+import { LoaderContext } from "../context/LoaderContextProvider";
 
 type STRING_UNDEFINED = string | undefined
 
@@ -149,7 +150,23 @@ const EnterContactInformation = (props: any) => {
                     await auth().signOut()
                 }
                 confirmation = await auth()
-                    .signInWithPhoneNumber(`${callingCode} ${phone}`)
+                    .verifyPhoneNumber(`${callingCode} ${phone}`, false, false)
+                    .on('state_changed', (snap) => {
+                        switch (snap.state) {
+                            case 'error':
+                                console.log(snap.code, snap.error)
+                                break
+                            case 'sent':
+                                console.log('otp sent successfully.')
+                                break
+                            case 'timeout':
+                                console.log('timed out.')
+                                break
+                            case 'verified':
+                                console.log('verified.')
+                                break
+                        }
+                    })
             } catch(err: any) {
                 console.log('[auth - signInWithPhoneNumber] Error : ', err)
                 toggleLoader(false)
@@ -303,10 +320,15 @@ const EnterContactInformation = (props: any) => {
         }
     }, [])
 
+    const loaderContext = useContext(LoaderContext)
+
+    useEffect(() => {
+        loaderContext.toggleLoader(isLoading || accountLoading)
+    }, [isLoading, accountLoading, loaderContext])
+
     return (
         <BackgroundImageComp>
             <View style={styles.root}>
-                <AppLoader isVisible={isLoading || accountLoading} />
                 <ScreenHeader
                     containerStyle={styles.headerContainer}
                     logo={getRegionIcon()}

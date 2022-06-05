@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import BottomTabNavigator from "./BottomTabNavigator";
 import EditProfileScreen from "../screens/EditProfileScreen";
@@ -6,10 +6,17 @@ import ChattingScreen from "../screens/ChattingScreen";
 import DonationDetailsScreen from "../screens/DonationDetailsScreen";
 import DetailsScreen from "../screens/DetailsScreen";
 import ExecutivesScreen from "../screens/ExecutivesScreen";
+import { LoaderContext } from "../context/LoaderContextProvider";
 
 const Stack = createNativeStackNavigator()
 
 const MainNavigator = () => {
+  const loaderContext = useContext(LoaderContext)
+
+  useEffect(() => {
+    loaderContext.toggleLoader(false)
+  }, [loaderContext])
+
     return (
         <Stack.Navigator
           initialRouteName="bottomTab"

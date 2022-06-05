@@ -11,6 +11,8 @@ import AdminNavigator from './AdminNavigator';
 
 import * as authActions from '../store/actions/AuthActions'
 import AppLoader from '../components/AppLoader';
+import { useContext } from 'react';
+import { LoaderContext } from '../context/LoaderContextProvider';
 
 
 type UserPayload = {
@@ -20,6 +22,8 @@ type UserPayload = {
 const RootNavigator = () => {
   const dispatch = useDispatch()
   const { userData }: UserPayload = useSelector((state: any) => state?.auth)
+
+  console.log('userData : ', userData)
 
   const accId = useMemo(() => userData?.['Account ID'], [userData?.['Account ID']])
 
@@ -32,6 +36,8 @@ const RootNavigator = () => {
   const userPassword = useMemo(() => userData?.['Mobile App Password'], [userData?.['Mobile App Password']])
 
   const [isLoading, setLoading] = useState(false)
+
+  const loaderContext = useContext(LoaderContext)
 
   const initHandler = useCallback(async () => {
     try {
@@ -56,8 +62,12 @@ const RootNavigator = () => {
     }
   }, [isNotApprovedAcc])
 
+  useEffect(() => {
+    loaderContext.toggleLoader(isLoading)
+  }, [isLoading, loaderContext])
+
   if (isLoading) {
-    return <AppLoader isVisible={isLoading} />
+    return null
   }
 
   return (

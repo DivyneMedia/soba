@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { ActivityIndicator, View, ViewStyle } from 'react-native';
 import Modal from 'react-native-modal'
 import colors from '../constants/colors';
@@ -18,16 +18,28 @@ const LOADER_CONTAINER: ViewStyle = {
     borderRadius: 10
 }
 
-type AppLoaderProps = {
-    isVisible: boolean
+export type AppLoaderProps = {
+    toggleLoader(visibility: boolean): void
 }
 
-const AppLoader = (props: AppLoaderProps) => {
-    const {isVisible} = props
+const AppLoader = forwardRef((_: any, ref: any) => {
+    const [isLoading, setLoading] = useState(false)
+
+    const toggleLoader = useCallback((visibility: boolean) => {
+        setLoading(visibility)         
+    }, [])
+
+    const initHandler = useCallback(() => {
+        return {
+            toggleLoader
+        }
+    }, [toggleLoader])
+
+    useImperativeHandle(ref, initHandler)
 
     return (
         <Modal
-            isVisible={isVisible}
+            isVisible={isLoading}
             useNativeDriver={true}
             animationIn="fadeIn"
             animationOut={"fadeOut"}
@@ -38,6 +50,6 @@ const AppLoader = (props: AppLoaderProps) => {
             </View>
         </Modal>
     )
-}
+})
 
-export default AppLoader
+export default React.memo(AppLoader)

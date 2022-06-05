@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Keyboard, StyleSheet, View } from 'react-native';
 import auth from '@react-native-firebase/auth'
 
@@ -16,6 +16,7 @@ import appConstants from "../constants/appConstants";
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
 import useAccount from "../hooks/useAccount";
+import { LoaderContext } from "../context/LoaderContextProvider";
 
 var confirmation: any = null
 var otpVerificationId: string | null = ''
@@ -87,6 +88,9 @@ const OTPScreen = (props: any) => {
             console.log('Error : ', err)
             let errorMessage = appConstants.SOMETHING_WENT_WRONG
             switch (err?.code) {
+                case 'auth/invalid-verification-code':
+                    errorMessage = 'The sms verification code used to create the phone auth credential is invalid. Please resend the verification code sms and be sure use the verification code provided by the user.'
+                    break
                 case 'auth/session-expired':
                     errorMessage = 'The sms code has expired. Please re-send the verification code to try again.'
                     break
@@ -132,8 +136,11 @@ const OTPScreen = (props: any) => {
     const onResendHandler = useCallback(async () => {
         try {
             toggleLoader(true)
+            if (auth().currentUser?.uid) {
+                await auth().signOut()
+            }
             const confirmation = await auth()
-                .signInWithPhoneNumber(`${callingCode} ${phone}`)
+                .verifyPhoneNumber(`${callingCode} ${phone}`, false, false)
             console.log('confirmation : ', confirmation.verificationId)
             toggleLoader(false)
             otpVerificationId = confirmation.verificationId
@@ -162,9 +169,14 @@ const OTPScreen = (props: any) => {
         }
     }, [callingCode, phone])
 
+    const loaderContext = useContext(LoaderContext)
+
+    useEffect(() => {
+        loaderContext.toggleLoader(isLoading || accountLoading)
+    }, [isLoading, accountLoading, loaderContext])
+
     return (
         <BackgroundImageComp>
-            <AppLoader isVisible={isLoading || accountLoading} />
             <View style={styles.root}>
                 <ScreenHeader
                     containerStyle={styles.headerContainer}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { FlatList, StyleSheet, View }  from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -16,6 +16,7 @@ import { height, keyExtractHandler } from "../utils/MiscUtils";
 import { SuccessToast } from "../utils/ToastUtils";
 import BoldText from "../components/BoldText";
 import { useFocusEffect } from "@react-navigation/native";
+import { LoaderContext } from "../context/LoaderContextProvider";
 
 type ChatScreenProps = {
     navigation: any
@@ -28,6 +29,8 @@ const ChatScreen = (props: ChatScreenProps) => {
 
     // const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
     // const isAdmin = useMemo(() => userData?.["Email 1"] === "admin@gmail.com", [userData?.["Email 1"]])
+
+    const loaderContext = useContext(LoaderContext)
 
     const {
         isLoading,
@@ -167,9 +170,12 @@ const ChatScreen = (props: ChatScreenProps) => {
         : null
     }, [approvals, isAdmin])
 
+    useEffect(() => {
+        loaderContext.toggleLoader(isLoading)
+    }, [isLoading, loaderContext])
+
     return (
         <SafeAreaView style={styles.root}>
-            <AppLoader isVisible={isLoading} />
             <SearchBar
                 value={searchText}
                 onChangeText={setSearchText}
