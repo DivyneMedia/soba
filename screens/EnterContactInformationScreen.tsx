@@ -167,6 +167,7 @@ const EnterContactInformation = (props: any) => {
                                 break
                         }
                     })
+                toggleLoader(false)
             } catch(err: any) {
                 console.log('[auth - signInWithPhoneNumber] Error : ', err)
                 toggleLoader(false)
