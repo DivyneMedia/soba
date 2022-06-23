@@ -9,11 +9,13 @@ import EnterContactInformationScreen from "../screens/EnterContactInformationScr
 import OTPScreen from "../screens/OTPScreen";
 import ConfirmRegistrationScreen from "../screens/ConfirmRegistration";
 import ChattingScreen from "../screens/ChattingScreen";
+import PhoneAuthContextProvider from "../context/PhoneAuthContextProvider";
 
 const Stack = createNativeStackNavigator()
 
 const AuthNavigator = (props: any) => {
   return (
+    <PhoneAuthContextProvider>
       <Stack.Navigator
         initialRouteName={"login"}
         screenOptions={{
@@ -57,6 +59,7 @@ const AuthNavigator = (props: any) => {
           }}
         />
     </Stack.Navigator>
+    </PhoneAuthContextProvider>
   )
 }
 

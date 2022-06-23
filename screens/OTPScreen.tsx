@@ -17,6 +17,7 @@ import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast } from "../utils/ToastUtils";
 import useAccount from "../hooks/useAccount";
 import { LoaderContext } from "../context/LoaderContextProvider";
+import { PhoneAuthContext } from "../context/PhoneAuthContextProvider";
 
 var confirmation: any = null
 var otpVerificationId: string | null = ''
@@ -46,6 +47,8 @@ const OTPScreen = (props: any) => {
         updateUserAccountDetails
     } = useAccount()
 
+    const { createAccount, verifyAccount } = useContext(PhoneAuthContext)
+
     const mountefRef = useRef(false)
 
     const [otp, setOtp] = useState('')
@@ -70,21 +73,29 @@ const OTPScreen = (props: any) => {
                 return
             }
 
-            const credential = auth.PhoneAuthProvider.credential(otpVerificationId, otp);
-            const myUserData: any = await auth().signInWithCredential(credential)
-            const { additionalUserInfo, user } = myUserData
-            const { uid, phoneNumber } = user
+            // const credential = auth.PhoneAuthProvider.credential(otpVerificationId, otp);
+            // const myUserData: any = await auth().signInWithCredential(credential)
+            setLoading(true)
+            const verifyRes = await verifyAccount(otp)
+            setLoading(false)
+            // const { additionalUserInfo, user } = myUserData
+            // const { uid, phoneNumber } = user
 
-            if (updateableDetails) {
-                await updateUserAccountDetails(accId, JSON.parse(updateableDetails))
+            if (verifyRes) {
+                if (updateableDetails) {
+                    setLoading(true)
+                    await updateUserAccountDetails(accId, JSON.parse(updateableDetails))
+                    setLoading(false)
+                }
+    
+                navigation.navigate('confirmRegistration', {
+                    // uid,
+                    accId,
+                    // phoneNumber
+                })
             }
-
-            navigation.navigate('confirmRegistration', {
-                uid,
-                accId,
-                phoneNumber
-            })
         } catch (err: any) {
+            setLoading(false)
             console.log('Error : ', err)
             let errorMessage = appConstants.SOMETHING_WENT_WRONG
             switch (err?.code) {
@@ -99,10 +110,8 @@ const OTPScreen = (props: any) => {
                     break
             }
             ErrorToast(errorMessage)
-        } finally {
-            setLoading(false)
         }
-    }, [otp, confirmation, navigation, accId, updateableDetails])
+    }, [otp, confirmation, navigation, accId, updateableDetails, verifyAccount])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
@@ -139,8 +148,9 @@ const OTPScreen = (props: any) => {
             if (auth().currentUser?.uid) {
                 await auth().signOut()
             }
-            const confirmation = await auth()
-                .verifyPhoneNumber(`${callingCode} ${phone}`, false, false)
+            const res = await createAccount(`${callingCode} ${phone}`)
+            // const confirmation = await auth()
+            //     .verifyPhoneNumber(`${callingCode} ${phone}`, false, false)
             console.log('confirmation : ', confirmation.verificationId)
             toggleLoader(false)
             otpVerificationId = confirmation.verificationId
@@ -167,7 +177,7 @@ const OTPScreen = (props: any) => {
             }
             ErrorToast(errorMessage)
         }
-    }, [callingCode, phone])
+    }, [callingCode, phone, createAccount])
 
     const loaderContext = useContext(LoaderContext)
 

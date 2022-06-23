@@ -15,7 +15,7 @@ export const getCurrFirestoreTimeStamp = () => firestore.FieldValue.serverTimest
 type UserAccDeails = {
     accId: string,
     uid: string
-    phoneNumber: string
+    phoneNumber: string | null
     username: string
     password: string
 }

@@ -18,7 +18,7 @@ import appConstants from "../constants/appConstants";
 import colors from "../constants/colors";
 
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
-import { ErrorToast } from "../utils/ToastUtils";
+import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
 import moment from "moment";
 import AppLoader from "../components/AppLoader";
 import { AxiosError } from "axios";
@@ -26,6 +26,7 @@ import useAccount from "../hooks/useAccount";
 import { useSelector } from "react-redux";
 import { USER_DETAILS } from "../model/UserData";
 import { LoaderContext } from "../context/LoaderContextProvider";
+import { PhoneAuthContext } from "../context/PhoneAuthContextProvider";
 
 type STRING_UNDEFINED = string | undefined
 
@@ -53,6 +54,8 @@ const EnterContactInformation = (props: any) => {
         // updateUserAccountDetails,
         toggleLoader
     } = useAccount()
+
+    const { createAccount, verifyAccount } = useContext(PhoneAuthContext)
 
     // **States
     const [callingCode, setCallingCode] = useState(__DEV__ ? '+91' : '+1') // useState(params?.callingCode ? `+${params?.callingCode}` : '+91')
@@ -142,60 +145,71 @@ const EnterContactInformation = (props: any) => {
                 return
             }
 
-            let confirmation = null
+            // let confirmation = null
 
-            try {
-                toggleLoader(true)
-                if (auth().currentUser?.uid) {
-                    await auth().signOut()
-                }
-                confirmation = await auth()
-                    .verifyPhoneNumber(`${callingCode} ${phone}`, false, false)
-                    .on('state_changed', (snap) => {
-                        switch (snap.state) {
-                            case 'error':
-                                console.log(snap.code, snap.error)
-                                break
-                            case 'sent':
-                                console.log('otp sent successfully.')
-                                break
-                            case 'timeout':
-                                console.log('timed out.')
-                                break
-                            case 'verified':
-                                console.log('verified.')
-                                break
-                        }
-                    })
-                toggleLoader(false)
-            } catch(err: any) {
-                console.log('[auth - signInWithPhoneNumber] Error : ', err)
-                toggleLoader(false)
-                let errorMessage = 'Something went wrong at sending OTP.'
-                switch (err?.code) {
-                    case 'auth/invalid-phone-number':
-                        errorMessage = 'Enter a valid phone number.'
-                        break
-                    case 'auth/phone-number-already-exists':
-                        errorMessage = 'Phone number already exist.'
-                        break
-                    case 'auth/too-many-requests':
-                        errorMessage = 'Limit exceeded for sending verification codes, please try after some time.'
-                        break
-                    case 'auth/network-request-failed':
-                        errorMessage = 'Check your network connection.'
-                        break
-                    default:
-                        errorMessage = 'Something went wrong at sending OTP.'
-                        break
-                }
-                ErrorToast(errorMessage)
-                return
-            }
 
-            if (!confirmation) {
-                return
-            }
+            // try {
+            //     toggleLoader(true)
+            //     if (auth().currentUser?.uid) {
+            //         SuccessToast("Logging out from previous sessions.")
+            //         await auth().signOut()
+            //         SuccessToast("Logging out done.")
+            //     }
+            //     confirmation = await auth()
+            //         .verifyPhoneNumber(`${callingCode} ${phone}`, false, false)
+            //         .on('state_changed', (snap) => {
+            //             switch (snap.state) {
+            //                 case 'error':
+            //                     console.log(snap.code, snap.error)
+            //                     ErrorToast(`${snap.code} ${snap.error}`)
+            //                     break
+            //                 case 'sent':
+            //                     SuccessToast('OTP sent successfully.')
+            //                     break
+            //                 case 'timeout':
+            //                     SuccessToast('Timed out.')
+            //                     break
+            //                 case 'verified':
+            //                     SuccessToast('Verified.')
+            //                     break
+            //                 default:
+            //                     SuccessToast('In default.')
+            //                     break
+            //             }
+            //         })
+            //     toggleLoader(false)
+            // } catch(err: any) {
+            //     toggleLoader(false)
+            //     console.log('[auth - signInWithPhoneNumber] Error : ', err)
+            //     let errorMessage = 'Something went wrong at sending OTP.'
+            //     switch (err?.code) {
+            //         case 'auth/invalid-phone-number':
+            //             errorMessage = 'Enter a valid phone number.'
+            //             break
+            //         case 'auth/phone-number-already-exists':
+            //             errorMessage = 'Phone number already exist.'
+            //             break
+            //         case 'auth/too-many-requests':
+            //             errorMessage = 'Limit exceeded for sending verification codes, please try after some time.'
+            //             break
+            //         case 'auth/network-request-failed':
+            //             errorMessage = 'Check your network connection.'
+            //             break
+            //         default:
+            //             errorMessage = err?.message ?? 'Something went wrong at sending OTP.'
+            //             break
+            //     }
+            //     ErrorToast(errorMessage)
+            //     return
+            // }
+
+            // if (!confirmation) {
+            //     return
+            // }
+            toggleLoader(true)
+            const createAccRes = await createAccount(`${callingCode} ${phone}`)
+            toggleLoader(false)
+            console.log('createAccRes : ', createAccRes)
 
             let payload = null
 
@@ -239,14 +253,13 @@ const EnterContactInformation = (props: any) => {
                 accId: params?.accId,
                 callingCode,
                 phone,
-                verificationId: confirmation.verificationId,
+                // verificationId: confirmation.verificationId,
                 updateableDetails: payload ? JSON.stringify(payload) : ''
             })
         } catch (err: any) {
-            console.log(err.message)
+            toggleLoader(false)
+            console.log('createAccRes:  ', err.message)
             ErrorToast(appConstants.SOMETHING_WENT_WRONG)
-        } finally {
-            mountedRef.current && setLoading(false)
         }
     }, [
         navigation,
@@ -259,7 +272,8 @@ const EnterContactInformation = (props: any) => {
         address,
         city,
         state,
-        zipcode
+        zipcode,
+        toggleLoader
     ])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {

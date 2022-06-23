@@ -16,10 +16,12 @@ import useFirebase from "../hooks/useFirebase";
 import { getRegionIcon } from "../utils/GetConditionalIconHelper";
 import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
 
+import auth from '@react-native-firebase/auth'
+
 const ConfirmRegistrationScreen = (props: any) => {
     const { navigation, route } = props
     const { params } = route
-    const { accId, uid, phoneNumber } = params
+    const { accId /*, uid, phoneNumber*/ } = params
 
     const { isLoading, createUserAcc } = useFirebase()
 
@@ -68,18 +70,22 @@ const ConfirmRegistrationScreen = (props: any) => {
             if (!isDataValid(true)) {
                 return
             }
-    
-            const createAccRes = await createUserAcc({
-                accId,
-                uid,
-                phoneNumber,
-                username,
-                password
-            })
-    
-            if (createAccRes) {
-                SuccessToast('Account setup success. please login to continue.')
-                navigation.popToTop()
+
+            const currentUser = auth().currentUser
+
+            if (currentUser) {
+                const createAccRes = await createUserAcc({
+                    accId,
+                    uid: currentUser?.uid,
+                    phoneNumber: currentUser?.phoneNumber,
+                    username,
+                    password
+                })
+        
+                if (createAccRes) {
+                    SuccessToast('Account setup success. please login to continue.')
+                    navigation.popToTop()
+                }
             }
             
             // setShowSuccess(true)
@@ -88,7 +94,7 @@ const ConfirmRegistrationScreen = (props: any) => {
             console.log('Error : ', err?.message)
             ErrorToast(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
         }
-    }, [isDataValid, navigation, username, phoneNumber, uid, accId, password])
+    }, [isDataValid, navigation, username, accId, password])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {
