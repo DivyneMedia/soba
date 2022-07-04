@@ -13,9 +13,11 @@ const usersCollection = firestore().collection(users)
 export const getCurrFirestoreTimeStamp = () => firestore.FieldValue.serverTimestamp()
 
 type UserAccDeails = {
-    accId: string,
+    accId: string
     uid: string
     phoneNumber: string | null
+    firstName: string
+    lastName: string
     username: string
     password: string
 }
@@ -44,6 +46,8 @@ const useFirebase = () => {
                 accId,
                 uid,
                 username,
+                firstName,
+                lastName,
                 password,
                 phoneNumber
             } = userAccDetails
@@ -109,6 +113,9 @@ const useFirebase = () => {
                             await usersCollection.doc(uid).set({
                                 crmAccId: accId,
                                 uid,
+                                firstName,
+                                lastName,
+                                fullname: `${firstName.trim()} ${lastName.trim()}`.toLowerCase(),
                                 username,
                                 phoneNumber,
                                 fcmToken: '',

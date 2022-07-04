@@ -25,6 +25,7 @@ export const userPayload = {
         "Gender",
         "Photo URL",
         "State/Province",
+        "Zip Code",
         75,
         77,
         83,

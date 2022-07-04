@@ -31,6 +31,8 @@ import { PhoneAuthContext } from "../context/PhoneAuthContextProvider";
 type STRING_UNDEFINED = string | undefined
 
 type RouteParams = {
+    firstName: STRING_UNDEFINED,
+    lastName: STRING_UNDEFINED,
     accId: STRING_UNDEFINED,
     address: STRING_UNDEFINED,
     dob: STRING_UNDEFINED,
@@ -66,6 +68,8 @@ const EnterContactInformation = (props: any) => {
     const [city, setCity] = useState(params?.city ?? '')
     const [state, setState] = useState(params?.state ?? '')
     const [zipcode, setZipcode] = useState(params?.zipCode?.substring(0, 15) ?? '')
+
+    console.log('params : ', params)
     
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isLoading, setLoading] = useState(false);
@@ -146,8 +150,6 @@ const EnterContactInformation = (props: any) => {
             }
 
             // let confirmation = null
-
-
             // try {
             //     toggleLoader(true)
             //     if (auth().currentUser?.uid) {
@@ -224,6 +226,8 @@ const EnterContactInformation = (props: any) => {
                 const formattedDate = moment(dob).format('DD/MM/YYYY').split('/')
 
                 payload = {
+                    firstName: params.firstName,
+                    lastName: params.lastName,
                     addressLine1: address,
                     city: city,
                     county: '',
@@ -254,7 +258,11 @@ const EnterContactInformation = (props: any) => {
                 callingCode,
                 phone,
                 // verificationId: confirmation.verificationId,
-                updateableDetails: payload ? JSON.stringify(payload) : ''
+                needToUpdateDetails: !!payload, // boolean
+                updateableDetails: payload ? JSON.stringify(payload) : JSON.stringify({
+                    firstName: params.firstName,
+                    lastName: params.lastName,
+                })
             })
         } catch (err: any) {
             toggleLoader(false)

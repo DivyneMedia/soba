@@ -61,7 +61,9 @@ const FetchMatriculationDetailsScreen = (props: any) => {
             const year = userBasicInfo?.searchResults[0]["DOB Year"]
     
             const dob = moment(`${date}/${month}/${year} 00:00:00`, "D/M/YYYY hh:mm:ss")
-            navigation.navigate('enterContactInformation', {
+            const payloadToSend = {
+                firstName: userBasicInfo?.searchResults[0]?.["First Name"],
+                lastName: userBasicInfo?.searchResults[0]["Last Name"],
                 accId: userBasicInfo?.searchResults[0]["Account ID"],
                 phoneNumber: userBasicInfo?.searchResults[0]["Phone 1 Full Number (F)"]?.split('-').join('').split(' ').join(''),
                 callingCode: userBasicInfo?.searchResults[0]["Phone 1 Area Code"],
@@ -70,8 +72,9 @@ const FetchMatriculationDetailsScreen = (props: any) => {
                 address: userBasicInfo?.searchResults[0]["Full Street Address (F)"],
                 state: userBasicInfo?.searchResults[0]["State/Province"],
                 city: userBasicInfo?.searchResults[0].City,
-                zipCode: userBasicInfo?.searchResults[0]["Full Zip Code (F)"]?.split('-').join('').split(' ').join('')
-            })
+                zipCode: userBasicInfo?.searchResults[0]["Zip Code"]
+            }
+            navigation.navigate('enterContactInformation', payloadToSend)
         } catch (err: any) {
             console.log('[nextPressHandler] Error : ', err?.message)
             ErrorToast(appConstants.SOMETHING_WENT_WRONG)
@@ -90,11 +93,8 @@ const FetchMatriculationDetailsScreen = (props: any) => {
             }
             const data: UserRespose | undefined = await getUserByAccountId(+matriculationNumber)
             if (data && typeof data !== "undefined") {
-
-                console.log('data : ', data)
-
                 userBasicInfo = data
-    
+
                 const confirmationData = {
                     profile: data.searchResults[0]["Photo URL"],
                     name: data.searchResults[0]["Full Name (F)"],
@@ -174,6 +174,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
                                 placeholder="Matriculation Number"
                                 value={matriculationNumber}
                                 maxLength={15}
+                                keyboardType="number-pad"
                                 blurOnSubmit={true}
                                 returnKeyType="done"
                                 onChangeText={onChangeTextHandler.bind(null, appConstants.MATRICULATION_INPUT)}

@@ -1,10 +1,9 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { FlatList, StyleSheet, View }  from 'react-native';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { BackHandler, FlatList, StyleSheet, View }  from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import useChat from "../hooks/useChat";
 
-import AppLoader from "../components/AppLoader";
 import SearchBar from "../components/SearchBar";
 import TextButton from "../components/TextButton";
 import ChatTile, { ChatTileProps } from "../components/ChatTile";
@@ -17,6 +16,9 @@ import { SuccessToast } from "../utils/ToastUtils";
 import BoldText from "../components/BoldText";
 import { useFocusEffect } from "@react-navigation/native";
 import { LoaderContext } from "../context/LoaderContextProvider";
+import ChatFilterModal, { ChatFilterModalRefTypes } from "../components/ChatFilterModal";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import useBackPreventHook from "../hooks/useBackPreventHook";
 
 type ChatScreenProps = {
     navigation: any
@@ -48,6 +50,21 @@ const ChatScreen = (props: ChatScreenProps) => {
     const [searchText, setSearchText] = useState('')
     const [approvals, setApprovals] = useState(false)
 
+    const chatFilterModalRef = useRef<ChatFilterModalRefTypes>()
+    
+    const getFlag = useCallback(() => chatFilterModalRef.current?.isVisible?.current, [])
+    
+    const backActionHandler = useCallback(() => {
+        chatFilterModalRef.current?.hide()
+    }, [])
+    
+    /**
+     * Prevent Back press on android
+     * @param getFlag: () => boolean // true to prevent back press
+     * @param backActionHandler: () => void // action code to handler on backpress when flag is true.
+     */
+    useBackPreventHook(getFlag, backActionHandler)
+
     useFocusEffect(() => {
         if (route?.params?.refresh) {
             getAdminOfficialChannelsHandler()
@@ -55,7 +72,9 @@ const ChatScreen = (props: ChatScreenProps) => {
         }
     })
 
-    const filterButtonPressHandler = useCallback(() => {}, [])
+    const filterButtonPressHandler = useCallback(() => {
+        chatFilterModalRef.current?.show()
+    }, [])
 
     const openChatHandler = useCallback((chatPayload: any, name: string) => {
         const {
@@ -174,16 +193,26 @@ const ChatScreen = (props: ChatScreenProps) => {
         loaderContext.toggleLoader(isLoading)
     }, [isLoading, loaderContext])
 
+    const onChatFilterSubmitHandler = useCallback(() => {
+        
+    }, [])
+
     return (
         <SafeAreaView style={styles.root}>
-            <SearchBar
-                value={searchText}
-                onChangeText={setSearchText}
-                onFilterButtonPress={filterButtonPressHandler}
-            />
-            {renderHeaderHandler}
-            {renderAdminChats}
-            {renderUserChats}
+            <BottomSheetModalProvider>
+                <SearchBar
+                    value={searchText}
+                    onChangeText={setSearchText}
+                    onFilterButtonPress={filterButtonPressHandler}
+                />
+                <ChatFilterModal
+                    ref={chatFilterModalRef}
+                    onSubmit={onChatFilterSubmitHandler}
+                />
+                {renderHeaderHandler}
+                {renderAdminChats}
+                {renderUserChats}
+            </BottomSheetModalProvider>
         </SafeAreaView>
     )
 }

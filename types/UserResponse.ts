@@ -44,6 +44,7 @@ export type USER = {
     "Mobile App Account Approved": STRING_NULL,
     "Mobile App Firebase UID": STRING_NULL,
     "State/Province": STRING_NULL
+    "Zip Code": STRING_NULL
 }
 
 export type UserRespose = {

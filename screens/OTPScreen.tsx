@@ -39,6 +39,7 @@ const OTPScreen = (props: any) => {
         callingCode,
         phone,
         verificationId: phoneVerificationId,
+        needToUpdateDetails,
         updateableDetails
     } = params
 
@@ -82,15 +83,19 @@ const OTPScreen = (props: any) => {
             // const { uid, phoneNumber } = user
 
             if (verifyRes) {
-                if (updateableDetails) {
+                if (needToUpdateDetails) {
                     setLoading(true)
                     await updateUserAccountDetails(accId, JSON.parse(updateableDetails))
                     setLoading(false)
                 }
+
+                const { firstName, lastName } = JSON.parse(updateableDetails)
     
                 navigation.navigate('confirmRegistration', {
                     // uid,
                     accId,
+                    firstName,
+                    lastName
                     // phoneNumber
                 })
             }

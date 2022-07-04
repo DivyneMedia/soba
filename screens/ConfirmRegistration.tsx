@@ -21,7 +21,7 @@ import auth from '@react-native-firebase/auth'
 const ConfirmRegistrationScreen = (props: any) => {
     const { navigation, route } = props
     const { params } = route
-    const { accId /*, uid, phoneNumber*/ } = params
+    const { accId, firstName, lastName/*, uid, phoneNumber*/ } = params
 
     const { isLoading, createUserAcc } = useFirebase()
 
@@ -78,6 +78,8 @@ const ConfirmRegistrationScreen = (props: any) => {
                     accId,
                     uid: currentUser?.uid,
                     phoneNumber: currentUser?.phoneNumber,
+                    firstName,
+                    lastName,
                     username,
                     password
                 })
@@ -94,7 +96,7 @@ const ConfirmRegistrationScreen = (props: any) => {
             console.log('Error : ', err?.message)
             ErrorToast(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
         }
-    }, [isDataValid, navigation, username, accId, password])
+    }, [isDataValid, navigation, firstName, lastName, username, accId, password])
 
     const onChangeTextHandler = useCallback((key: any, value: string) => {
         switch (key) {

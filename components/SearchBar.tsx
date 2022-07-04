@@ -1,6 +1,6 @@
 import React from "react";
-import { Pressable, StyleSheet, TextInput, TextInputProps, View } from "react-native";
-import { Image } from "react-native";
+import { Pressable, StyleSheet, TextInput, TextInputProps, View, Image } from "react-native";
+
 import images from "../assets/images";
 import colors from "../constants/colors";
 
@@ -14,11 +14,7 @@ const SearchBar = (props: SearchBarProps & TextInputProps) => {
         <View style={styles.searchBarContainer}>
             <Image
                 source={images.ic_search}
-                style={{
-                    height: 17,
-                    width: 17,
-                    marginRight: 5,
-                }}
+                style={styles.searchIcon}
             />
             <TextInput
                 placeholder={"search your friends or chapter"}
@@ -34,11 +30,7 @@ const SearchBar = (props: SearchBarProps & TextInputProps) => {
             >
                 <Image
                     source={images.ic_filter}
-                    style={{
-                        height: 17,
-                        width: 17,
-                        marginLeft: 10,
-                    }}
+                    style={styles.filterIcon}
                 />
             </Pressable>
         </View>
@@ -54,6 +46,16 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         margin: 10,
         paddingHorizontal: 15,
+    },
+    searchIcon: {
+        height: 17,
+        width: 17,
+        marginRight: 5,
+    },
+    filterIcon: {
+        height: 17,
+        width: 17,
+        marginLeft: 10,
     }
 })
 
