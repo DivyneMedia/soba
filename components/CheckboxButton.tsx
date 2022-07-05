@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { Image, Pressable, StyleSheet, TextStyle, ViewStyle } from "react-native";
 import images from "../assets/images";
 import BoldText from "./BoldText";
@@ -8,6 +8,7 @@ type CheckboxButtonTypes = {
     defaultChecked?: boolean
     containerStyle?: ViewStyle
     textStyle?: TextStyle
+    onChange?: (newState: boolean) => void
 }
 
 export type CheckboxButtonRef = {
@@ -18,16 +19,23 @@ export type CheckboxButtonRef = {
 const CheckboxButton = forwardRef((props: CheckboxButtonTypes, ref: any) => {
     const {
         text,
+        onChange,
         defaultChecked,
         containerStyle,
         textStyle
     } = props
 
-    const [checked, setChecked] = useState(defaultChecked)
+    const [checked, setChecked] = useState(defaultChecked ?? false)
 
     const onChangeHandler = useCallback(() => {
         setChecked(prevState => !prevState)
     }, [])
+
+    useEffect(() => {
+        if (typeof onChange === "function") {
+            onChange(checked)
+        }
+    }, [checked, onChange])
 
     const initHandler = useCallback(() => {
         return {

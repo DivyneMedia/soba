@@ -11,6 +11,8 @@ import ChatTile, { ChatTileProps } from "../components/ChatTile";
 import colors from "../constants/colors";
 import images from "../assets/images";
 
+import debounce from 'lodash.debounce'
+
 import { height, keyExtractHandler } from "../utils/MiscUtils";
 import { SuccessToast } from "../utils/ToastUtils";
 import BoldText from "../components/BoldText";
@@ -19,6 +21,7 @@ import { LoaderContext } from "../context/LoaderContextProvider";
 import ChatFilterModal, { ChatFilterModalRefTypes } from "../components/ChatFilterModal";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import useBackPreventHook from "../hooks/useBackPreventHook";
+import firestore from '@react-native-firebase/firestore'
 
 type ChatScreenProps = {
     navigation: any
@@ -193,9 +196,52 @@ const ChatScreen = (props: ChatScreenProps) => {
         loaderContext.toggleLoader(isLoading)
     }, [isLoading, loaderContext])
 
-    const onChatFilterSubmitHandler = useCallback(() => {
-        
+    const onChatFilterSubmitHandler = useCallback((selectedFilterOption) => {
+        console.log(selectedFilterOption)
     }, [])
+
+    const searchUsers = useCallback(async (searchVal) => {
+        try {
+            const queryRef = firestore()
+                            .collection('users')
+                            .orderBy('fullname')
+                            .startAt(searchVal)
+                            .endAt(searchVal + '\uf8ff')
+
+            // switch (chatFilterModalRef.current?.getSelectedFilterOption()) {
+            //     case 'all':
+            //         break
+            //     case 'approved':
+            //         break
+            //     case 'unapproved':
+            //         break
+            // }
+            
+            queryRef
+            .get()
+            .then(res => {
+                let searchResults = []
+                res.docs.forEach(doc => {
+                    searchResults.push(doc.data())
+                })
+            })
+            .catch(err => {
+                console.log('Error : ', err.message)
+            })
+        } catch (err: any) {
+            console.log('Error : ', err.message)
+        }
+    }, [])
+
+    // const debounceSave = useRef((nextVal: string) => debounce(searchUsers,800)).current
+
+    const debouncedSave = useRef(debounce((nextValue: string) => searchUsers(nextValue), 800)).current;
+
+    useEffect(() => {
+        if (searchText) {
+            debouncedSave(searchText)
+        }
+    }, [searchText])
 
     return (
         <SafeAreaView style={styles.root}>
