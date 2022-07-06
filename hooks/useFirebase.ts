@@ -118,6 +118,7 @@ const useFirebase = () => {
                                 fullname: `${firstName.trim()} ${lastName.trim()}`.toLowerCase(),
                                 username,
                                 phoneNumber,
+                                isAccountApproved: false,
                                 fcmToken: '',
                                 createdAt: currFirebaseTimeStamp,
                                 updatedAt: currFirebaseTimeStamp,

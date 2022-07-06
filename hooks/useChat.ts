@@ -250,7 +250,7 @@ const useChat = () => {
 
             const allChats = userChannels.docs.map(doc => doc.data())
 
-            console.log('allChats : ', allChats)
+            // console.log('allChats : ', allChats)
 
             const names = await Promise.all(allChats.map(async chat => {
                 const {

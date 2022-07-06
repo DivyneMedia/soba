@@ -84,7 +84,7 @@ const useAccount = (chatChannelId?: string) => {
         }
     }, [])
 
-    const approveUserAcc = useCallback(async (accountId: number) => {
+    const approveUserAcc = useCallback(async (accountId: number, userFirestoreId: string) => {
         try {
             if (!accountId) {
                 throw new Error(appConstants.SOMETHING_WENT_WRONG)
@@ -97,6 +97,21 @@ const useAccount = (chatChannelId?: string) => {
             .update({
                 isApproved: true
             })
+
+            await firestore()
+            .collection(appConstants.users)
+            .doc(userFirestoreId)
+            .update({
+                isAccountApproved: true
+            })
+
+            // await firestore()
+            // .collection(appConstants.users)
+            // .where("crmAccId", "==", accountId)
+            // .get()
+            // .update({
+            //     isApproved: true
+            // })
 
             let accUpdateRes: AxiosResponse<any>
             try {

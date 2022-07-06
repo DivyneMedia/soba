@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { BackHandler, FlatList, StyleSheet, View }  from 'react-native';
+import { FlatList, StyleSheet, View }  from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import useChat from "../hooks/useChat";
@@ -51,6 +51,7 @@ const ChatScreen = (props: ChatScreenProps) => {
     } = useChat()
     
     const [searchText, setSearchText] = useState('')
+    const [searchData, setSearchData] = useState<any[]>([])
     const [approvals, setApprovals] = useState(false)
 
     const chatFilterModalRef = useRef<ChatFilterModalRefTypes>()
@@ -202,30 +203,32 @@ const ChatScreen = (props: ChatScreenProps) => {
 
     const searchUsers = useCallback(async (searchVal) => {
         try {
-            const queryRef = firestore()
+            let queryRef: any = firestore()
                             .collection('users')
-                            .orderBy('fullname')
-                            .startAt(searchVal)
-                            .endAt(searchVal + '\uf8ff')
 
-            // switch (chatFilterModalRef.current?.getSelectedFilterOption()) {
-            //     case 'all':
-            //         break
-            //     case 'approved':
-            //         break
-            //     case 'unapproved':
-            //         break
-            // }
+            switch (chatFilterModalRef.current?.getSelectedFilterOption()) {
+                case 'all':
+                    break
+                case 'approved':
+                    queryRef = queryRef.where("isAccountApproved", "==", true)
+                    break
+                case 'unapproved':
+                    queryRef = queryRef.where("isAccountApproved", "==", false)
+                    break
+            }
             
             queryRef
-            .get()
-            .then(res => {
-                let searchResults = []
-                res.docs.forEach(doc => {
+            .orderBy('fullname', 'asc')
+            .startAt(searchVal)
+            .endAt(searchVal + '\uf8ff').get()
+            .then((res: any) => {
+                const searchResults: any[] = []
+                res.docs.forEach((doc: any) => {
                     searchResults.push(doc.data())
                 })
+                setSearchData(searchResults)
             })
-            .catch(err => {
+            .catch((err: any) => {
                 console.log('Error : ', err.message)
             })
         } catch (err: any) {
@@ -243,6 +246,22 @@ const ChatScreen = (props: ChatScreenProps) => {
         }
     }, [searchText])
 
+    const renderSearchDataHandler = useMemo(() => {
+        return (
+            <FlatList
+                data={searchData}
+                // style={{ flex: approvals ? -1 : 1 }}
+                // contentContainerStyle={{ height: approvals ? 0 : "100%" }}
+                keyExtractor={keyExtractHandler}
+                renderItem={(item) => {
+                    console.log('renderItem : ', item.index, item.item)
+                    return null
+                }}
+                ListEmptyComponent={renderListFoorter}
+            />
+        )
+    }, [searchData])
+
     return (
         <SafeAreaView style={styles.root}>
             <BottomSheetModalProvider>
@@ -255,9 +274,14 @@ const ChatScreen = (props: ChatScreenProps) => {
                     ref={chatFilterModalRef}
                     onSubmit={onChatFilterSubmitHandler}
                 />
-                {renderHeaderHandler}
-                {renderAdminChats}
-                {renderUserChats}
+                {
+                    searchData.length ? (
+                        renderSearchDataHandler
+                    ) : null
+                }
+                {searchData.length ? null : renderHeaderHandler}
+                {searchData.length ? null : renderAdminChats}
+                {searchData.length ? null : renderUserChats}
             </BottomSheetModalProvider>
         </SafeAreaView>
     )

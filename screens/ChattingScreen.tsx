@@ -38,6 +38,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
             ? params?.chatChannelId.split('_').filter((id: string) => id !== params?.chatSenderId)[0]
             : params?.chatSenderId
     , [params])
+
     const userCrmId = useMemo(() => params?.crmAccId, [params])
 
     const {
@@ -64,7 +65,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
     const approveAccHandler = useCallback(async () => {
         try {
             if (userCrmId) {
-                await approveUserAcc(+userCrmId)
+                await approveUserAcc(+userCrmId, params?.chatSenderId)
                 SuccessToast('Account Approved succfully.')
                 navigation.navigate('bottomTab', {
                     screen: 'chat',
@@ -77,7 +78,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
             console.log('Error : ', err?.message)
             ErrorToast(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
         }
-    }, [userCrmId, approveUserAcc])
+    }, [userCrmId, approveUserAcc, params?.chatSenderId])
 
     const renderApproveBtnHandler = useCallback(() => {
         return (
