@@ -7,7 +7,7 @@ import { USER } from '../types/UserResponse'
 import { useSelector } from 'react-redux'
 
 const useChat = () => {
-    // **States
+    // ** States
     const [isLoading, setLoading] = useState(false)
     const [officialChats, setOfficialChats] = useState<any>([])
     const [userChats, setUserChats] = useState<any>([])
@@ -15,10 +15,10 @@ const useChat = () => {
     const [isAdmin, setIsAdmin] = useState<boolean>(false)
     const [approvedChats, setApprovedChats] = useState<any>([])
 
-    // **Refs
+    // ** Refs
     const mountedRef = useRef(false)
 
-    // **Redux
+    // ** Redux
     const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
 
     useEffect(() => {
@@ -91,10 +91,11 @@ const useChat = () => {
     useEffect(() => {
         const subscribe = firestore()
             .collection(appConstants.privateChannel)
+            // .where('memberIds', 'array-contains-any', userData['Mobile App Firebase UID'])
             .onSnapshot(onSnapshotHandler)
 
         return subscribe
-    }, [onSnapshotHandler])
+    }, [onSnapshotHandler, userData])
 
     const toggleLoaderHandler = useCallback((status: boolean) => {
         mountedRef.current && setLoading(prevState => !prevState)
@@ -147,11 +148,13 @@ const useChat = () => {
                         .get()
 
                     return {
-                        name: dataRes.data()?.username,
+                        name: dataRes.data()?.firstName + " " + dataRes.data()?.lastName,
                         crmAccId: dataRes.data()?.crmAccId,
                         ...chat
                     }
                 }))
+
+                console.log('names : ', names)
 
                 const unApprovedChats = names.filter((chat: any) => chat?.isApproved === false)
                 const approvedChats = names.filter((chat: any) => chat?.isApproved === true)
@@ -278,6 +281,8 @@ const useChat = () => {
                         ...chat
                     }
             }))
+
+            console.log('names : ', names)
 
             setUserChats(names)
             toggleLoaderHandler(false)

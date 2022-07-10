@@ -54,11 +54,11 @@ const AccApproveRequest = (props: AccApproveRequestType) => {
                         updatedAt
                     } = channelData
 
-                    navigation.navigate('chattingScreen', {
-                        name,
-                        channelId,
-                        firebaseUid
-                    })
+                    // navigation.navigate('chattingScreen', {
+                    //     name,
+                    //     channelId,
+                    //     firebaseUid
+                    // })
                     navigation.navigate('chattingScreen', {
                         showApproveBtn: false,
                         chatName: name || 'No Name',

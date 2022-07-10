@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, StyleSheet, View }  from 'react-native';
+import { FlatList, Pressable, StyleSheet, View }  from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import useChat from "../hooks/useChat";
@@ -14,7 +14,7 @@ import images from "../assets/images";
 import debounce from 'lodash.debounce'
 
 import { height, keyExtractHandler } from "../utils/MiscUtils";
-import { SuccessToast } from "../utils/ToastUtils";
+import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
 import BoldText from "../components/BoldText";
 import { useFocusEffect } from "@react-navigation/native";
 import { LoaderContext } from "../context/LoaderContextProvider";
@@ -22,6 +22,11 @@ import ChatFilterModal, { ChatFilterModalRefTypes } from "../components/ChatFilt
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import useBackPreventHook from "../hooks/useBackPreventHook";
 import firestore from '@react-native-firebase/firestore'
+import RegularText from "../components/RegularText";
+import { FIRESTORE_USER } from "../types";
+import { useSelector } from "react-redux";
+import { USER } from "../types/UserResponse";
+import appConstants from "../constants/appConstants";
 
 type ChatScreenProps = {
     navigation: any
@@ -47,8 +52,11 @@ const ChatScreen = (props: ChatScreenProps) => {
         // getAllOfficialChannelsHandler,
         userChats,
         getUserChatsHandler,
+        createChannelIdDoesNotExist
         // toggleLoaderHandler
     } = useChat()
+
+    const userData: USER = useSelector((state: any) => state?.auth?.userData)
     
     const [searchText, setSearchText] = useState('')
     const [searchData, setSearchData] = useState<any[]>([])
@@ -203,6 +211,7 @@ const ChatScreen = (props: ChatScreenProps) => {
 
     const searchUsers = useCallback(async (searchVal) => {
         try {
+            setSearchData([])
             let queryRef: any = firestore()
                             .collection('users')
 
@@ -216,17 +225,21 @@ const ChatScreen = (props: ChatScreenProps) => {
                     queryRef = queryRef.where("isAccountApproved", "==", false)
                     break
             }
-            
+
             queryRef
             .orderBy('fullname', 'asc')
             .startAt(searchVal)
             .endAt(searchVal + '\uf8ff').get()
             .then((res: any) => {
                 const searchResults: any[] = []
-                res.docs.forEach((doc: any) => {
-                    searchResults.push(doc.data())
-                })
-                setSearchData(searchResults)
+                if (res.docs?.length) {
+                    res.docs.forEach((doc: any) => {
+                        searchResults.push(doc.data())
+                    })
+                    setSearchData(searchResults)
+                } else {
+                    setSearchData([])
+                }
             })
             .catch((err: any) => {
                 console.log('Error : ', err.message)
@@ -242,25 +255,105 @@ const ChatScreen = (props: ChatScreenProps) => {
 
     useEffect(() => {
         if (searchText) {
-            debouncedSave(searchText)
+            debouncedSave(searchText.toLowerCase().trim())
+        } else {
+            setSearchData([])
         }
     }, [searchText])
+
+    const onSearchItemPressHandler = useCallback(async (userPayload: FIRESTORE_USER) => {
+        try {
+            const {
+                uid,
+                firstName,
+                lastName
+            } = userPayload
+
+            if (!userData["Mobile App Firebase UID"]) {
+                ErrorToast(`Something went wrong please try again.`)
+                return
+            }
+
+            if (uid === userData["Mobile App Firebase UID"]) {
+                ErrorToast(`Can't open self account conversation.`)
+                return
+            }
+
+            const firebaseUid: string = userData["Mobile App Firebase UID"]
+            const channelData = await createChannelIdDoesNotExist(firebaseUid, uid)
+            if (channelData) {
+                const {
+                    channelId,
+                    createdAt,
+                    isDeleted,
+                    updatedAt
+                } = channelData
+
+                // navigation.navigate('chattingScreen', {
+                //     name,
+                //     channelId,
+                //     firebaseUid
+                // })
+                navigation.navigate('chattingScreen', {
+                    showApproveBtn: false,
+                    chatName: firstName + " " + lastName || 'User',
+                    chatChannelId: channelId,
+                    chatSenderId: userData['Mobile App Firebase UID']
+                })
+            } else {
+                ErrorToast(appConstants.SOMETHING_WENT_WRONG)
+            }
+        } catch (err: any) {
+            console.log('[onSearchItemPressHandler] Error : ', err.message)
+        }
+    }, [userData])
 
     const renderSearchDataHandler = useMemo(() => {
         return (
             <FlatList
                 data={searchData}
-                // style={{ flex: approvals ? -1 : 1 }}
-                // contentContainerStyle={{ height: approvals ? 0 : "100%" }}
                 keyExtractor={keyExtractHandler}
-                renderItem={(item) => {
-                    console.log('renderItem : ', item.index, item.item)
-                    return null
+                extraData={searchData}
+                ListHeaderComponent={
+                    <View style={{ marginVertical: 10 }}>
+                        <BoldText>{"Search Results"}</BoldText>
+                    </View>
+                }
+                contentContainerStyle={{
+                    paddingHorizontal: 20
+                }}
+                renderItem={({item, index}) => {
+                    const {
+                        createdAt,
+                        crmAccId,
+                        fcmToken,
+                        firstName,
+                        fullname,
+                        isAccountApproved,
+                        isDeleted,
+                        lastName,
+                        phoneNumber,
+                        uid,
+                        updatedAt,
+                        username
+                    } = item
+                    return (
+                        <Pressable
+                            onPress={onSearchItemPressHandler.bind(null, item)}
+                            style={{
+                                paddingVertical: 10,
+                                borderBottomWidth: (searchData.length - 1) === index ? 0 : 1,
+                                borderBottomColor: 'black'
+                            }}
+                        >
+                            <RegularText>{firstName + " " + lastName}</RegularText>
+                        </Pressable>
+                    )
                 }}
                 ListEmptyComponent={renderListFoorter}
             />
         )
-    }, [searchData])
+    }, [searchData, onSearchItemPressHandler])
 
     return (
         <SafeAreaView style={styles.root}>
@@ -274,14 +367,10 @@ const ChatScreen = (props: ChatScreenProps) => {
                     ref={chatFilterModalRef}
                     onSubmit={onChatFilterSubmitHandler}
                 />
-                {
-                    searchData.length ? (
-                        renderSearchDataHandler
-                    ) : null
-                }
-                {searchData.length ? null : renderHeaderHandler}
-                {searchData.length ? null : renderAdminChats}
-                {searchData.length ? null : renderUserChats}
+                {searchText.length ? renderSearchDataHandler : null}
+                {searchText.length ? null : renderHeaderHandler}
+                {searchText.length ? null : renderAdminChats}
+                {searchText.length ? null : renderUserChats}
             </BottomSheetModalProvider>
         </SafeAreaView>
     )

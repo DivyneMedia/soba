@@ -31,7 +31,7 @@ const ChatFilterModal = forwardRef((props: ChatFilterModalProps, ref: any) => {
     // hooks
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const bottomSheetOpenStatusRef = useRef(false)
-    const selectedFilterOptionRef = useRef('')
+    const selectedFilterOptionRef = useRef('all')
 
     // variables
     const snapPoints = useMemo(() => [height / 2], []);
@@ -135,17 +135,19 @@ const ChatFilterModal = forwardRef((props: ChatFilterModalProps, ref: any) => {
                 <CheckboxButton
                     ref={filterAllRef}
                     text="All"
-                    defaultChecked={true}
+                    defaultChecked={() => selectedFilterOptionRef.current === 'all'}
                     onChange={onFilterOptionChangeHandler.bind(null, "all")}
                 />
                 <CheckboxButton
                     ref={filterApprovedRef}
                     text="Approved"
+                    defaultChecked={() => selectedFilterOptionRef.current === 'approved'}
                     onChange={onFilterOptionChangeHandler.bind(null, "approved")}
                 />
                 <CheckboxButton
                     ref={filterUnapprovedRef}
                     text="Unapproved"
+                    defaultChecked={() => selectedFilterOptionRef.current === 'unapproved'}
                     onChange={onFilterOptionChangeHandler.bind(null, "unapproved")}
                 />
             </Root>
@@ -179,4 +181,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default ChatFilterModal
+export default React.memo(ChatFilterModal)

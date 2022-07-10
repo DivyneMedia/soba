@@ -17,54 +17,54 @@ const MainNavigator = () => {
     loaderContext.toggleLoader(false)
   }, [loaderContext])
 
-    return (
-        <Stack.Navigator
-          initialRouteName="bottomTab"
-          screenOptions={{
-            headerShown: false
-          }}
-        >
-            <Stack.Screen
-              name="bottomTab"
-              component={BottomTabNavigator}
-            />
-             <Stack.Screen
-              name="detailsScreen"
-              component={DetailsScreen}
-              options={{
-                headerShown: true,
-                headerTitle: "Details"
-              }}
-            />
-            <Stack.Screen
-              name="editProfile"
-              component={EditProfileScreen}
-            />
-            <Stack.Screen
-              name="chattingScreen"
-              component={ChattingScreen}
-              options={{
-                headerShown: true,
-              }}
-            />
-            <Stack.Screen
-              name="donationDetails"
-              component={DonationDetailsScreen}
-              options={{
-                headerShown: true,
-                headerTitle: "Dontion Details"
-              }}
-            />
-            <Stack.Screen
-              name="executives"
-              component={ExecutivesScreen}
-              options={{
-                headerShown: true,
-                headerTitle: 'Executives'
-              }}
-            />
-        </Stack.Navigator>
-    )
+  return (
+    <Stack.Navigator
+      initialRouteName="bottomTab"
+      screenOptions={{
+        headerShown: false
+      }}
+    >
+      <Stack.Screen
+        name="bottomTab"
+        component={BottomTabNavigator}
+      />
+      <Stack.Screen
+        name="detailsScreen"
+        component={DetailsScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "Details"
+        }}
+      />
+      <Stack.Screen
+        name="editProfile"
+        component={EditProfileScreen}
+      />
+      <Stack.Screen
+        name="chattingScreen"
+        component={ChattingScreen}
+        options={{
+          headerShown: true,
+        }}
+      />
+      <Stack.Screen
+        name="donationDetails"
+        component={DonationDetailsScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "Dontion Details"
+        }}
+      />
+      <Stack.Screen
+        name="executives"
+        component={ExecutivesScreen}
+        options={{
+          headerShown: true,
+          headerTitle: 'Executives'
+        }}
+      />
+    </Stack.Navigator>
+  )
 }
 
 export default MainNavigator;
