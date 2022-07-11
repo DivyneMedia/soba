@@ -1283,13 +1283,27 @@ const ChatScreen = (props: ChatScreenProps) => {
         approvals: test,
         chats,
         getUserApprovalsHandler,
-        getUsersChatsHandler,
+        // getUsersChatsHandler,
+        getUserChats,
+        fetchMoreUserChats,
         createChannelIdDoesNotExist
     } = useChat()
 
     useEffect(() => {
-        getUsersChatsHandler()
-        getUserApprovalsHandler()
+        getUserChats()
+        .then(() => {
+            console.log('getUserChats done')
+        })
+        .catch(err => {
+            console.log('getUserChats err')
+        })
+        // getUserApprovalsHandler()
+        // .then(() => {
+        //     console.log('getUserApprovalsHandlergetUserChats done')
+        // })
+        // .catch(err => {
+        //     console.log('getUserApprovalsHandler err')
+        // })
     }, [])
 
     const userData: USER = useSelector((state: any) => state?.auth?.userData)
@@ -1313,12 +1327,12 @@ const ChatScreen = (props: ChatScreenProps) => {
      */
     useBackPreventHook(getFlag, backActionHandler)
 
-    // useFocusEffect(() => {
-    //     if (route?.params?.refresh) {
-    //         getAdminOfficialChannelsHandler()
-    //         delete route?.params?.refresh
-    //     }
-    // })
+    useFocusEffect(
+        React.useCallback(() => {
+            setSearchText('')
+            setSearchData([])
+        }, [])
+    );
 
     const filterButtonPressHandler = useCallback(() => {
         chatFilterModalRef.current?.show()
@@ -1335,11 +1349,13 @@ const ChatScreen = (props: ChatScreenProps) => {
             senderId,
             updatedAt,
             crmAccId,
-            isAdmin
+            isAdmin,
+            isApproved
         } = chatPayload
+
         const msgSenderId = isAdmin ? channelId.split('_').filter((id: string) => id !== senderId)[0] : senderId
         navigation.navigate('chattingScreen', {
-            showApproveBtn: approvals,
+            showApproveBtn: !isApproved,
             chatName: name || 'Messages',
             chatChannelId: channelId,
             chatSenderId: msgSenderId,
@@ -1414,9 +1430,11 @@ const ChatScreen = (props: ChatScreenProps) => {
                 keyExtractor={keyExtractHandler}
                 renderItem={renderChatListHandler}
                 ListEmptyComponent={renderListFoorter}
+                onEndReached={fetchMoreUserChats}
+                onEndReachedThreshold={0.01}
             />
         )
-    }, [approvals, chats])
+    }, [approvals, chats, fetchMoreUserChats])
 
     const renderHeaderHandler = useMemo(() => {
         return isAdmin

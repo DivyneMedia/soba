@@ -35,6 +35,7 @@ export default {
     chapters: 'chapters',
     executives: 'executives',
     chatMessagesFetchLimit: 15,
+    chatsLimit: 15,
 
     FIRESTORE_USERS_SEARCH_LIMIT: 15,
 }
