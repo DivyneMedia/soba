@@ -13,7 +13,7 @@ type ExecutivesItemProps = {
     role: string
     email: string
     phoneNumber: string
-    onChat(): void
+    onChat(obj: any): void
 }
 
 const ExecutivesItem = (props: ExecutivesItemProps) => {

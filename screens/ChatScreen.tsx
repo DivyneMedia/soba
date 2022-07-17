@@ -145,7 +145,7 @@
 // //         getUserChatsHandler()
 // //     }, [getAdminOfficialChannelsHandler, getUserChatsHandler])
 
-// //     const renderListFoorter = useMemo(() => {
+// //     const renderEmptyListComponent = useMemo(() => {
 // //         if (isLoading) {
 // //             return null
 // //         }
@@ -166,7 +166,7 @@
 // //                 // contentContainerStyle={{ height: approvals ? "100%" : 0 }}
 // //                 keyExtractor={keyExtractHandler}
 // //                 renderItem={renderChatListHandler}
-// //                 ListEmptyComponent={renderListFoorter}
+// //                 ListEmptyComponent={renderEmptyListComponent}
 // //             />
 // //         )
 // //     }, [approvals, adminChats])
@@ -182,7 +182,7 @@
 // //                 // contentContainerStyle={{ height: approvals ? 0 : "100%" }}
 // //                 keyExtractor={keyExtractHandler}
 // //                 renderItem={renderChatListHandler}
-// //                 ListEmptyComponent={renderListFoorter}
+// //                 ListEmptyComponent={renderEmptyListComponent}
 // //             />
 // //         )
 // //     }, [approvals, userChats, approvedChats])
@@ -356,7 +356,7 @@
 // //                         </Pressable>
 // //                     )
 // //                 }}
-// //                 ListEmptyComponent={renderListFoorter}
+// //                 ListEmptyComponent={renderEmptyListComponent}
 // //             />
 // //         )
 // //     }, [searchData, onSearchItemPressHandler])
@@ -560,7 +560,7 @@
 //         getUserChatsHandler()
 //     }, [getAdminOfficialChannelsHandler, getUserChatsHandler])
 
-//     const renderListFoorter = useMemo(() => {
+//     const renderEmptyListComponent = useMemo(() => {
 //         if (isLoading) {
 //             return null
 //         }
@@ -581,7 +581,7 @@
 //                 // contentContainerStyle={{ height: approvals ? "100%" : 0 }}
 //                 keyExtractor={keyExtractHandler}
 //                 renderItem={renderChatListHandler}
-//                 ListEmptyComponent={renderListFoorter}
+//                 ListEmptyComponent={renderEmptyListComponent}
 //             />
 //         )
 //     }, [approvals, adminChats])
@@ -597,7 +597,7 @@
 //                 // contentContainerStyle={{ height: approvals ? 0 : "100%" }}
 //                 keyExtractor={keyExtractHandler}
 //                 renderItem={renderChatListHandler}
-//                 ListEmptyComponent={renderListFoorter}
+//                 ListEmptyComponent={renderEmptyListComponent}
 //             />
 //         )
 //     }, [approvals, userChats, approvedChats])
@@ -771,7 +771,7 @@
 //                         </Pressable>
 //                     )
 //                 }}
-//                 ListEmptyComponent={renderListFoorter}
+//                 ListEmptyComponent={renderEmptyListComponent}
 //             />
 //         )
 //     }, [searchData, onSearchItemPressHandler])
@@ -963,7 +963,7 @@
 //         getUserChatsHandler()
 //     }, [getAdminOfficialChannelsHandler, getUserChatsHandler])
 
-//     const renderListFoorter = useMemo(() => {
+//     const renderEmptyListComponent = useMemo(() => {
 //         if (isLoading) {
 //             return null
 //         }
@@ -984,7 +984,7 @@
 //                 // contentContainerStyle={{ height: approvals ? "100%" : 0 }}
 //                 keyExtractor={keyExtractHandler}
 //                 renderItem={renderChatListHandler}
-//                 ListEmptyComponent={renderListFoorter}
+//                 ListEmptyComponent={renderEmptyListComponent}
 //             />
 //         )
 //     }, [approvals, adminChats])
@@ -1000,7 +1000,7 @@
 //                 // contentContainerStyle={{ height: approvals ? 0 : "100%" }}
 //                 keyExtractor={keyExtractHandler}
 //                 renderItem={renderChatListHandler}
-//                 ListEmptyComponent={renderListFoorter}
+//                 ListEmptyComponent={renderEmptyListComponent}
 //             />
 //         )
 //     }, [approvals, userChats, approvedChats])
@@ -1174,7 +1174,7 @@
 //                         </Pressable>
 //                     )
 //                 }}
-//                 ListEmptyComponent={renderListFoorter}
+//                 ListEmptyComponent={renderEmptyListComponent}
 //             />
 //         )
 //     }, [searchData, onSearchItemPressHandler])
@@ -1219,7 +1219,7 @@
 // export default ChatScreen
 
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, Pressable, StyleSheet, View }  from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, View }  from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import useChat from "../hooks/useChat";
@@ -1282,21 +1282,22 @@ const ChatScreen = (props: ChatScreenProps) => {
         isAdmin,
         approvals: test,
         chats,
-        getUserApprovalsHandler,
+        refreshing,
+        // getUserApprovalsHandler,
         // getUsersChatsHandler,
         getUserChats,
         fetchMoreUserChats,
-        createChannelIdDoesNotExist
+        getAdminChats,
+        fetchMoreAdminChats,
+        createChannelIdDoesNotExist,
+        getAllChatIds,
+        chatsEndReached,
+        approvalsEndReached
     } = useChat()
 
     useEffect(() => {
         getUserChats()
-        .then(() => {
-            console.log('getUserChats done')
-        })
-        .catch(err => {
-            console.log('getUserChats err')
-        })
+        getAdminChats()
         // getUserApprovalsHandler()
         // .then(() => {
         //     console.log('getUserApprovalsHandlergetUserChats done')
@@ -1349,11 +1350,14 @@ const ChatScreen = (props: ChatScreenProps) => {
             senderId,
             updatedAt,
             crmAccId,
-            isAdmin,
+            isAdminChat,
             isApproved
         } = chatPayload
 
-        const msgSenderId = isAdmin ? channelId.split('_').filter((id: string) => id !== senderId)[0] : senderId
+        const msgSenderId = isAdminChat
+            ? channelId.split('_').filter((id: string) => id !== userData["Mobile App Firebase UID"])[0]
+            : userData["Mobile App Firebase UID"]
+
         navigation.navigate('chattingScreen', {
             showApproveBtn: !isApproved,
             chatName: name || 'Messages',
@@ -1361,7 +1365,7 @@ const ChatScreen = (props: ChatScreenProps) => {
             chatSenderId: msgSenderId,
             crmAccId
         })
-    }, [navigation, approvals])
+    }, [navigation, approvals, getAllChatIds, userData])
 
     const favoriteChatHander = useCallback((chatPayload: any) => {
        SuccessToast('Coming Soon')
@@ -1392,7 +1396,7 @@ const ChatScreen = (props: ChatScreenProps) => {
     //     getUserChatsHandler()
     // }, [getAdminOfficialChannelsHandler, getUserChatsHandler])
 
-    const renderListFoorter = useMemo(() => {
+    const renderEmptyListComponent = useMemo(() => {
         if (isLoading) {
             return null
         }
@@ -1401,7 +1405,23 @@ const ChatScreen = (props: ChatScreenProps) => {
                 <BoldText>No Data Available</BoldText>
             </View>
         )
-    }, [])
+    }, [isLoading])
+
+    const userListFooterComponent = useMemo(() => {
+        return !chatsEndReached
+        ? <View style={{ height: 50, alignItems: 'center', justifyContent: 'center' }}>
+            <ActivityIndicator size={"large"} color={colors.primary} />
+        </View>
+        : null
+    }, [chatsEndReached])
+
+    const adminListFooterComponent = useMemo(() => {
+        return !approvalsEndReached
+        ? <View style={{ height: 50, alignItems: 'center', justifyContent: 'center' }}>
+            <ActivityIndicator size={"large"} color={colors.primary} />
+        </View>
+        : null
+    }, [approvalsEndReached])
 
     const renderAdminChats = useMemo(() => {
         if (!approvals) {
@@ -1411,12 +1431,25 @@ const ChatScreen = (props: ChatScreenProps) => {
             <FlatList
                 data={test}
                 // contentContainerStyle={{ height: approvals ? "100%" : 0 }}
+                refreshing={refreshing}
+                onRefresh={getAdminChats.bind(null, true)}
                 keyExtractor={keyExtractHandler}
                 renderItem={renderChatListHandler}
-                ListEmptyComponent={renderListFoorter}
+                ListEmptyComponent={renderEmptyListComponent}
+                ListFooterComponent={adminListFooterComponent}
+                onEndReachedThreshold={0.01}
+                onEndReached={fetchMoreAdminChats}
             />
         )
-    }, [approvals, test])
+    }, [
+        approvals,
+        test,
+        refreshing,
+        getAdminChats,
+        fetchMoreAdminChats,
+        renderEmptyListComponent,
+        adminListFooterComponent
+    ])
 
     const renderUserChats = useMemo(() => {
         if (approvals) {
@@ -1427,14 +1460,24 @@ const ChatScreen = (props: ChatScreenProps) => {
                 data={chats}
                 // style={{ flex: approvals ? -1 : 1 }}
                 // contentContainerStyle={{ height: approvals ? 0 : "100%" }}
+                refreshing={refreshing}
+                onRefresh={getUserChats.bind(null, true)}
                 keyExtractor={keyExtractHandler}
                 renderItem={renderChatListHandler}
-                ListEmptyComponent={renderListFoorter}
+                ListEmptyComponent={renderEmptyListComponent}
+                ListFooterComponent={userListFooterComponent}
                 onEndReached={fetchMoreUserChats}
                 onEndReachedThreshold={0.01}
             />
         )
-    }, [approvals, chats, fetchMoreUserChats])
+    }, [
+        approvals,
+        chats,
+        getUserChats,
+        fetchMoreUserChats,
+        renderEmptyListComponent,
+        userListFooterComponent
+    ])
 
     const renderHeaderHandler = useMemo(() => {
         return isAdmin
@@ -1535,7 +1578,7 @@ const ChatScreen = (props: ChatScreenProps) => {
 
             const firebaseUid: string = userData["Mobile App Firebase UID"]
             console.log(firebaseUid, uid)
-            const channelData = await createChannelIdDoesNotExist(firebaseUid, uid)
+            const channelData = await createChannelIdDoesNotExist(firebaseUid, uid, true)
             if (channelData) {
                 const {
                     channelId,
@@ -1605,7 +1648,7 @@ const ChatScreen = (props: ChatScreenProps) => {
                         </Pressable>
                     )
                 }}
-                ListEmptyComponent={renderListFoorter}
+                ListEmptyComponent={renderEmptyListComponent}
             />
         )
     }, [searchData, onSearchItemPressHandler])

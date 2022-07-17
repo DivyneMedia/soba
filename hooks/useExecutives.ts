@@ -13,6 +13,7 @@ export type ExecutiveItemType = {
 
 type useExecutivesReturnType = {
     isLoading: boolean
+    isRefreshing: boolean
     endReached: boolean
     executives: ExecutiveItemType[]
     getExecutives(): void
@@ -29,6 +30,7 @@ const useExecutives = (props?: useExecutivesType): useExecutivesReturnType => {
 
     // ** State
     const [isLoading, setLoading] = useState(false)
+    const [isRefreshing, setRefreshing] = useState(false)
     const [endReached, setEndReached] = useState(true)
     const [executives, setExecutives] = useState<ExecutiveItemType[]>([])
 
@@ -49,25 +51,42 @@ const useExecutives = (props?: useExecutivesType): useExecutivesReturnType => {
         }
     }, [])
 
-    const getExecutives = useCallback(async () => {
+    const getExecutives = useCallback(async (refreshing = false) => {
         try {
+            if(refreshing) {
+                lastRecordRef.current = null
+                setRefreshing(true)
+            } else {
+                setLoading(true)
+            }
             const getExecutivesRes = await firestore()
                 .collectionGroup(appConstants.executives)
-                .limit(15)
+                .limit(appConstants.FIRESTORE_USERS_SEARCH_LIMIT)
                 .get()
 
             const executiveData: ExecutiveItemType[] = getExecutivesRes.docs.map((doc: any) => doc.data())
             lastRecordRef.current = getExecutivesRes.docs[getExecutivesRes.docs.length - 1]
             setExecutives(executiveData)
 
-            if (executiveData.length < 15) {
+            if (executiveData.length < appConstants.FIRESTORE_USERS_SEARCH_LIMIT) {
                 setEndReached(true)
             } else {
                 setEndReached(false)
             }
 
+            if(refreshing) {
+                setRefreshing(false)
+            } else {
+                setLoading(false)
+            }
         } catch (err: any) {
-            console.log('Error : ', err.message)
+            setEndReached(true)
+            if(refreshing) {
+                setRefreshing(false)
+            } else {
+                setLoading(false)
+            }
+            console.log('[getExecutives] Error : ', err.message)
         }
     }, [])
 
@@ -80,7 +99,7 @@ const useExecutives = (props?: useExecutivesType): useExecutivesReturnType => {
             const getExecutivesRes = await firestore()
                 .collectionGroup(appConstants.executives)
                 .startAfter(lastRecordRef.current)
-                .limit(15)
+                .limit(appConstants.FIRESTORE_USERS_SEARCH_LIMIT)
                 .get()
 
             const dataRes = getExecutivesRes.docs.map(doc => doc.data())
@@ -88,13 +107,14 @@ const useExecutives = (props?: useExecutivesType): useExecutivesReturnType => {
 
             lastRecordRef.current = getExecutivesRes.docs[getExecutivesRes.docs.length - 1]
 
-            if (dataRes.length < 15) {
+            if (dataRes.length < appConstants.FIRESTORE_USERS_SEARCH_LIMIT) {
                 setEndReached(true)
             } else {
                 setEndReached(false)
             }
         } catch (err: any) {
-            console.log('Error : ', err.message)
+            setEndReached(true)
+            console.log('[useExecutives-fetchMore] Error : ', err.message)
         }
     }, [])
 
@@ -106,6 +126,7 @@ const useExecutives = (props?: useExecutivesType): useExecutivesReturnType => {
 
     return {
         isLoading,
+        isRefreshing,
         endReached,
         executives,
         getExecutives,

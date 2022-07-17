@@ -20,12 +20,18 @@ const useChat = () => {
     const [approvals, setApprovals] = useState<any[]>([])
     const [chatsEndReached, setChatsEndReached] = useState(true)
     const [approvalsEndReached, setApprovalsEndReached] = useState(true)
-    const [refreshing, setRefreshing] = useState(true)
+    const [refreshing, setRefreshing] = useState(false)
 
     // ** Refs
     const mountedRef = useRef(false)
+    const adminIds = useRef<any[]>([])
+
     const lastUserChatRef = useRef<any>(null)
     const lastAdminChatRef = useRef<any>(null)
+
+    const lastUserChatTimeRef = useRef<number>(new Date().getTime())
+    const lastAdminChatTimeRef = useRef<number>(new Date().getTime())
+    const [adminChatsListener, setAdminChatsListener] = useState(false)
 
     // ** Redux
     const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
@@ -192,10 +198,10 @@ const useChat = () => {
     //     }
     // }, [toggleLoaderHandler])
 
-    const createChannelIdDoesNotExist = useCallback(async (userId: string, chatId: string) => {
+    const createChannelIdDoesNotExist = useCallback(async (userId: string, chatId: string, isApproved = false, isExecutiveChat = false) => {
         try {
             toggleLoaderHandler(true)
-            const channelId = userId > chatId ? `${userId}_${chatId}` : `${chatId}_${userId}`
+            const channelId = userId.trim() > chatId.trim() ? `${userId.trim()}_${chatId.trim()}` : `${chatId.trim()}_${userId.trim()}`
             const chatChannel = await firestore()
                 .collection(appConstants.privateChannel)
                 .doc(channelId)
@@ -213,7 +219,8 @@ const useChat = () => {
                     lastMessageType: 'text',
                     memberIds: [userId, chatId],
                     senderId: userId,
-                    isApproved: false,
+                    isApproved,
+                    isAdminChat: false,
                     isPinned: false
                 }
                 await firestore().collection(appConstants.privateChannel).doc(channelId).set(data)
@@ -391,18 +398,50 @@ const useChat = () => {
     //     }
     // }, [userData])
 
+    
+    const getAdminChatIds = useCallback(async (refreshing = false) => {
+        try {
+            if (!refreshing && Array.isArray(adminIds.current) && adminIds.current.length) {
+                return adminIds.current
+            }
+            
+            const defaultChannels =
+                await firestore()
+                .collection(appConstants.defaultChannels)
+                .where("admins", "array-contains", userData['Mobile App Firebase UID'])
+                .where("isDeleted", "!=", true)
+                .get()
+
+            const adminChannelIds = defaultChannels.docs.map(doc => doc.data().id)
+
+            // console.log('adminChannelIds : ', adminChannelIds)
+            adminIds.current = [...adminChannelIds, userData['Mobile App Firebase UID']]
+
+            if (adminIds.current.length) {
+                setIsAdmin(true)
+            }
+            return adminIds.current
+        } catch (err: any) {
+            console.log('[getAdminChatIds] Error : ', err.message)
+            return []
+        }
+    }, [userData])
+
     const fetchUserChats = useCallback(async (refresh = false) => {
         try {
-            let userChatIds: any[] = []
-            try {
-                const adminChatIds = userData?.['Mobile App Firebase Admin Ids']
-                if (adminChatIds) {
-                    const adminChatIdsArr = JSON.parse(adminChatIds)
-                    userChatIds = [...adminChatIdsArr, userData['Mobile App Firebase UID']]
-                }
-            } catch (err: any) {
-                userChatIds = [userData['Mobile App Firebase UID']]
-            }
+            const userChatIds: any[] = await getAdminChatIds(refresh)
+            console.log('userChatIds : ', userChatIds)
+            // try {
+            //     const adminChatIds = userData?.['Mobile App Firebase Admin Ids']
+            //     if (adminChatIds) {
+            //         const adminChatIdsArr = JSON.parse(adminChatIds)
+            //         userChatIds = [...adminChatIdsArr, userData['Mobile App Firebase UID']]
+            //     }
+            // } catch (err: any) {
+            //     userChatIds = [userData['Mobile App Firebase UID']]
+            // }
+
+            // console.log('fetchUserChats - userChatIds : ', userChatIds)
 
             let query = firestore()
                 .collection(appConstants.privateChannel)
@@ -412,11 +451,13 @@ const useChat = () => {
                 .orderBy('isApproved', 'asc')
                 .limit(appConstants.chatsLimit)
 
-            if (lastUserChatRef.current) {
+            if (!refresh && !!lastUserChatRef.current) {
                 query = query.startAfter(lastUserChatRef.current)
             }
             
             const getChatsRes = await query.get()
+
+            console.log('getChatsRes.docs.length : ', getChatsRes.docs.length, !refresh && !!lastUserChatRef.current)
 
             lastUserChatRef.current = getChatsRes.docs[getChatsRes.docs.length - 1]
 
@@ -427,7 +468,7 @@ const useChat = () => {
             }
 
             if (getChatsRes.docs.length) {
-                const chatsArr = await Promise.all(getChatsRes.docs.map(async (doc, index) => {
+                const chatsArr: any = await Promise.all(getChatsRes.docs.map(async (doc, index) => {
                     const docData = doc.data()
                     if ('isAdminChat' in docData) { // has key
                         if (docData?.isAdminChat) {
@@ -463,7 +504,8 @@ const useChat = () => {
             
                             return {
                                 name: dataRes.data()?.name,
-                                ...docData
+                                ...docData,
+                                isAdminChat: false
                             }
                         } else {
                             const id = docData.channelId.split('_').filter((id: string) => id !== userData['Mobile App Firebase UID'])[0]
@@ -475,7 +517,8 @@ const useChat = () => {
 
                             return {
                                 name: dataRes.data()?.firstName + " " + dataRes.data()?.lastName,
-                                ...docData
+                                ...docData,
+                                isAdminChat: false
                             }
                         }
                     }
@@ -494,7 +537,7 @@ const useChat = () => {
             console.log('[fetchUserChats] Error : ', err.message)
             return []
         }
-    }, [userData])
+    }, [userData, getAdminChatIds])
 
     const getUserChats = useCallback(async (refresh = false) => {
         try {
@@ -509,7 +552,6 @@ const useChat = () => {
             } else {
                 toggleLoaderHandler(false)
             }
-            console.log('initialUserChats : ', initialUserChats)
             setChats(initialUserChats)
         } catch (err: any) {
             console.log('[getUserChats] Error : ', err.message)
@@ -620,18 +662,21 @@ const useChat = () => {
     //     }
     // }, [userData])
 
-    const fetchAdminApprovals = useCallback(async () => {
+    const fetchAdminApprovals = useCallback(async (refresh = false) => {
         try {
-            let userChatIds: any[] = []
-            try {
-                const adminChatIds = userData?.['Mobile App Firebase Admin Ids']
-                if (adminChatIds) {
-                    const adminChatIdsArr = JSON.parse(adminChatIds)
-                    userChatIds = [...adminChatIdsArr]
-                }
-            } catch (err: any) {
-                userChatIds = []
-            }
+            // let userChatIds: any[] = []
+            // try {
+            //     const adminChatIds = userData?.['Mobile App Firebase Admin Ids']
+            //     if (adminChatIds) {
+            //         const adminChatIdsArr = JSON.parse(adminChatIds)
+            //         userChatIds = [...adminChatIdsArr]
+            //     }
+            // } catch (err: any) {
+            //     userChatIds = []
+            // }
+            const userChatIds: any[] = await getAdminChatIds(refresh)
+
+            // console.log('fetchAdminApprovals - userChatIds : ', userChatIds)
 
             if (!userChatIds.length) {
                 return []
@@ -646,7 +691,7 @@ const useChat = () => {
                 .orderBy('isApproved', 'asc')
                 .limit(appConstants.chatsLimit)
 
-            if (lastAdminChatRef.current) {
+            if (!refresh && !!lastAdminChatRef.current) {
                 query.startAfter(lastAdminChatRef.current)
             }
 
@@ -661,6 +706,7 @@ const useChat = () => {
             }
                             
             if (getChatsRes.docs.length) {
+                setAdminChatsListener(true)
                 const chatsArr = await Promise.all(getChatsRes.docs.map(async (doc, index) => {
                     const docData = doc.data()
                     let id = ''
@@ -706,7 +752,7 @@ const useChat = () => {
             console.log('Error : ', err.message)
             return []
         }
-    }, [userData])
+    }, [userData, getAdminChatIds])
 
     const getAdminChats = useCallback(async (refresh = false) => {
         try {
@@ -715,7 +761,7 @@ const useChat = () => {
             } else {
                 toggleLoaderHandler(true)
             }
-            const chatsArr = await fetchAdminApprovals()
+            const chatsArr = await fetchAdminApprovals(refresh)
             setApprovals(chatsArr)
             if (refresh) {
                 setRefreshing(false)
@@ -746,32 +792,140 @@ const useChat = () => {
         }
     }, [approvalsEndReached, fetchAdminApprovals])
 
-    const initHandler = useCallback(async () => {
-        try {
-            toggleLoaderHandler(true)
-            const defaultChannels =
-                await firestore()
-                .collection(appConstants.defaultChannels)
-                .where("admins", "array-contains", userData['Mobile App Firebase UID'])
-                .where("isDeleted", "!=", true)
-                .get()
-            
-            toggleLoaderHandler(false)
+    const getAllChatIds = useCallback(() => adminIds.current, [])
 
-            const adminChannelIds = defaultChannels.docs.map(doc => doc.data().id)
+    // useEffect(() => {
+    //     let unsubscribe = null
+    //     getAdminChatIds(false)
+    //     .then(res => {
+    //         if (res.length) {
+    //             unsubscribe = firestore()
+    //                 .collection(appConstants.privateChannel)
+    //                 .where("memberIds", "array-contains-any", res)
+    //                 .where("isApproved", "!=", false)
+    //                 .where("isDeleted", "==", false)
+    //                 .orderBy('isApproved', 'asc')
+    //                 .limit(appConstants.chatsLimit)
+    //                 .where("lastMessageTime", ">=", lastUserChatTimeRef.current)
+    //                 .onSnapshot((snap) => {
+    //                     snap.docChanges().forEach((snapObj) => {
+    //                         switch (snapObj.type) {
+    //                             case 'added':
+    //                                 {
+    //                                     const docData = snapObj.doc.data()
+    //                                     if ('isAdminChat' in docData) { // has key
+    //                                         if (docData?.isAdminChat) {
 
-            if (adminChannelIds.length) {
-                setIsAdmin(true)
-            }
-        } catch (err: any) {
-            toggleLoaderHandler(false)
-            console.log('Error : ', err.message)
-        }
-    }, [userData])
+    //                                             let id = ''
+                                                    
+    //                                             docData
+    //                                             .channelId
+    //                                             .split('_')
+    //                                             .forEach((channelIdPart: string) => {
+    //                                                 try {
+    //                                                     if (!userData['Mobile App Firebase Admin Ids']) {
+    //                                                         throw new Error("not an admin")
+    //                                                     }
+    //                                                     const adminChatIds = JSON.parse(userData['Mobile App Firebase Admin Ids'])
 
-    useEffect(() => {
-        initHandler()
-    }, [])
+    //                                                     const myID = adminChatIds.filter((adminChatId: any) => adminChatId !== channelIdPart)
+
+    //                                                     if (myID.length) {
+    //                                                         id = myID[0]
+    //                                                     }
+    //                                                 } catch (err: any) {
+    //                                                     if (channelIdPart !== userData['Mobile App Firebase UID']) {
+    //                                                         id = channelIdPart
+    //                                                     }
+    //                                                 }
+    //                                             })
+
+    //                                             const dataRes = await firestore()
+    //                                                 .collection(appConstants.defaultChannels)
+    //                                                 .doc(id)
+    //                                                 .get()
+                                
+    //                                             return {
+    //                                                 name: dataRes.data()?.name,
+    //                                                 ...docData,
+    //                                                 isAdminChat: false
+    //                                             }
+    //                                         } else {
+    //                                             const id = docData.channelId.split('_').filter((id: string) => id !== userData['Mobile App Firebase UID'])[0]
+
+    //                                             const dataRes = await firestore()
+    //                                                 .collection(appConstants.users)
+    //                                                 .doc(id)
+    //                                                 .get()
+
+    //                                             return {
+    //                                                 name: dataRes.data()?.firstName + " " + dataRes.data()?.lastName,
+    //                                                 ...docData,
+    //                                                 isAdminChat: false
+    //                                             }
+    //                                         }
+    //                                     }
+    //                                 }
+    //                                 setUserChats((prevState: any[]) => {
+    //                                     const existingChats = [...prevState]
+    //                                     existingChats.unshift({
+    //                                         ...snapObj.doc.data(),
+                                            
+    //                                     })
+    //                                 })
+    //                                 break
+    //                             case 'modified':
+    //                             case 'removed':
+    //                             default:
+    //                                 break
+    //                         }
+    //                     })
+    //                 })
+    //         }
+    //     })
+    //     .catch((err: any) => {
+    //         console.log('[getAdminChatIds] Error : ', err.message)
+    //     })
+    // }, [])
+
+    // useEffect(() => {
+    //     if (adminChatsListener) {
+    //         let unsubscribe = null
+    //         getAdminChatIds(false)
+    //         .then(res => {
+    //             if (res.length) {
+    //                 unsubscribe = firestore()
+    //                     .collection(appConstants.privateChannel)
+    //                     .where("memberIds", "array-contains-any", res)
+    //                     .where("isAdminChat", "==", true)
+    //                     .where("isDeleted", "==", false)
+    //                     .where('isApproved', '!=', '')
+    //                     .orderBy('isApproved', 'asc')
+    //                     .where("messageTime", ">=", lastAdminChatTimeRef.current)
+    //                     .onSnapshot((snap) => {
+    //                         snap.docChanges().forEach((snapObj) => {
+    //                             switch (snapObj.type) {
+    //                                 case 'added':
+    //                                     setAdminChats((prevState: any[]) => {
+    //                                         const existingChats = [...prevState]
+    //                                         existingChats.unshift(snapObj.doc.data())
+    //                                         return existingChats
+    //                                     })
+    //                                     break
+    //                                 case 'modified':
+    //                                 case 'removed':
+    //                                 default:
+    //                                     break
+    //                             }
+    //                         })
+    //                     })
+    //             }
+    //         })
+    //         .catch ((err: any) => {
+    //             console.log('Error : ', err.message)
+    //         })
+    //     }
+    // }, [adminChatsListener, getAdminChatIds])
 
     return {
         // isLoading,
@@ -791,10 +945,16 @@ const useChat = () => {
         chats,
         approvals,
         // getUsersChatsHandler,
+        refreshing,
         getUserChats,
         fetchMoreUserChats,
-        getUserApprovalsHandler,
-        createChannelIdDoesNotExist
+        // getUserApprovalsHandler,
+        getAdminChats,
+        fetchMoreAdminChats,
+        createChannelIdDoesNotExist,
+        getAllChatIds,
+        chatsEndReached,
+        approvalsEndReached
     }
 }
 
