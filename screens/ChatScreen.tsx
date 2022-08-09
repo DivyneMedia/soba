@@ -1254,28 +1254,19 @@ type ChatScreenProps = {
 }
 
 const ChatScreen = (props: ChatScreenProps) => {
-    const { navigation, route } = props
-    // console.log('route : ', route)
-
-    // const { userData }: { userData: USER } = useSelector((state: any) => state.auth)
-    // const isAdmin = useMemo(() => userData?.["Email 1"] === "admin@gmail.com", [userData?.["Email 1"]])
+    const { navigation /* , route */ } = props
 
     const loaderContext = useContext(LoaderContext)
 
-    // const {
-    //     isLoading,
-    //     isAdmin,
-    //     // officialChats,
-    //     adminChats,
-    //     approvedChats,
-    //     getAdminOfficialChannelsHandler,
-    //     // getAllOfficialChannelsHandler,
-    //     userChats,
-    //     getUserChatsHandler,
-    //     createChannelIdDoesNotExist,
-    //     getUsersChatsHandler
-    //     // toggleLoaderHandler
-    // } = useChat()
+    const userData: USER = useSelector((state: any) => state?.auth?.userData)
+    
+    const [searchText, setSearchText] = useState('')
+    const [searchData, setSearchData] = useState<any[]>([])
+    const [approvals, setApprovals] = useState(false)
+
+    const chatFilterModalRef = useRef<ChatFilterModalRefTypes>()
+    
+    const getFlag = useCallback(() => chatFilterModalRef.current?.isVisible?.current, [])
 
     const {
         isLoading,
@@ -1283,8 +1274,6 @@ const ChatScreen = (props: ChatScreenProps) => {
         approvals: test,
         chats,
         refreshing,
-        // getUserApprovalsHandler,
-        // getUsersChatsHandler,
         getUserChats,
         fetchMoreUserChats,
         getAdminChats,
@@ -1297,25 +1286,13 @@ const ChatScreen = (props: ChatScreenProps) => {
 
     useEffect(() => {
         getUserChats()
-        getAdminChats()
-        // getUserApprovalsHandler()
-        // .then(() => {
-        //     console.log('getUserApprovalsHandlergetUserChats done')
-        // })
-        // .catch(err => {
-        //     console.log('getUserApprovalsHandler err')
-        // })
     }, [])
 
-    const userData: USER = useSelector((state: any) => state?.auth?.userData)
-    
-    const [searchText, setSearchText] = useState('')
-    const [searchData, setSearchData] = useState<any[]>([])
-    const [approvals, setApprovals] = useState(false)
-
-    const chatFilterModalRef = useRef<ChatFilterModalRefTypes>()
-    
-    const getFlag = useCallback(() => chatFilterModalRef.current?.isVisible?.current, [])
+    useEffect(() => {
+        if (isAdmin) {
+            getAdminChats()
+        }
+    }, [isAdmin, getAdminChats])
     
     const backActionHandler = useCallback(() => {
         chatFilterModalRef.current?.hide()
@@ -1578,7 +1555,7 @@ const ChatScreen = (props: ChatScreenProps) => {
 
             const firebaseUid: string = userData["Mobile App Firebase UID"]
             console.log(firebaseUid, uid)
-            const channelData = await createChannelIdDoesNotExist(firebaseUid, uid, true)
+            const channelData = await createChannelIdDoesNotExist(firebaseUid, uid, false, true)
             if (channelData) {
                 const {
                     channelId,

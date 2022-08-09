@@ -70,7 +70,7 @@ const ExecutivesScreen = (props: ExecutivesScreenProps) => {
             console.log(id.trim(), userData['Mobile App Firebase UID']?.trim())
 
             if (userData['Mobile App Firebase UID']) {
-                const data: any = await createChannelIdDoesNotExist(userData['Mobile App Firebase UID'], id, false)
+                const data: any = await createChannelIdDoesNotExist(userData['Mobile App Firebase UID'], id, false, true)
                 const {
                     channelId, // ": "lVLTCs1NtlWYhniVvAyk_QFYiNomTRcMZCXzvCbOGoravDrY2",
                     createdAt, // ": {"_elements": undefined, "_type": "timestamp"},

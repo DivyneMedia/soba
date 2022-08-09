@@ -38,14 +38,10 @@ const AccApproveRequest = (props: AccApproveRequestType) => {
     
     const openChatHandler = useCallback(async (data: any) => {
         try {
-            // navigation.navigate('chattingScreen', {
-            //     name
-            // })
-            // console.log(userData)
             if (userData["Mobile App Firebase UID"] && data) {
                 const { id, profile, name, phone } = data
                 const firebaseUid = userData["Mobile App Firebase UID"]
-                const channelData = await createChannelIdDoesNotExist(firebaseUid, id)
+                const channelData = await createChannelIdDoesNotExist(firebaseUid, id, true)
                 if (channelData) {
                     const {
                         channelId,
