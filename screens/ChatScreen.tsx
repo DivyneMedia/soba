@@ -1280,6 +1280,7 @@ const ChatScreen = (props: ChatScreenProps) => {
         fetchMoreAdminChats,
         createChannelIdDoesNotExist,
         getAllChatIds,
+        getAdminChatIds,
         chatsEndReached,
         approvalsEndReached
     } = useChat()
@@ -1316,7 +1317,7 @@ const ChatScreen = (props: ChatScreenProps) => {
         chatFilterModalRef.current?.show()
     }, [])
 
-    const openChatHandler = useCallback((chatPayload: any, name: string) => {
+    const openChatHandler = useCallback(async (chatPayload: any, name: string) => {
         const {
             channelId,
             createdAt,
@@ -1330,19 +1331,25 @@ const ChatScreen = (props: ChatScreenProps) => {
             isAdminChat,
             isApproved
         } = chatPayload
+        
+        const adminIds = await getAdminChatIds()
 
-        const msgSenderId = isAdminChat
-            ? channelId.split('_').filter((id: string) => id !== userData["Mobile App Firebase UID"])[0]
-            : userData["Mobile App Firebase UID"]
+        let chatSenderId = userData["Mobile App Firebase UID"]
+        if (approvals) {
+            const myAdminIds = [...adminIds].splice(0, adminIds.length - 1)
+            for (let adminId of myAdminIds) {
+                chatSenderId = channelId.split('_').filter((id: string) => id === adminId)[0]
+            }
+        }
 
         navigation.navigate('chattingScreen', {
             showApproveBtn: !isApproved,
             chatName: name || 'Messages',
             chatChannelId: channelId,
-            chatSenderId: msgSenderId,
+            chatSenderId,
             crmAccId
         })
-    }, [navigation, approvals, getAllChatIds, userData])
+    }, [navigation, approvals, getAllChatIds, userData, getAdminChatIds])
 
     const favoriteChatHander = useCallback((chatPayload: any) => {
        SuccessToast('Coming Soon')
@@ -1367,11 +1374,6 @@ const ChatScreen = (props: ChatScreenProps) => {
             return null
         }
     }, [openChatHandler, favoriteChatHander])
-
-    // useEffect(() => {
-    //     getAdminOfficialChannelsHandler()
-    //     getUserChatsHandler()
-    // }, [getAdminOfficialChannelsHandler, getUserChatsHandler])
 
     const renderEmptyListComponent = useMemo(() => {
         if (isLoading) {
@@ -1522,8 +1524,6 @@ const ChatScreen = (props: ChatScreenProps) => {
             console.log('Error : ', err.message)
         }
     }, [])
-
-    // const debounceSave = useRef((nextVal: string) => debounce(searchUsers,800)).current
 
     const debouncedSave = useRef(debounce((nextValue: string) => searchUsers(nextValue), 800)).current;
 

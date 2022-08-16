@@ -148,6 +148,7 @@ const useChat = () => {
         }
     }, [userData])
 
+    // ** Fetch User Chats firebase call
     const fetchUserChats = useCallback(async (refresh = false) => {
         try {
             const userChatIds: any[] = await getAdminChatIds(refresh)
@@ -226,8 +227,6 @@ const useChat = () => {
                                 .doc(id)
                                 .get()
 
-                            console.log('dataRes : ', dataRes)
-
                             return {
                                 name: dataRes.data()?.firstName + " " + dataRes.data()?.lastName,
                                 ...docData,
@@ -290,6 +289,7 @@ const useChat = () => {
         }
     }, [fetchUserChats, chatsEndReached])
 
+    // ** Fetch Admin Chats firebase call
     const fetchAdminApprovals = useCallback(async (refresh = false) => {
         try {
             const userChatIds: any[] = await getAdminChatIds(refresh)
@@ -410,6 +410,56 @@ const useChat = () => {
 
     const getAllChatIds = useCallback(() => adminIds.current, [])
 
+    useEffect(() => {
+        try {
+            firestore()
+            .collection(appConstants.privateChannel)
+            .where("createdAt", ">", new Date())
+            .where("memberIds", "array-contains", userData['Mobile App Firebase UID'])
+            .onSnapshot((snapShot) => {
+                snapShot.docChanges().forEach((doc) => {
+                    if (doc.type === "added") {
+                        setChats(prevState => [...prevState, doc.doc.data()])
+                    }
+                })
+            }, (error) => {
+                console.log('[useEffect-userChats] Error : ', error)
+            })
+        } catch (error) {
+            console.log('[[useEffect-userChats] ] Error : ', error)
+        }
+    }, [userData])
+
+    // useEffect(() => {
+    //     try {
+    //         getAdminChatIds(false)
+    //         .then(res => {
+    //             if (!res.length) {
+    //                 return []
+    //             }
+    
+    //             firestore()
+    //             .collection(appConstants.privateChannel)
+    //             .where("memberIds", "array-contains-any", [...res].splice(0, res.length - 1))
+    //             .where("createdAt", ">", new Date())
+    //             .onSnapshot((snapShot) => {
+    //                 snapShot.docChanges().forEach((doc) => {
+    //                     if (doc.type === "added") {
+    //                         setApprovals(prevState => [...prevState, doc.doc.data()])
+    //                     }
+    //                 })
+    //             }, (error) => {
+    //                 console.log('[useEffect - getAdminChatIds] Error : ', error)
+    //             })
+    //         })
+    //         .catch((err: any) => {
+    //             console.log('[useEffect - getAdminChatIds] Error : ', err.message)
+    //         })
+    //     } catch (error) {
+    //         console.log('[useEffect - getAdminChatIds] Error : ', error)
+    //     }
+    // }, [userData])
+
     return {
         officialChats,
         getAllOfficialChannelsHandler,
@@ -424,6 +474,7 @@ const useChat = () => {
         fetchMoreAdminChats,
         createChannelIdDoesNotExist,
         getAllChatIds,
+        getAdminChatIds,
         chatsEndReached,
         approvalsEndReached
     }
