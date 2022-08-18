@@ -42,6 +42,7 @@ type RouteParams = {
     state: STRING_UNDEFINED
     city: STRING_UNDEFINED
     zipCode: STRING_UNDEFINED
+    profilePic: STRING_UNDEFINED
 } 
 
 const EnterContactInformation = (props: any) => {
@@ -57,7 +58,7 @@ const EnterContactInformation = (props: any) => {
         toggleLoader
     } = useAccount()
 
-    const { createAccount, verifyAccount } = useContext(PhoneAuthContext)
+    const { createAccount } = useContext(PhoneAuthContext)
 
     // **States
     const [callingCode, setCallingCode] = useState(__DEV__ ? '+91' : '+1') // useState(params?.callingCode ? `+${params?.callingCode}` : '+91')
@@ -238,6 +239,7 @@ const EnterContactInformation = (props: any) => {
                     year: formattedDate[2],
                     primaryAddressId: userDetails?.individualAccount.primaryContact.addresses.filter(addresDetails => addresDetails.isPrimaryAddress)[0].addressId,
                     zipCode: zipcode,
+                    profilePic: params.profilePic
                 }
 
                 // await updateUserAccountDetails(params.accId, {
@@ -262,6 +264,7 @@ const EnterContactInformation = (props: any) => {
                 updateableDetails: payload ? JSON.stringify(payload) : JSON.stringify({
                     firstName: params.firstName,
                     lastName: params.lastName,
+                    profilePic: params.profilePic
                 })
             })
         } catch (err: any) {

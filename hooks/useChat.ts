@@ -216,6 +216,7 @@ const useChat = () => {
             
                             return {
                                 name: dataRes.data()?.name,
+                                profilePic: dataRes.data()?.profilePic,
                                 ...docData,
                                 isAdminChat: false
                             }
@@ -229,6 +230,7 @@ const useChat = () => {
 
                             return {
                                 name: dataRes.data()?.firstName + " " + dataRes.data()?.lastName,
+                                profilePic: dataRes.data()?.profilePic,
                                 ...docData,
                                 isAdminChat: false
                             }
@@ -259,12 +261,12 @@ const useChat = () => {
                 toggleLoaderHandler(true)
             }
             const initialUserChats = await fetchUserChats(refresh)
+            setChats(initialUserChats)
             if (refresh) {
                 setRefreshing(false)
             } else {
                 toggleLoaderHandler(false)
             }
-            setChats(initialUserChats)
         } catch (err: any) {
             console.log('[getUserChats] Error : ', err.message)
             if (refresh) {
@@ -357,6 +359,7 @@ const useChat = () => {
                     return {
                         name: dataRes.data()?.firstName + " " + dataRes.data()?.lastName,
                         crmAccId: dataRes.data()?.crmAccId,
+                        profilePic: dataRes.data()?.profilePic,
                         ...docData
                     }
                 }))
@@ -430,6 +433,24 @@ const useChat = () => {
         }
     }, [userData])
 
+    const setAccountApprovedLocally = useCallback((channelId: string) => {
+        setApprovals((prevState: any[]) => {
+            const existingApprovals = [...prevState]
+
+            const updateIndex = existingApprovals.findIndex(approval => approval.channelId === channelId)
+
+            if (updateIndex > -1) {
+                existingApprovals[updateIndex] = {
+                    ...existingApprovals[updateIndex],
+                    isApproved: true
+                }
+                return existingApprovals
+            } else {
+                return prevState
+            }
+        })
+    }, [])
+
     // useEffect(() => {
     //     try {
     //         getAdminChatIds(false)
@@ -476,7 +497,8 @@ const useChat = () => {
         getAllChatIds,
         getAdminChatIds,
         chatsEndReached,
-        approvalsEndReached
+        approvalsEndReached,
+        setAccountApprovedLocally
     }
 }
 

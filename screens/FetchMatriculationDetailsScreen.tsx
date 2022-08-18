@@ -61,6 +61,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
             const year = userBasicInfo?.searchResults[0]["DOB Year"]
     
             const dob = moment(`${date}/${month}/${year} 00:00:00`, "D/M/YYYY hh:mm:ss")
+
             const payloadToSend = {
                 firstName: userBasicInfo?.searchResults[0]?.["First Name"],
                 lastName: userBasicInfo?.searchResults[0]["Last Name"],
@@ -72,8 +73,10 @@ const FetchMatriculationDetailsScreen = (props: any) => {
                 address: userBasicInfo?.searchResults[0]["Full Street Address (F)"],
                 state: userBasicInfo?.searchResults[0]["State/Province"],
                 city: userBasicInfo?.searchResults[0].City,
-                zipCode: userBasicInfo?.searchResults[0]["Zip Code"]
+                zipCode: userBasicInfo?.searchResults[0]["Zip Code"],
+                profilePic: userBasicInfo?.searchResults[0]["Photo URL"]
             }
+
             navigation.navigate('enterContactInformation', payloadToSend)
         } catch (err: any) {
             console.log('[nextPressHandler] Error : ', err?.message)

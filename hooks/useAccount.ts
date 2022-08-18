@@ -91,6 +91,8 @@ const useAccount = (chatChannelId?: string) => {
             }
             toggleLoader(true)
 
+
+            console.log('chatChannelId : ', chatChannelId)
             await firestore()
             .collection(appConstants.privateChannel)
             .doc(chatChannelId)
@@ -98,6 +100,7 @@ const useAccount = (chatChannelId?: string) => {
                 isApproved: true
             })
 
+            console.log('userFirestoreId : ', userFirestoreId)
             await firestore()
             .collection(appConstants.users)
             .doc(userFirestoreId)

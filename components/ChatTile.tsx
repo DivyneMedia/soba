@@ -1,6 +1,7 @@
 import React from "react";
 import { Image, ImageRequireSource, Pressable, StyleSheet, View } from 'react-native'
 import images from "../assets/images";
+import colors from "../constants/colors";
 import BoldText from "./BoldText";
 import RegularText from "./RegularText";
 
@@ -24,15 +25,27 @@ const ChatTile = (props: ChatTileProps) => {
                 alignItems: 'center',
                 marginVertical: 15,
                 paddingHorizontal: 15,
+                shadowColor: colors.black,
+                shadowOffset: {
+                    width: 0,
+                    height: 1,
+                },
+                shadowOpacity: 0.18,
+                shadowRadius: 1.00,
+                elevation: 1,
+                backgroundColor: colors.white,
+                paddingVertical: 10,
+                marginHorizontal: 10,
+                borderRadius: 10
             }}
         >
             <Image
-                style={{ height: 34, width: 34, borderRadius: 30, overflow: 'hidden' }}
+                style={{ height: 48, width: 48, borderRadius: 100, overflow: 'hidden' }}
                 source={profile}
-                resizeMode="contain" />
-            <View style={{ flex: 1, marginLeft: 10, alignItems: 'flex-start', justifyContent: 'center' }}>
+                resizeMode="cover" />
+            <View style={{ flex: 1, marginLeft: 10, alignItems: 'flex-start', justifyContent: 'center', overflow: 'hidden' }}>
                 <BoldText style={{ fontSize: 12 }}>{name}</BoldText>
-                {lastSeen ? <RegularText style={{ fontSize: 10 }}>{lastSeen}</RegularText> : null}
+                {lastSeen ? <RegularText style={{ width: '100%', fontSize: 10 }} numberOfLines={1}>{lastSeen}</RegularText> : null}
             </View>
             {
                 typeof onFavPress === "function"

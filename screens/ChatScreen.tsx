@@ -1254,7 +1254,10 @@ type ChatScreenProps = {
 }
 
 const ChatScreen = (props: ChatScreenProps) => {
-    const { navigation /* , route */ } = props
+    const { navigation, route } = props
+    const routeData = useMemo(() => route, [route])
+    const params = useMemo(() => routeData?.params, [routeData])
+    const refresh = useMemo(() => params?.refresh, [params])
 
     const loaderContext = useContext(LoaderContext)
 
@@ -1282,8 +1285,16 @@ const ChatScreen = (props: ChatScreenProps) => {
         getAllChatIds,
         getAdminChatIds,
         chatsEndReached,
-        approvalsEndReached
+        approvalsEndReached,
+        setAccountApprovedLocally
     } = useChat()
+
+    useEffect(() => {
+        if (refresh) {
+            setAccountApprovedLocally(refresh?.chatChannelId)
+            delete params?.refresh
+        }
+    }, [refresh, params, setAccountApprovedLocally])
 
     useEffect(() => {
         getUserChats()
@@ -1358,13 +1369,13 @@ const ChatScreen = (props: ChatScreenProps) => {
     const renderChatListHandler = useCallback((item: any) => {
         try {
             const {item: chat, index}: { item: ChatTileProps, index: number } = item
-            const { id, lastMessage, name, profile, isGroup } = chat
+            const { id, lastMessage, name, profile, isGroup, profilePic } = chat
             return (
                 <ChatTile
                     id={id}
                     lastSeen={lastMessage}
                     name={name || 'No Name'}
-                    profile={profile || images.ic_soba_america}
+                    profile={profilePic ? { uri: profilePic} : images.ic_soba_america}
                     onOpen={openChatHandler.bind(null, chat, name)}
                     onFavPress={isGroup ? favoriteChatHander.bind(null, chat) : null}
                 />

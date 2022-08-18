@@ -33,10 +33,10 @@ const ChattingScreen = (props: ChattingScreenProps) => {
     const showApproveBtn = useMemo(() => params?.showApproveBtn, [params])
     const chatName = useMemo(() => params?.chatName, [params])
     const chatChannelId = useMemo(() => params?.chatChannelId, [params])
-    const chatSenderId = useMemo(() =>
-        params?.showApproveBtn
-            ? params?.chatChannelId.split('_').filter((id: string) => id !== params?.chatSenderId)[0]
-            : params?.chatSenderId
+    const chatSenderId = useMemo(() => params?.chatSenderId
+        // params?.showApproveBtn
+        //     ? params?.chatChannelId.split('_').filter((id: string) => id !== params?.chatSenderId)[0]
+        //     : params?.chatSenderId
     , [params])
 
     const userCrmId = useMemo(() => params?.crmAccId, [params])
@@ -65,11 +65,15 @@ const ChattingScreen = (props: ChattingScreenProps) => {
     const approveAccHandler = useCallback(async () => {
         try {
             if (userCrmId) {
-                await approveUserAcc(+userCrmId, params?.chatSenderId)
+                    await approveUserAcc(+userCrmId, chatChannelId.split('_').filter((id: string) => id !== chatSenderId)[0])
                 SuccessToast('Account Approved succfully.')
                 navigation.navigate('bottomTab', {
                     screen: 'chat',
-                    params: { refresh: true },
+                    params: {
+                        refresh: {
+                            chatChannelId
+                        }
+                    },
                 })
             } else {
                 throw new Error('Cannot approve account please try again.')
@@ -78,7 +82,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
             console.log('Error : ', err?.message)
             ErrorToast(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
         }
-    }, [userCrmId, approveUserAcc, params?.chatSenderId])
+    }, [userCrmId, approveUserAcc, chatSenderId, chatChannelId])
 
     const renderApproveBtnHandler = useCallback(() => {
         return (

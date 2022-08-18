@@ -89,13 +89,14 @@ const OTPScreen = (props: any) => {
                     setLoading(false)
                 }
 
-                const { firstName, lastName } = JSON.parse(updateableDetails)
+                const { firstName, lastName, profilePic } = JSON.parse(updateableDetails)
     
                 navigation.navigate('confirmRegistration', {
                     // uid,
                     accId,
                     firstName,
-                    lastName
+                    lastName,
+                    profilePic
                     // phoneNumber
                 })
             }
