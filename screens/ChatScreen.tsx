@@ -1221,13 +1221,24 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View }  from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import firestore from '@react-native-firebase/firestore'
+import { useFocusEffect } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 
+import { LoaderContext } from "../context/LoaderContextProvider";
+
+import useBackPreventHook from "../hooks/useBackPreventHook";
 import useChat from "../hooks/useChat";
 
-import SearchBar from "../components/SearchBar";
-import TextButton from "../components/TextButton";
+import ChatFilterModal, { ChatFilterModalRefTypes } from "../components/ChatFilterModal";
 import ChatTile, { ChatTileProps } from "../components/ChatTile";
+import RegularText from "../components/RegularText";
+import TextButton from "../components/TextButton";
+import SearchBar from "../components/SearchBar";
+import BoldText from "../components/BoldText";
 
+import { FIRESTORE_USER } from "../types";
 import colors from "../constants/colors";
 import images from "../assets/images";
 
@@ -1235,16 +1246,7 @@ import debounce from 'lodash.debounce'
 
 import { height, keyExtractHandler } from "../utils/MiscUtils";
 import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
-import BoldText from "../components/BoldText";
-import { useFocusEffect } from "@react-navigation/native";
-import { LoaderContext } from "../context/LoaderContextProvider";
-import ChatFilterModal, { ChatFilterModalRefTypes } from "../components/ChatFilterModal";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import useBackPreventHook from "../hooks/useBackPreventHook";
-import firestore from '@react-native-firebase/firestore'
-import RegularText from "../components/RegularText";
-import { FIRESTORE_USER } from "../types";
-import { useSelector } from "react-redux";
+
 import { USER } from "../types/UserResponse";
 import appConstants from "../constants/appConstants";
 
@@ -1438,7 +1440,8 @@ const ChatScreen = (props: ChatScreenProps) => {
         getAdminChats,
         fetchMoreAdminChats,
         renderEmptyListComponent,
-        adminListFooterComponent
+        adminListFooterComponent,
+        renderChatListHandler
     ])
 
     const renderUserChats = useMemo(() => {
@@ -1466,7 +1469,8 @@ const ChatScreen = (props: ChatScreenProps) => {
         getUserChats,
         fetchMoreUserChats,
         renderEmptyListComponent,
-        userListFooterComponent
+        userListFooterComponent,
+        renderChatListHandler
     ])
 
     const renderHeaderHandler = useMemo(() => {
@@ -1594,6 +1598,39 @@ const ChatScreen = (props: ChatScreenProps) => {
         }
     }, [userData])
 
+    const renderSearchResultHandler = useCallback(({item, index}) => {
+        try {
+            const {
+                createdAt,
+                crmAccId,
+                fcmToken,
+                firstName,
+                fullname,
+                isAccountApproved,
+                isDeleted,
+                lastName,
+                phoneNumber,
+                uid,
+                updatedAt,
+                username,
+                profilePic
+            } = item
+            return (
+                <ChatTile
+                    id={uid}
+                    lastSeen={''}
+                    name={`${firstName} ${lastName}` || 'No Name'}
+                    profile={profilePic ? { uri: profilePic} : images.ic_soba_america}
+                    onOpen={onSearchItemPressHandler.bind(null, item)}
+                    onFavPress={null}
+                />
+            )
+        } catch (err: any) {
+            console.log('Error : ', err.message)
+            return null
+        }
+    }, [onSearchItemPressHandler])
+
     const renderSearchDataHandler = useMemo(() => {
         return (
             <FlatList
@@ -1601,45 +1638,15 @@ const ChatScreen = (props: ChatScreenProps) => {
                 keyExtractor={keyExtractHandler}
                 extraData={searchData}
                 ListHeaderComponent={
-                    <View style={{ marginVertical: 10 }}>
+                    <View style={styles.searchTitle}>
                         <BoldText>{"Search Results"}</BoldText>
                     </View>
                 }
-                contentContainerStyle={{
-                    paddingHorizontal: 20
-                }}
-                renderItem={({item, index}) => {
-                    const {
-                        createdAt,
-                        crmAccId,
-                        fcmToken,
-                        firstName,
-                        fullname,
-                        isAccountApproved,
-                        isDeleted,
-                        lastName,
-                        phoneNumber,
-                        uid,
-                        updatedAt,
-                        username
-                    } = item
-                    return (
-                        <Pressable
-                            onPress={onSearchItemPressHandler.bind(null, item)}
-                            style={{
-                                paddingVertical: 10,
-                                borderBottomWidth: (searchData.length - 1) === index ? 0 : 1,
-                                borderBottomColor: 'black'
-                            }}
-                        >
-                            <RegularText>{firstName + " " + lastName}</RegularText>
-                        </Pressable>
-                    )
-                }}
+                renderItem={renderSearchResultHandler}
                 ListEmptyComponent={renderEmptyListComponent}
             />
         )
-    }, [searchData, onSearchItemPressHandler])
+    }, [searchData, renderSearchResultHandler])
 
     return (
         <SafeAreaView style={styles.root}>
@@ -1676,6 +1683,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: 'hidden'
     },
+    searchTitle: { marginVertical: 10, paddingHorizontal: 20 }
 })
 
 export default ChatScreen

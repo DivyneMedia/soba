@@ -23,7 +23,7 @@ const ChatTile = (props: ChatTileProps) => {
             style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginVertical: 15,
+                marginVertical: 5,
                 paddingHorizontal: 15,
                 shadowColor: colors.black,
                 shadowOffset: {

@@ -420,9 +420,68 @@ const useChat = () => {
             .where("createdAt", ">", new Date())
             .where("memberIds", "array-contains", userData['Mobile App Firebase UID'])
             .onSnapshot((snapShot) => {
-                snapShot.docChanges().forEach((doc) => {
+                snapShot.docChanges().forEach(async (doc) => {
+                    console.log('----- doc type : ', doc.type)
                     if (doc.type === "added") {
-                        setChats(prevState => [...prevState, doc.doc.data()])
+                        const docData = doc.doc.data()
+                        let docDataToAddedInList: any = null
+
+                        console.log('docData : ', docData)
+        
+                        if ('isAdminChat' in docData) { // has key
+                            if (docData?.isAdminChat) {
+                                let id = ''
+                                    
+                                docData
+                                .channelId
+                                .split('_')
+                                .forEach((channelIdPart: string) => {
+                                    try {
+                                        if (!userData['Mobile App Firebase Admin Ids']) {
+                                            throw new Error("not an admin")
+                                        }
+                                        const adminChatIds = JSON.parse(userData['Mobile App Firebase Admin Ids'])
+    
+                                        const myID = adminChatIds.filter((adminChatId: any) => adminChatId !== channelIdPart)
+    
+                                        if (myID.length) {
+                                            id = myID[0]
+                                        }
+                                    } catch (err: any) {
+                                        if (channelIdPart !== userData['Mobile App Firebase UID']) {
+                                            id = channelIdPart
+                                        }
+                                    }
+                                })
+    
+                                const dataRes = await firestore()
+                                    .collection(appConstants.defaultChannels)
+                                    .doc(id)
+                                    .get()
+                
+                                docDataToAddedInList = {
+                                    name: dataRes.data()?.name,
+                                    profilePic: dataRes.data()?.profilePic,
+                                    ...docData,
+                                    isAdminChat: false
+                                }
+                            } else {
+                                const id = docData.channelId.split('_').filter((id: string) => id !== userData['Mobile App Firebase UID'])[0]
+    
+                                const dataRes = await firestore()
+                                    .collection(appConstants.users)
+                                    .doc(id)
+                                    .get()
+    
+                                docDataToAddedInList = {
+                                    name: dataRes.data()?.firstName + " " + dataRes.data()?.lastName,
+                                    profilePic: dataRes.data()?.profilePic,
+                                    ...docData,
+                                    isAdminChat: false
+                                }
+                            }
+                        }
+                        setChats(prevState => [...prevState, docDataToAddedInList])
                     }
                 })
             }, (error) => {
@@ -430,6 +489,41 @@ const useChat = () => {
             })
         } catch (error) {
             console.log('[[useEffect-userChats] ] Error : ', error)
+        }
+    }, [userData])
+
+    useEffect(() => {
+        try {
+            firestore()
+            .collection(appConstants.privateChannel)
+            .where("memberIds", "array-contains", userData['Mobile App Firebase UID'])
+            .onSnapshot((snapShot) => {
+                snapShot.docChanges().forEach(async (doc) => {
+                    console.log('----- doc type : ', doc.type)
+                    if (doc.type === 'modified') {
+                        const docData = doc.doc.data()
+                        setChats((prevState: any[]) => {
+                            const existingChats = [...prevState]
+
+                            const updateIndex = existingChats.findIndex(chat => chat.channelId === docData.channelId)
+
+                            if (updateIndex > -1) {
+                                existingChats[updateIndex] = {
+                                    ...existingChats[updateIndex],
+                                    ...docData
+                                }
+                                return existingChats
+                            } else {
+                                return prevState
+                            }
+                        })
+                    }
+                })
+            }, (error) => {
+                console.log('[useEffect-userChats] Error : ', error)
+            })
+        } catch (error) {
+            console.log('[[useEffect-userChats 2] ] Error : ', error)
         }
     }, [userData])
 
