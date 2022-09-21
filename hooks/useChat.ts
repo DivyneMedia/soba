@@ -185,40 +185,49 @@ const useChat = () => {
                     if ('isAdminChat' in docData) { // has key
                         if (docData?.isAdminChat) {
 
-                            let id = ''
+                            // let id = ''
                                 
-                            docData
-                            .channelId
-                            .split('_')
-                            .forEach((channelIdPart: string) => {
-                                try {
-                                    if (!userData['Mobile App Firebase Admin Ids']) {
-                                        throw new Error("not an admin")
-                                    }
-                                    const adminChatIds = JSON.parse(userData['Mobile App Firebase Admin Ids'])
+                            // docData
+                            // .channelId
+                            // .split('_')
+                            // .forEach((channelIdPart: string) => {
+                            //     try {
+                            //         if (!userData['Mobile App Firebase Admin Ids']) {
+                            //             throw new Error("not an admin")
+                            //         }
+                            //         const adminChatIds = JSON.parse(userData['Mobile App Firebase Admin Ids'])
 
-                                    const myID = adminChatIds.filter((adminChatId: any) => adminChatId !== channelIdPart)
+                            //         const myID = adminChatIds.filter((adminChatId: any) => adminChatId !== channelIdPart)
 
-                                    if (myID.length) {
-                                        id = myID[0]
-                                    }
-                                } catch (err: any) {
-                                    if (channelIdPart !== userData['Mobile App Firebase UID']) {
-                                        id = channelIdPart
-                                    }
-                                }
-                            })
+                            //         if (myID.length) {
+                            //             id = myID[0]
+                            //         }
+                            //     } catch (err: any) {
+                            //         if (channelIdPart !== userData['Mobile App Firebase UID']) {
+                            //             id = channelIdPart
+                            //         }
+                            //     }
+                            // })
 
                             const dataRes = await firestore()
                                 .collection(appConstants.defaultChannels)
-                                .doc(id)
+                                .where("id", "in", docData.channelId.split('_'))
                                 .get()
-            
-                            return {
-                                name: dataRes.data()?.name,
-                                profilePic: dataRes.data()?.profilePic,
-                                ...docData,
-                                isAdminChat: false
+
+                            if (dataRes.docs.length) {
+                                return {
+                                    name: dataRes.docs[0].data()?.name,
+                                    profilePic: dataRes.docs[0].data()?.profilePic,
+                                    ...docData,
+                                    isAdminChat: false
+                                }
+                            } else {
+                                return {
+                                    name: '',
+                                    profilePic: '',
+                                    ...docData,
+                                    isAdminChat: false
+                                }
                             }
                         } else {
                             const id = docData.channelId.split('_').filter((id: string) => id !== userData['Mobile App Firebase UID'])[0]
@@ -322,45 +331,55 @@ const useChat = () => {
             } else {
                 setApprovalsEndReached(false)
             }
-                            
+
             if (getChatsRes.docs.length) {
                 const chatsArr = await Promise.all(getChatsRes.docs.map(async (doc, index) => {
                     const docData = doc.data()
-                    let id = ''
-                                
-                    docData
-                    .channelId
-                    .split('_')
-                    .forEach((channelIdPart: string) => {
-                        try {
-                            if (!userData['Mobile App Firebase Admin Ids']) {
-                                throw new Error("not an admin")
-                            }
-                            const adminChatIds = JSON.parse(userData['Mobile App Firebase Admin Ids'])
 
-                            const myID = adminChatIds.filter((adminChatId: any) => adminChatId !== channelIdPart)
+                    // let id = ''
+                    // docData
+                    // .channelId
+                    // .split('_')
+                    // .forEach((channelIdPart: string) => {
+                    //     try {
+                    //         console.log('aa  :: ', channelIdPart)
+                    //         if (!userData['Mobile App Firebase Admin Ids']) {
+                    //             throw new Error("not an admin")
+                    //         }
+                    //         const adminChatIds = JSON.parse(userData['Mobile App Firebase Admin Ids'])
 
-                            if (myID.length) {
-                                id = channelIdPart
-                            }
-                        } catch (err: any) {
-                            console.log('in catch')
-                            if (channelIdPart !== userData['Mobile App Firebase UID']) {
-                                id = channelIdPart
-                            }
-                        }
-                    })
+                    //         const myID = adminChatIds.filter((adminChatId: any) => adminChatId !== channelIdPart)
+
+                    //         if (myID.length) {
+                    //             id = channelIdPart
+                    //         }
+                    //     } catch (err: any) {
+                    //         console.log('in catch')
+                    //         if (channelIdPart !== userData['Mobile App Firebase UID']) {
+                    //             id = channelIdPart
+                    //         }
+                    //     }
+                    // })
 
                     const dataRes = await firestore()
                         .collection(appConstants.users)
-                        .doc(id)
+                        .where("uid", "in", docData.channelId.split('_'))
                         .get()
-    
-                    return {
-                        name: dataRes.data()?.firstName + " " + dataRes.data()?.lastName,
-                        crmAccId: dataRes.data()?.crmAccId,
-                        profilePic: dataRes.data()?.profilePic,
-                        ...docData
+
+                    if (!dataRes.docs.length) {
+                        return {
+                            name: '',
+                            crmAccId: '',
+                            profilePic: '',
+                            ...docData
+                        }
+                    } else {
+                        return {
+                            name: dataRes.docs[0].data()?.firstName + " " + dataRes.docs[0].data()?.lastName,
+                            crmAccId: dataRes.docs[0].data()?.crmAccId,
+                            profilePic: dataRes.docs[0].data()?.profilePic,
+                            ...docData
+                        }
                     }
                 }))
                 return chatsArr
@@ -417,7 +436,7 @@ const useChat = () => {
         try {
             firestore()
             .collection(appConstants.privateChannel)
-            .where("createdAt", ">", new Date())
+            .where("updatedAt", ">", new Date())
             .where("memberIds", "array-contains", userData['Mobile App Firebase UID'])
             .onSnapshot((snapShot) => {
                 snapShot.docChanges().forEach(async (doc) => {

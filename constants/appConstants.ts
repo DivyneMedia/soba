@@ -27,7 +27,7 @@ export default {
     TAB_ACCOUNT: 'TAB_ACCOUNT',
 
     // CHAT
-    defaultChannels: 'defaultChannels',
+    defaultChannels: 'defaultChannel',
     privateChannel: 'privateChannel',
     users: 'users',
     chatMembersData: 'chatMembersData',

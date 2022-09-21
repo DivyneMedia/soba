@@ -50,12 +50,12 @@ const ExecutivesItem = (props: ExecutivesItemProps) => {
                 text={phoneNumber}
                 noBold
             />
-            <RoundedButton
+            {/* <RoundedButton
                 text='Chat'
                 onPress={onChat}
                 style={styles.chatBtn}
                 textStyle={styles.chatBtnText}
-            />
+            /> */}
         </View>
     )
 }

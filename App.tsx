@@ -14,6 +14,15 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import LoaderContextProvider from './context/LoaderContextProvider';
 LogBox.ignoreLogs(['Non-serializable values were found in the navigation state.'])
 
+import algoliasearch from 'algoliasearch';
+import { InstantSearch } from 'react-instantsearch-hooks';
+
+const searchClient = algoliasearch(
+  'A2GH5T4LDG',
+  '832f6fbf9c22c1fc19c81e35c503b3eb'
+);
+
+
 const App = () => {
   const [isLoading, setLoading] = useState(true)
   
@@ -45,8 +54,13 @@ const App = () => {
         <SafeAreaProvider style={styles.container}>
           <GestureHandlerRootView style={styles.container}>
             <LoaderContextProvider>
-              <RootNavigator />
-              <Toast ref={setInitialToastRef} />
+              <InstantSearch
+                searchClient={searchClient}
+                indexName="users"
+              >
+                <RootNavigator />
+                <Toast ref={setInitialToastRef} />
+              </InstantSearch>
             </LoaderContextProvider>
           </GestureHandlerRootView>
         </SafeAreaProvider>

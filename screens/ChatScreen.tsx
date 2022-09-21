@@ -1233,8 +1233,6 @@ import useChat from "../hooks/useChat";
 
 import ChatFilterModal, { ChatFilterModalRefTypes } from "../components/ChatFilterModal";
 import ChatTile, { ChatTileProps } from "../components/ChatTile";
-import RegularText from "../components/RegularText";
-import TextButton from "../components/TextButton";
 import SearchBar from "../components/SearchBar";
 import BoldText from "../components/BoldText";
 
@@ -1250,27 +1248,38 @@ import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
 import { USER } from "../types/UserResponse";
 import appConstants from "../constants/appConstants";
 
+import { useInfiniteHits, useSearchBox, useToggleRefinement } from 'react-instantsearch-hooks';
+import TextButton from "../components/TextButton";
+
 type ChatScreenProps = {
     navigation: any
     route: any
 }
 
-const ChatScreen = (props: ChatScreenProps) => {
+const ChatScreen = (props: ChatScreenProps | SearchBoxConnectorParams | undefined) => {
     const { navigation, route } = props
     const routeData = useMemo(() => route, [route])
     const params = useMemo(() => routeData?.params, [routeData])
     const refresh = useMemo(() => params?.refresh, [params])
+
+    const { refine } = useSearchBox();
+    const { hits, isLastPage, showMore } = useInfiniteHits();
+
+    const [refinementConfig, setRefinementConfig] = useState<any>({
+        attribute: 'isAccountApproved'
+    })
+
+    useToggleRefinement(refinementConfig)
 
     const loaderContext = useContext(LoaderContext)
 
     const userData: USER = useSelector((state: any) => state?.auth?.userData)
     
     const [searchText, setSearchText] = useState('')
-    const [searchData, setSearchData] = useState<any[]>([])
     const [approvals, setApprovals] = useState(false)
 
-    const chatFilterModalRef = useRef<ChatFilterModalRefTypes>()
-    
+    const chatFilterModalRef = useRef<ChatFilterModalRefTypes>();
+
     const getFlag = useCallback(() => chatFilterModalRef.current?.isVisible?.current, [])
 
     const {
@@ -1321,9 +1330,11 @@ const ChatScreen = (props: ChatScreenProps) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            setSearchText('')
-            setSearchData([])
-        }, [])
+            refine('')
+            setRefinementConfig({
+                attribute: 'isAccountApproved'
+            })
+        }, [refine])
     );
 
     const filterButtonPressHandler = useCallback(() => {
@@ -1466,6 +1477,7 @@ const ChatScreen = (props: ChatScreenProps) => {
     }, [
         approvals,
         chats,
+        refreshing,
         getUserChats,
         fetchMoreUserChats,
         renderEmptyListComponent,
@@ -1496,59 +1508,71 @@ const ChatScreen = (props: ChatScreenProps) => {
         loaderContext.toggleLoader(isLoading)
     }, [isLoading, loaderContext])
 
-    const onChatFilterSubmitHandler = useCallback((selectedFilterOption) => {
-        console.log(selectedFilterOption)
-    }, [])
-
-    const searchUsers = useCallback(async (searchVal) => {
-        try {
-            setSearchData([])
-            let queryRef: any = firestore()
-                            .collection('users')
-
-            switch (chatFilterModalRef.current?.getSelectedFilterOption()) {
-                case 'all':
-                    break
-                case 'approved':
-                    queryRef = queryRef.where("isAccountApproved", "==", true)
-                    break
-                case 'unapproved':
-                    queryRef = queryRef.where("isAccountApproved", "==", false)
-                    break
-            }
-
-            queryRef
-            .orderBy('fullname', 'asc')
-            .startAt(searchVal)
-            .endAt(searchVal + '\uf8ff').get()
-            .then((res: any) => {
-                const searchResults: any[] = []
-                if (res.docs?.length) {
-                    res.docs.forEach((doc: any) => {
-                        searchResults.push(doc.data())
-                    })
-                    setSearchData(searchResults)
-                } else {
-                    setSearchData([])
-                }
+    const onChatFilterSubmitHandler = useCallback((selectedFilterOption: 'approved' | 'unapproved' | 'all') => {
+        if (selectedFilterOption === 'all') {
+            setRefinementConfig({
+                attribute: 'isAccountApproved'
             })
-            .catch((err: any) => {
-                console.log('Error : ', err.message)
+        } else if (selectedFilterOption === 'unapproved') {
+            setRefinementConfig({
+                attribute: 'isAccountApproved',
+                on: true,
+                off: false
             })
-        } catch (err: any) {
-            console.log('Error : ', err.message)
+        } else {
+            setRefinementConfig({
+                attribute: 'isAccountApproved',
+                on: false,
+                off: true
+            })
         }
     }, [])
 
-    const debouncedSave = useRef(debounce((nextValue: string) => searchUsers(nextValue), 800)).current;
+    // const searchUsers = useCallback(async (searchVal) => {
+    //     try {
+    //         setSearchData([])
+    //         let queryRef: any = firestore()
+    //                         .collection('users')
+
+    //         switch (chatFilterModalRef.current?.getSelectedFilterOption()) {
+    //             case 'all':
+    //                 break
+    //             case 'approved':
+    //                 queryRef = queryRef.where("isAccountApproved", "==", true)
+    //                 break
+    //             case 'unapproved':
+    //                 queryRef = queryRef.where("isAccountApproved", "==", false)
+    //                 break
+    //         }
+
+    //         queryRef
+    //         .orderBy('fullname', 'asc')
+    //         .startAt(searchVal)
+    //         .endAt(searchVal + '\uf8ff').get()
+    //         .then((res: any) => {
+    //             const searchResults: any[] = []
+    //             if (res.docs?.length) {
+    //                 res.docs.forEach((doc: any) => {
+    //                     searchResults.push(doc.data())
+    //                 })
+    //                 setSearchData(searchResults)
+    //             } else {
+    //                 setSearchData([])
+    //             }
+    //         })
+    //         .catch((err: any) => {
+    //             console.log('Error : ', err.message)
+    //         })
+    //     } catch (err: any) {
+    //         console.log('Error : ', err.message)
+    //     }
+    // }, [])
+
+    const debouncedSave = useRef(debounce((nextValue: string) => refine(nextValue.toLowerCase().trim()), 1000)).current;
 
     useEffect(() => {
-        if (searchText) {
-            debouncedSave(searchText.toLowerCase().trim())
-        } else {
-            setSearchData([])
-        }
-    }, [searchText])
+        debouncedSave(searchText.toLowerCase().trim())
+    }, [searchText, debouncedSave])
 
     const onSearchItemPressHandler = useCallback(async (userPayload: FIRESTORE_USER) => {
         try {
@@ -1631,39 +1655,59 @@ const ChatScreen = (props: ChatScreenProps) => {
         }
     }, [onSearchItemPressHandler])
 
+    const onEndReachedHandler = useCallback(() => {
+        if (!isLastPage) {
+            showMore();
+        }
+    }, [isLastPage, showMore])
+
     const renderSearchDataHandler = useMemo(() => {
         return (
             <FlatList
-                data={searchData}
+                data={hits}
                 keyExtractor={keyExtractHandler}
-                extraData={searchData}
                 ListHeaderComponent={
                     <View style={styles.searchTitle}>
                         <BoldText>{"Search Results"}</BoldText>
                     </View>
                 }
-                renderItem={renderSearchResultHandler}
                 ListEmptyComponent={renderEmptyListComponent}
+                onEndReached={onEndReachedHandler}
+                onEndReachedThreshold={0.01}
+                renderItem={renderSearchResultHandler}
             />
         )
-    }, [searchData, renderSearchResultHandler])
+    }, [
+        hits,
+        isLastPage,
+        showMore,
+        onEndReachedHandler,
+        renderSearchResultHandler,
+        renderEmptyListComponent
+    ])
 
     return (
         <SafeAreaView style={styles.root}>
             <BottomSheetModalProvider>
+                <ChatFilterModal
+                    ref={chatFilterModalRef}
+                    onSubmit={onChatFilterSubmitHandler}
+                />
                 <SearchBar
                     value={searchText}
                     onChangeText={setSearchText}
                     onFilterButtonPress={filterButtonPressHandler}
                 />
-                <ChatFilterModal
-                    ref={chatFilterModalRef}
-                    onSubmit={onChatFilterSubmitHandler}
-                />
-                {searchText.length ? renderSearchDataHandler : null}
-                {searchText.length ? null : renderHeaderHandler}
-                {searchText.length ? null : renderAdminChats}
-                {searchText.length ? null : renderUserChats}
+                {searchText.length ?
+                    renderSearchDataHandler :
+                    (
+                        <>
+                            {renderHeaderHandler}
+                            {renderAdminChats}
+                            {renderUserChats}
+                        </>
+                    )
+                }
             </BottomSheetModalProvider>
         </SafeAreaView>
     )

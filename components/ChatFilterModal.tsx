@@ -13,6 +13,7 @@ import CheckboxButton, { CheckboxButtonRef } from "./CheckboxButton";
 
 import { height } from "../utils/MiscUtils";
 import { ErrorToast } from "../utils/ToastUtils";
+import { useToggleRefinement } from "react-instantsearch-hooks";
 
 type ChatFilterModalProps = {
     onSubmit(filterOption: string): void
@@ -32,6 +33,10 @@ const ChatFilterModal = forwardRef((props: ChatFilterModalProps, ref: any) => {
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const bottomSheetOpenStatusRef = useRef(false)
     const selectedFilterOptionRef = useRef('all')
+
+    const filterAllRef = useRef<CheckboxButtonRef>(null)
+    const filterApprovedRef = useRef<CheckboxButtonRef>(null)
+    const filterUnapprovedRef = useRef<CheckboxButtonRef>(null)
 
     // variables
     const snapPoints = useMemo(() => [height / 2], []);
@@ -69,10 +74,6 @@ const ChatFilterModal = forwardRef((props: ChatFilterModalProps, ref: any) => {
             />
         )
     }, [handlePresentModalPress])
-
-    const filterAllRef = useRef<CheckboxButtonRef>(null)
-    const filterApprovedRef = useRef<CheckboxButtonRef>(null)
-    const filterUnapprovedRef = useRef<CheckboxButtonRef>(null)
 
     const savePasswordHandler = useCallback(async () => {
         try {

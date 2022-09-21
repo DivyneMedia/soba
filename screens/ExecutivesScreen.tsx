@@ -12,6 +12,7 @@ import useChat from '../hooks/useChat'
 import useExecutives, { ExecutiveItemType } from '../hooks/useExecutives'
 import { USER } from '../types/UserResponse'
 import { keyExtractHandler } from '../utils/MiscUtils'
+import { SuccessToast } from '../utils/ToastUtils'
 
 type ExecutivesScreenProps = {
     navigation: any,
@@ -42,13 +43,13 @@ const ExecutivesScreen = (props: ExecutivesScreenProps) => {
         createChannelIdDoesNotExist
     } = useChat()
 
-    useEffect(() => {
-        loaderRef.current?.toggleLoader(isLoading)
-    }, [isLoading])
+    // useEffect(() => {
+    //     loaderRef.current?.toggleLoader(isLoading)
+    // }, [isLoading])
 
-    useEffect(() => {
-        loaderRef.current?.toggleLoader(chatLoading)
-    }, [chatLoading])
+    // useEffect(() => {
+    //     loaderRef.current?.toggleLoader(chatLoading)
+    // }, [chatLoading])
     
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -58,6 +59,8 @@ const ExecutivesScreen = (props: ExecutivesScreenProps) => {
 
     const openChatHandler = useCallback(async (obj: ExecutiveItemType) => {
         try {
+            SuccessToast("Coming Soon")
+            return
             const {
                 chapterId, // ": "XCEEbOz3t4qFuI3PyUQh",
                 email, // ": "paulcoleon@yahoo.com",
@@ -138,9 +141,13 @@ const ExecutivesScreen = (props: ExecutivesScreenProps) => {
         loaderContext.toggleLoader(isLoading)
     }, [isLoading, loaderContext])
 
+    useEffect(() => {
+        loaderContext.toggleLoader(chatLoading)
+    }, [chatLoading, loaderContext])
+
     return (
         <SafeAreaView style={styles.root}>
-            <AppLoader ref={loaderRef} />
+            {/* <AppLoader ref={loaderRef} /> */}
             <FlatList
                 data={executives}
                 renderItem={renderExecutivesHandler}
