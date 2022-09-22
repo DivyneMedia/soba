@@ -40,6 +40,11 @@ const loginWithMatriculationRequest = (number: number, password: string) => [
         "field": "Mobile App Password",
         "operator": "EQUAL",
         "value": password
+    },
+    {
+        field: "Mobile App Account Claimed",
+        operator: "EQUAL",
+        value: true
     }
 ]
 

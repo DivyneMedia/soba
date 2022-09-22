@@ -23,8 +23,6 @@ const RootNavigator = () => {
   const dispatch = useDispatch()
   const { userData }: UserPayload = useSelector((state: any) => state?.auth)
 
-  console.log('userData : ', userData)
-
   const accId = useMemo(() => userData?.['Account ID'], [userData?.['Account ID']])
 
   const isNotApprovedAcc = useMemo(() =>
