@@ -46,4 +46,5 @@ export default {
     ic_password: require('./ic_password.png'),
     ic_checked: require('./ic_checked.png'),
     ic_unchecked: require('./ic_unchecked.png'),
+    ic_clear: require('./ic_clear.png'),
 }

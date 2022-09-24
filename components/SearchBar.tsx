@@ -5,11 +5,12 @@ import images from "../assets/images";
 import colors from "../constants/colors";
 
 type SearchBarProps = {
+    onClearButtonPress: () => any
     onFilterButtonPress: () => any
 }
 
 const SearchBar = (props: SearchBarProps & TextInputProps) => {
-    const { onFilterButtonPress, ...otherProps } = props
+    const { onFilterButtonPress, onClearButtonPress, ...otherProps } = props
     return (
         <View style={styles.searchBarContainer}>
             <Image
@@ -25,6 +26,14 @@ const SearchBar = (props: SearchBarProps & TextInputProps) => {
                 }}
                 {...otherProps}
             />
+            <Pressable
+                onPress={onClearButtonPress}
+            >
+                <Image
+                    source={images.ic_clear}
+                    style={styles.filterIcon}
+                />
+            </Pressable>
             <Pressable
                 onPress={onFilterButtonPress}
             >

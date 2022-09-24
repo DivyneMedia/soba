@@ -1263,7 +1263,10 @@ const ChatScreen = (props: ChatScreenProps | SearchBoxConnectorParams | undefine
     const refresh = useMemo(() => params?.refresh, [params])
 
     const { refine } = useSearchBox();
-    const { hits, isLastPage, showMore } = useInfiniteHits();
+    const { hits, isLastPage, showMore } = useInfiniteHits({
+        cache: undefined,
+        showPrevious: false
+    });
 
     const [refinementConfig, setRefinementConfig] = useState<any>({
         attribute: 'isAccountApproved'
@@ -1340,6 +1343,15 @@ const ChatScreen = (props: ChatScreenProps | SearchBoxConnectorParams | undefine
     const filterButtonPressHandler = useCallback(() => {
         chatFilterModalRef.current?.show()
     }, [])
+
+    const clearSearchTextHandler = useCallback(() => {
+        try {
+            setSearchText('')
+            refine('')
+        } catch (err: any) {
+            console.log('[clearSearchTextHandler] Error : ', err.message)
+        }
+    }, [refine])
 
     const openChatHandler = useCallback(async (chatPayload: any, name: string) => {
         const {
@@ -1697,6 +1709,7 @@ const ChatScreen = (props: ChatScreenProps | SearchBoxConnectorParams | undefine
                     value={searchText}
                     onChangeText={setSearchText}
                     onFilterButtonPress={filterButtonPressHandler}
+                    onClearButtonPress={clearSearchTextHandler}
                 />
                 {searchText.length ?
                     renderSearchDataHandler :
