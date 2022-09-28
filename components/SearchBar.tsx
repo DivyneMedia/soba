@@ -26,14 +26,18 @@ const SearchBar = (props: SearchBarProps & TextInputProps) => {
                 }}
                 {...otherProps}
             />
-            <Pressable
-                onPress={onClearButtonPress}
-            >
-                <Image
-                    source={images.ic_clear}
-                    style={styles.filterIcon}
-                />
-            </Pressable>
+            {
+                otherProps?.value && otherProps?.value?.length ? (
+                    <Pressable
+                        onPress={onClearButtonPress}
+                    >
+                        <Image
+                            source={images.ic_clear}
+                            style={styles.filterIcon}
+                        />
+                    </Pressable>
+                ) : null
+            }
             <Pressable
                 onPress={onFilterButtonPress}
             >

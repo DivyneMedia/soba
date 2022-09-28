@@ -1333,6 +1333,7 @@ const ChatScreen = (props: ChatScreenProps | SearchBoxConnectorParams | undefine
 
     useFocusEffect(
         React.useCallback(() => {
+            setSearchText('')
             refine('')
             setRefinementConfig({
                 attribute: 'isAccountApproved'

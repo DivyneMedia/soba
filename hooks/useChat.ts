@@ -436,17 +436,15 @@ const useChat = () => {
         try {
             firestore()
             .collection(appConstants.privateChannel)
-            .where("updatedAt", ">", new Date())
+            .where("updatedAt", ">", new Date().getTime())
             .where("memberIds", "array-contains", userData['Mobile App Firebase UID'])
             .onSnapshot((snapShot) => {
                 snapShot.docChanges().forEach(async (doc) => {
-                    console.log('----- doc type : ', doc.type)
+                    console.log('updatedAt doc type : ', doc.type)
                     if (doc.type === "added") {
                         const docData = doc.doc.data()
                         let docDataToAddedInList: any = null
 
-                        console.log('docData : ', docData)
-        
                         if ('isAdminChat' in docData) { // has key
                             if (docData?.isAdminChat) {
                                 let id = ''
@@ -518,7 +516,7 @@ const useChat = () => {
             .where("memberIds", "array-contains", userData['Mobile App Firebase UID'])
             .onSnapshot((snapShot) => {
                 snapShot.docChanges().forEach(async (doc) => {
-                    console.log('----- doc type : ', doc.type)
+                    console.log('doc type (array-contains) : ', doc.type)
                     if (doc.type === 'modified') {
                         const docData = doc.doc.data()
                         setChats((prevState: any[]) => {
