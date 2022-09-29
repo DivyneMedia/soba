@@ -3,23 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>620461915889-511nhoejr1hbcaelfqopj92cee95qssn.apps.googleusercontent.com</string>
+	<string>239948656342-rt57lie3vk074edlqas28mn7psv9pm57.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.620461915889-511nhoejr1hbcaelfqopj92cee95qssn</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>620461915889-3hpt5iueqhpptb7b11at8k3eimlob179.apps.googleusercontent.com</string>
+	<string>com.googleusercontent.apps.239948656342-rt57lie3vk074edlqas28mn7psv9pm57</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDaNDN3NJPXH-Re7r3k1ecK1ZuZySq45S8</string>
+	<string>AIzaSyC1cfh9aVFafcm_g96AMCULACizPcd_Css</string>
 	<key>GCM_SENDER_ID</key>
-	<string>620461915889</string>
+	<string>239948656342</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.divynemedia.soba</string>
 	<key>PROJECT_ID</key>
-	<string>soba-1027e</string>
+	<string>soba-81062</string>
 	<key>STORAGE_BUCKET</key>
-	<string>soba-1027e.appspot.com</string>
+	<string>soba-81062.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:620461915889:ios:b45d1d9ebc2ab6662ef350</string>
+	<string>1:239948656342:ios:8bf397b42b38aeb2d12377</string>
 </dict>
 </plist>
