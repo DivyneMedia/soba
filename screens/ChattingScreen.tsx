@@ -145,7 +145,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
     }, [isLoading, accountLoading, loaderContext])
 
     return (
-        <SafeAreaView style={styles.root}>
+        <View style={styles.root}>
             <FlatList
                 ref={flatListRef}
                 style={{flex: 1}}
@@ -230,7 +230,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
                     </Pressable>
                 </View>
             </View>
-        </SafeAreaView>
+        </View>
     )
 }
 
