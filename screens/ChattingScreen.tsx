@@ -1,8 +1,6 @@
 import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Platform, Pressable, StyleSheet, TextInput, View }  from 'react-native';
-import { SafeAreaView } from "react-native-safe-area-context";
 import images from "../assets/images";
-import AppLoader from "../components/AppLoader";
 import ChatMessageItem from "../components/ChatMessageItem";
 import RegularText from "../components/RegularText";
 import appConstants from "../constants/appConstants";
