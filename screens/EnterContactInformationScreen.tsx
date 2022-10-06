@@ -61,7 +61,7 @@ const EnterContactInformation = (props: any) => {
     const { createAccount } = useContext(PhoneAuthContext)
 
     // **States
-    const [callingCode, setCallingCode] = useState(__DEV__ ? '+91' : '+1') // useState(params?.callingCode ? `+${params?.callingCode}` : '+91')
+    const [callingCode, setCallingCode] = useState(!__DEV__ ? '+91' : '+1') // useState(params?.callingCode ? `+${params?.callingCode}` : '+91')
     const [phone, setPhone] = useState(__DEV__ ? '9662343453' : (params?.phoneNumber ?? '')) // useState(params?.phoneNumber ?? '')
     const [email, setEmail] = useState(params?.email ?? '')
     const [dob, setDob] = useState(params?.dob ? +params?.dob : '')
@@ -115,7 +115,7 @@ const EnterContactInformation = (props: any) => {
             if (userAddress.length) {
                 setAddress(userAddress[0].addressLine1)
                 setCity(userAddress[0].city)
-                setZipcode(userAddress[0].zipCodeSuffix + userAddress[0].zipCode)
+                setZipcode(userAddress[0].zipCode)
             }
         }
     }, [userDetails])
