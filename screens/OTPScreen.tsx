@@ -154,33 +154,16 @@ const OTPScreen = (props: any) => {
             if (auth().currentUser?.uid) {
                 await auth().signOut()
             }
-            const res = await createAccount(`${callingCode} ${phone}`)
+            await createAccount(`${callingCode} ${phone}`)
+            toggleLoader(false)
             // const confirmation = await auth()
             //     .verifyPhoneNumber(`${callingCode} ${phone}`, false, false)
-            console.log('confirmation : ', confirmation.verificationId)
-            toggleLoader(false)
-            otpVerificationId = confirmation.verificationId
+            // console.log('confirmation : ', confirmation.verificationId)
+            // otpVerificationId = confirmation.verificationId
         } catch(err: any) {
             console.log('[onResendHandler - signInWithPhoneNumber] Error : ', err)
             toggleLoader(false)
-            let errorMessage = 'Something went wrong at sending OTP.'
-            switch (err?.code) {
-                case 'auth/invalid-phone-number':
-                    errorMessage = 'Enter a valid phone number.'
-                    break
-                case 'auth/phone-number-already-exists':
-                    errorMessage = 'Phone number already exist.'
-                    break
-                case 'auth/too-many-requests':
-                    errorMessage = 'Limit exceeded for sending verification codes, please try after some time.'
-                    break
-                case 'auth/network-request-failed':
-                    errorMessage = 'Check your network connection.'
-                    break
-                default:
-                    errorMessage = 'Something went wrong at sending OTP.'
-                    break
-            }
+            const errorMessage = err?.message ?? 'Something went wrong at sending OTP.'
             ErrorToast(errorMessage)
         }
     }, [callingCode, phone, createAccount])

@@ -78,19 +78,6 @@ export default (props: any) => {
                 const userData: any = await confirmRef.current.confirmation.confirm(code)
                 if (userData) {
                     loggedInRef.current.authorized = true
-                    // const { additionalUserInfo, user } = userData
-                    // if (additionalUserInfo) {
-                    //     const {
-                    //         isNewUser,
-                    //         profile,
-                    //         providerId,
-                    //         username
-                    //     } = additionalUserInfo
-                    // }
-
-                    // if (user) {
-                    //     const { uid } = user
-                    // }
                     return true
                 } else {
                     throw new Error("Something went wrong at verifing account.")
@@ -100,7 +87,7 @@ export default (props: any) => {
             }
         }  catch (err: any) {
             console.log('[verifyAccount] - Error : ', err.message)
-            let errorMessage = 'Something went wrong at sending OTP.'
+            let errorMessage = err?.message ?? 'Something went wrong at sending OTP.'
             switch (err?.code) {
                 case 'auth/invalid-verification-code':
                     errorMessage = 'The sms verification code used to create the phone auth credential is invalid. Please resend the verification code sms and be sure use the verification code provided by the user.'
