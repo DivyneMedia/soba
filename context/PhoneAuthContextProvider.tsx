@@ -1,7 +1,9 @@
 import React, { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
-import auth from '@react-native-firebase/auth';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { ErrorToast } from '../utils/ToastUtils';
+import appConstants from '../constants/appConstants';
+import axios from 'axios';
 
 export const PhoneAuthContext = createContext<any>({
 })
@@ -12,7 +14,7 @@ const styles = {
     }
 }
 
-let methodRef:any = null
+let methodRef: any = null
 
 export default (props: any) => {
     const { style, children } = props
@@ -41,13 +43,35 @@ export default (props: any) => {
         return unsubscribe
     }, [])
 
+    const checkPhoneNumberAlreadyExistOrNot = useCallback(async (phoneNumber) => {
+        try {
+            const apiRes = await axios(
+                'https://us-central1-soba-81062.cloudfunctions.net/getUserByPhoneNumber',
+                {
+                    method: "POST",
+                    data: {
+                        phoneNumber
+                    }
+                }
+            )
+            return apiRes.data
+        } catch (err: any) {
+            throw err
+        }
+    }, [])
+
     const createAccount = useCallback(async (phoneNumber) => {
         try {
+            const phoneNumberData: FirebaseAuthTypes.User = await checkPhoneNumberAlreadyExistOrNot(phoneNumber)
+            if (phoneNumberData.uid) {
+                ErrorToast("Phone number already used.")
+                return
+            }
             const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
             confirmRef.current = {
                 confirmation
             }
-        }  catch (err: any) {
+        } catch (err: any) {
             console.log('[createAccount] - Error : ', err.message)
             let errorMessage = 'Something went wrong at sending OTP.'
             switch (err?.code) {
@@ -70,7 +94,7 @@ export default (props: any) => {
             ErrorToast(errorMessage)
             throw new Error(errorMessage)
         }
-    }, [])
+    }, [checkPhoneNumberAlreadyExistOrNot])
 
     const verifyAccount = useCallback(async (code) => {
         try {
@@ -85,7 +109,7 @@ export default (props: any) => {
             } else {
                 throw new Error("Something went wrong at verifing account.")
             }
-        }  catch (err: any) {
+        } catch (err: any) {
             console.log('[verifyAccount] - Error : ', err.message)
             let errorMessage = err?.message ?? 'Something went wrong at sending OTP.'
             switch (err?.code) {

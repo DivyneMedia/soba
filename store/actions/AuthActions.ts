@@ -16,12 +16,12 @@ const loginWithUserNameRequest = (username: string, password: string) => [
     {
         field: "Mobile App Username",
         operator: "EQUAL",
-        value: username
+        value: username.trim()
     },
     {
         field: "Mobile App Password",
         operator: "EQUAL",
-        value: password
+        value: password.trim()
     },
     {
         field: "Mobile App Account Claimed",
@@ -65,7 +65,7 @@ export const login = (loginReq: LoginRequestType) => {
             })
 
             if (loginRes && loginRes.data) {
-                const {searchResults} = loginRes.data
+                const { searchResults } = loginRes.data
                 if (searchResults && Array.isArray(searchResults) && searchResults.length) {
                     dispatch({
                         type: LOGIN,

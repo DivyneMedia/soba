@@ -78,19 +78,19 @@ const ConfirmRegistrationScreen = (props: any) => {
                     accId,
                     uid: currentUser?.uid,
                     phoneNumber: currentUser?.phoneNumber,
-                    firstName,
-                    lastName,
-                    username,
-                    password,
+                    firstName: firstName.trim() ?? firstName,
+                    lastName: lastName.trim() ?? lastName,
+                    username: username.trim() ?? username,
+                    password: password.trim() ?? password,
                     profilePic
                 })
-        
+
                 if (createAccRes) {
                     SuccessToast('Account setup success. please login to continue.')
                     navigation.popToTop()
                 }
             }
-            
+
             // setShowSuccess(true)
             // bottomSheetModalRef.current?.present();
         } catch (err: any) {
@@ -181,7 +181,7 @@ const ConfirmRegistrationScreen = (props: any) => {
                         style={{ borderRadius: 0 }}
                         onPress={nextPressHandler}
                         text={"Finish"}
-                        // disabled={!isDataValid()}
+                    // disabled={!isDataValid()}
                     />
                 </View>
             </View>

@@ -43,13 +43,13 @@ type RouteParams = {
     city: STRING_UNDEFINED
     zipCode: STRING_UNDEFINED
     profilePic: STRING_UNDEFINED
-} 
+}
 
 const EnterContactInformation = (props: any) => {
     const { navigation, route } = props
     const params: RouteParams = route.params
     // console.log(params)
-    
+
     // **Hooks
     const {
         isLoading: accountLoading,
@@ -70,8 +70,6 @@ const EnterContactInformation = (props: any) => {
     const [state, setState] = useState(params?.state ?? '')
     const [zipcode, setZipcode] = useState(params?.zipCode?.substring(0, 15) ?? '')
 
-    console.log('params : ', params)
-    
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [isLoading, setLoading] = useState(false);
 
@@ -95,23 +93,17 @@ const EnterContactInformation = (props: any) => {
 
     useEffect(() => {
         getUserAccountDetails(params.accId)
-        .then((userDetailsRes) => {
-            setUserDetails(userDetailsRes)
-        })
-        .catch((err: any) => {
-            console.log('Error : ', err.message)
-        })
+            .then((userDetailsRes) => {
+                setUserDetails(userDetailsRes)
+            })
+            .catch((err: any) => {
+                console.log('Error : ', err.message)
+            })
     }, [getUserAccountDetails, params.accId])
 
     useEffect(() => {
         if (userDetails) {
             const userAddress = userDetails.individualAccount.primaryContact.addresses.filter(addressData => addressData.isPrimaryAddress)
-            // phone
-            // email
-            // dob
-            // address
-            // city
-            // zipcode
             if (userAddress.length) {
                 setAddress(userAddress[0].addressLine1)
                 setCity(userAddress[0].city)
@@ -150,65 +142,6 @@ const EnterContactInformation = (props: any) => {
                 return
             }
 
-            // let confirmation = null
-            // try {
-            //     toggleLoader(true)
-            //     if (auth().currentUser?.uid) {
-            //         SuccessToast("Logging out from previous sessions.")
-            //         await auth().signOut()
-            //         SuccessToast("Logging out done.")
-            //     }
-            //     confirmation = await auth()
-            //         .verifyPhoneNumber(`${callingCode} ${phone}`, false, false)
-            //         .on('state_changed', (snap) => {
-            //             switch (snap.state) {
-            //                 case 'error':
-            //                     console.log(snap.code, snap.error)
-            //                     ErrorToast(`${snap.code} ${snap.error}`)
-            //                     break
-            //                 case 'sent':
-            //                     SuccessToast('OTP sent successfully.')
-            //                     break
-            //                 case 'timeout':
-            //                     SuccessToast('Timed out.')
-            //                     break
-            //                 case 'verified':
-            //                     SuccessToast('Verified.')
-            //                     break
-            //                 default:
-            //                     SuccessToast('In default.')
-            //                     break
-            //             }
-            //         })
-            //     toggleLoader(false)
-            // } catch(err: any) {
-            //     toggleLoader(false)
-            //     console.log('[auth - signInWithPhoneNumber] Error : ', err)
-            //     let errorMessage = 'Something went wrong at sending OTP.'
-            //     switch (err?.code) {
-            //         case 'auth/invalid-phone-number':
-            //             errorMessage = 'Enter a valid phone number.'
-            //             break
-            //         case 'auth/phone-number-already-exists':
-            //             errorMessage = 'Phone number already exist.'
-            //             break
-            //         case 'auth/too-many-requests':
-            //             errorMessage = 'Limit exceeded for sending verification codes, please try after some time.'
-            //             break
-            //         case 'auth/network-request-failed':
-            //             errorMessage = 'Check your network connection.'
-            //             break
-            //         default:
-            //             errorMessage = err?.message ?? 'Something went wrong at sending OTP.'
-            //             break
-            //     }
-            //     ErrorToast(errorMessage)
-            //     return
-            // }
-
-            // if (!confirmation) {
-            //     return
-            // }
             toggleLoader(true)
             const createAccRes = await createAccount(`${callingCode} ${phone}`)
             toggleLoader(false)
@@ -229,16 +162,16 @@ const EnterContactInformation = (props: any) => {
                 payload = {
                     firstName: params.firstName,
                     lastName: params.lastName,
-                    addressLine1: address,
-                    city: city,
+                    addressLine1: address.trim(),
+                    city: city.trim(),
                     county: '',
-                    email: email,
-                    phone: phone,
+                    email: email.trim(),
+                    phone: phone.trim(),
                     date: formattedDate[0],
                     month: formattedDate[1],
                     year: formattedDate[2],
                     primaryAddressId: userDetails?.individualAccount.primaryContact.addresses.filter(addresDetails => addresDetails.isPrimaryAddress)[0].addressId,
-                    zipCode: zipcode,
+                    zipCode: zipcode.trim(),
                     profilePic: params.profilePic
                 }
 
@@ -319,7 +252,7 @@ const EnterContactInformation = (props: any) => {
                 // setDatePickerVisibility(true)
                 break
             case appConstants.DOB: // on date select
-            // console.log(value)
+                // console.log(value)
                 if (value) {
                     const date = moment(value).set({
                         hours: 0,

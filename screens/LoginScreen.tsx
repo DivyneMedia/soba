@@ -49,8 +49,8 @@ const LoginScreen = (props: any) => {
         try {
             setLoading(true)
             await dispatch(authActions.login({
-                username: email,
-                password: password
+                username: email.trim(),
+                password: password.trim()
             }))
             setLoading(false)
             SuccessToast("Login Successfully.")

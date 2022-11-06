@@ -59,7 +59,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
             const date = userBasicInfo?.searchResults[0]["DOB Day"]
             const month = userBasicInfo?.searchResults[0]["DOB Month"]
             const year = userBasicInfo?.searchResults[0]["DOB Year"]
-    
+
             const dob = moment(`${date}/${month}/${year} 00:00:00`, "D/M/YYYY hh:mm:ss")
 
             const payloadToSend = {
@@ -94,7 +94,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
                 ErrorToast("Enter valid Matriculation Number to continue.")
                 return
             }
-            const data: UserRespose | undefined = await getUserByAccountId(+matriculationNumber)
+            const data: UserRespose | undefined = await getUserByAccountId(+matriculationNumber.trim())
             if (data && typeof data !== "undefined") {
                 userBasicInfo = data
 
@@ -119,7 +119,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <View style={{ minHeight: 180, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.grey }}>
                         <Image
-                            source={{uri: profile}}
+                            source={{ uri: profile }}
                             style={{
                                 height: 70,
                                 width: 70,
