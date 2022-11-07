@@ -50,7 +50,7 @@ const ConfirmRegistrationScreen = (props: any) => {
             showError && ErrorToast("Password required.")
             return false
         }
-        if (password.length < 6) {
+        if (password.trim().length < 6) {
             showError && ErrorToast("Password should be minimum 6 character long.")
             return false
         }
@@ -58,7 +58,7 @@ const ConfirmRegistrationScreen = (props: any) => {
             showError && ErrorToast("Re-enter password.")
             return false
         }
-        if (password !== confirmPassword) {
+        if (password.trim() !== confirmPassword.trim()) {
             showError && ErrorToast("Password and confirm password doesn't match.")
             return false
         }

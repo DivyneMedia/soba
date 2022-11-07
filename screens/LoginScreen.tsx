@@ -47,10 +47,23 @@ const LoginScreen = (props: any) => {
 
     const signInHandler = useCallback(async () => {
         try {
+            const emailVal = email.trim()
+            const passwordVal = password.trim()
+
+            if (!emailVal) {
+                ErrorToast("Please enter your email.")
+                return
+            }
+
+            if (!passwordVal) {
+                ErrorToast("Please enter password.")
+                return
+            }
+
             setLoading(true)
             await dispatch(authActions.login({
-                username: email.trim(),
-                password: password.trim()
+                username: emailVal,
+                password: passwordVal
             }))
             setLoading(false)
             SuccessToast("Login Successfully.")

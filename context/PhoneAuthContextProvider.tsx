@@ -64,8 +64,7 @@ export default (props: any) => {
         try {
             const phoneNumberData: FirebaseAuthTypes.User = await checkPhoneNumberAlreadyExistOrNot(phoneNumber)
             if (phoneNumberData.uid) {
-                ErrorToast("Phone number already used.")
-                return
+                throw new Error("Phone number already used.")
             }
             const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
             confirmRef.current = {

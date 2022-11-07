@@ -130,7 +130,7 @@ const EnterContactInformation = (props: any) => {
             return false
         }
         if (!address || !address.trim()) {
-            showError && ErrorToast("Address address required.")
+            showError && ErrorToast("Address required.")
             return false
         }
         return true
