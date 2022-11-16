@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Platform, Pressable, StyleSheet, TextInput, View }  from 'react-native';
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import images from "../assets/images";
 import ChatMessageItem from "../components/ChatMessageItem";
 import RegularText from "../components/RegularText";
@@ -8,6 +9,7 @@ import colors from "../constants/colors";
 import { LoaderContext } from "../context/LoaderContextProvider";
 import useAccount from "../hooks/useAccount";
 import useChatHistory from "../hooks/useChatHistory";
+import { isIos } from "../utils/MiscUtils";
 import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
 
 type ChatItem = {
@@ -142,8 +144,14 @@ const ChattingScreen = (props: ChattingScreenProps) => {
         loaderContext.toggleLoader(isLoading || accountLoading)
     }, [isLoading, accountLoading, loaderContext])
 
+    const safeArea = useSafeAreaInsets()
+
+    const combinedRootStyle = useMemo(() => { 
+        return StyleSheet.compose(styles.root, { paddingBottom: isIos ? safeArea.bottom : 0})
+     }, [safeArea])
+
     return (
-        <View style={styles.root}>
+        <View style={combinedRootStyle}>
             <FlatList
                 ref={flatListRef}
                 style={{flex: 1}}
