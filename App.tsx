@@ -34,7 +34,7 @@ const App = () => {
   useEffect(() => {
     if (isIos) {
       KeyboardManager.setEnable(isIos)
-      KeyboardManager.setKeyboardDistanceFromTextField(50)
+      KeyboardManager.setKeyboardDistanceFromTextField(20)
       KeyboardManager.setToolbarPreviousNextButtonEnable(isIos)
     }
     
