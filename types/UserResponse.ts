@@ -11,41 +11,41 @@ type PAGINATION = {
 }
 
 export type USER = {
-    "Admission Number": STRING_NULL,
-    "DOB Month": STRING_NULL,
-    "First Name": STRING_NULL,
-    "Gender": STRING_NULL,
-    "Photo URL": STRING_NULL,
-    "Mobile App Password": STRING_NULL,
-    "Account Note": STRING_NULL,
-    "DOB Day": STRING_NULL,
-    "Email 1": STRING_NULL,
-    "Phone 1 Area Code": STRING_NULL,
-    "Phone 1 Full Number (F)": STRING_NULL,
-    "Phone 1 Number": STRING_NULL,
-    "Phone 1 Type": STRING_NULL,
-    "Full Zip Code (F)": STRING_NULL,
-    "Account Type": STRING_NULL,
-    "Address Type": STRING_NULL,
-    "Account ID": STRING_NULL,
-    "Full Name (F)": STRING_NULL,
-    "Year of Entry": STRING_NULL,
-    "City": STRING_NULL,
-    "DOB Year": STRING_NULL,
-    "Account Created Date/Time": STRING_NULL,
-    "Account Login Name": STRING_NULL,
-    "Full Street Address (F)": STRING_NULL,
-    "Mobile App Account Claimed": STRING_NULL,
-    "Account Created By": STRING_NULL,
-    "Mobile App Username": STRING_NULL,
-    "Country": STRING_NULL,
-    "Chapter Affiliate": STRING_NULL,
-    "Last Name": STRING_NULL,
-    "Mobile App Account Approved": STRING_NULL,
-    "Mobile App Firebase UID": STRING_NULL,
-    "State/Province": STRING_NULL
-    "Zip Code": STRING_NULL
-    "Mobile App Firebase Admin Ids": STRING_NULL
+    "Admission Number": STRING_NULL, // 82
+    "DOB Month": STRING_NULL, // NAC
+    "First Name": STRING_NULL, // NAC
+    "Gender": STRING_NULL,  // NAC
+    "Photo URL": STRING_NULL, // NAC
+    "Mobile App Password": STRING_NULL, // 87
+    "Account Note": STRING_NULL, // NAC
+    "DOB Day": STRING_NULL, // NAC
+    "Email 1": STRING_NULL, // NAC
+    "Phone 1 Area Code": STRING_NULL, // NAC
+    "Phone 1 Full Number (F)": STRING_NULL, // NAC
+    "Phone 1 Number": STRING_NULL, // NAC
+    "Phone 1 Type": STRING_NULL, // NAC
+    "Full Zip Code (F)": STRING_NULL, // NAC
+    "Account Type": STRING_NULL, // NAC
+    "Address Type": STRING_NULL, // NAC
+    "Account ID": STRING_NULL, // NAC
+    "Full Name (F)": STRING_NULL, // NAC
+    "Year of Entry": STRING_NULL, // 77
+    "City": STRING_NULL, // NAC
+    "DOB Year": STRING_NULL, // NAC
+    "Account Created Date/Time": STRING_NULL, // NAC
+    "Account Login Name": STRING_NULL, // NAC
+    "Full Street Address (F)": STRING_NULL, // NAC
+    "Mobile App Account Claimed": STRING_NULL, // 99
+    "Account Created By": STRING_NULL, // NAC
+    "Mobile App Username": STRING_NULL, // 86
+    "Country": STRING_NULL, // NAC
+    "Chapter Affiliate": STRING_NULL, // 75
+    "Last Name": STRING_NULL, // NAC
+    "Mobile App Account Approved": STRING_NULL, // 96
+    "Mobile App Firebase UID": STRING_NULL, // 94
+    "State/Province": STRING_NULL // NAC
+    "Zip Code": STRING_NULL // NAC
+    "Mobile App Firebase Admin Ids": STRING_NULL // 95
 }
 
 export type UserRespose = {

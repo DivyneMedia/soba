@@ -1,5 +1,55 @@
 export type STRING_NULL = string | null
 
+export const userPayloadOutputFieldsOptions = {
+    "Account ID": "Account ID",
+    "Account Login Name": "Account Login Name",
+    "Account Note": "Account Note",
+    "Account Type": "Account Type",
+    "Address Type": "Address Type",
+    "City": "City",
+    "Country": "Country",
+    "DOB Day": "DOB Day",
+    "DOB Month": "DOB Month",
+    "DOB Year": "DOB Year",
+    "Email 1": "Email 1",
+    "Phone 1 Area Code": "Phone 1 Area Code",
+    "Phone 1 Full Number (F)": "Phone 1 Full Number (F)",
+    "Phone 1 Number": "Phone 1 Number",
+    "Phone 1 Type": "Phone 1 Type",
+    "First Name": "First Name",
+    "Last Name": "Last Name",
+    "Full Name (F)": "Full Name (F)",
+    "Full Street Address (F)": "Full Street Address (F)",
+    "Full Zip Code (F)": "Full Zip Code (F)",
+    "Gender": "Gender",
+    "Photo URL": "Photo URL",
+    "State/Province": "State/Province",
+    "Zip Code": "Zip Code",
+    // 75: 75,
+    // 77: 77,
+    // 83: 83,
+    // 85: 85,
+    // 86: 86,
+    // 87: 87,
+    // 88: 88,
+    // 89: 89,
+    // 90: 90
+    75: 75,
+    77: 77,
+    82: 82,
+    // 83,
+    // 85,
+    86: 86,
+    87: 87,
+    // 88,
+    // 89,
+    // 90,
+    94: 94,
+    95: 95,
+    96: 96,
+    99: 99
+}
+
 export const userPayload = {
     "outputFields": [
         "Account ID",
@@ -28,13 +78,18 @@ export const userPayload = {
         "Zip Code",
         75,
         77,
-        83,
-        85,
+        82,
+        // 83,
+        // 85,
         86,
         87,
-        88,
-        89,
-        90
+        // 88,
+        // 89,
+        // 90,
+        94,
+        95,
+        96,
+        99
     ],
     "pagination": {
         "currentPage": 0,
@@ -48,8 +103,8 @@ export type USER_ADDRESS = {
     addressLine2: STRING_NULL,
     city: STRING_NULL,
     stateProvince: {
-       code: STRING_NULL,
-       name: STRING_NULL
+        code: STRING_NULL,
+        name: STRING_NULL
     },
     county: STRING_NULL,
     zipCode: STRING_NULL,
@@ -70,7 +125,7 @@ export type USER_ADDRESS = {
 
 export type USER_DETAILS = {
     individualAccount: {
-        accountCustomFields: STRING_NULL, 
+        accountCustomFields: STRING_NULL,
         accountId: STRING_NULL,
         individualTypes: STRING_NULL,
         noSolicitation: STRING_NULL,

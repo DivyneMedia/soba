@@ -1,5 +1,5 @@
 import React, { forwardRef, Ref, useCallback, useImperativeHandle, useMemo, useRef } from "react";
-import { StyleSheet }  from 'react-native';
+import { StyleSheet } from 'react-native';
 import {
     BottomSheetBackdropProps,
     BottomSheetModal,
@@ -13,7 +13,6 @@ import CheckboxButton, { CheckboxButtonRef } from "./CheckboxButton";
 
 import { height } from "../utils/MiscUtils";
 import { ErrorToast } from "../utils/ToastUtils";
-import { useToggleRefinement } from "react-instantsearch-hooks";
 
 type ChatFilterModalProps = {
     onSubmit(filterOption: string): void
@@ -51,7 +50,6 @@ const ChatFilterModal = forwardRef((props: ChatFilterModalProps, ref: any) => {
     }, []);
 
     const handleSheetChanges = useCallback((index: number) => {
-        // console.log('handleSheetChanges', index);
         bottomSheetOpenStatusRef.current = index !== -1
     }, []);
 
@@ -80,7 +78,7 @@ const ChatFilterModal = forwardRef((props: ChatFilterModalProps, ref: any) => {
             const allChatsSelected = filterAllRef.current?.getChecked()
             const approvedChatsSelected = filterApprovedRef.current?.getChecked()
             const unapprovedChatsSelected = filterUnapprovedRef.current?.getChecked()
-            
+
             if (!allChatsSelected && !approvedChatsSelected && !unapprovedChatsSelected) {
                 ErrorToast("Please select option to continue.")
             } else {

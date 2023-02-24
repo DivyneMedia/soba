@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Keyboard, StyleSheet, TextInput, View } from 'react-native';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import AuthFooter from "../components/AuthFooter";
 import BackgroundImageComp from "../components/BackgroundImageComp";

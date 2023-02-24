@@ -55,7 +55,7 @@ const useFirebase = () => {
             } = userAccDetails
 
             console.log('userAccDetails : ', userAccDetails)
-            
+
             toggleLoader(true)
 
             try {
@@ -74,44 +74,58 @@ const useFirebase = () => {
                         }
                     ]
                 })
-    
+
                 if (loginRes && loginRes.data) {
-                    const {searchResults} = loginRes.data
+                    const { searchResults } = loginRes.data
                     if (searchResults && Array.isArray(searchResults) && searchResults.length) {
                         throw new Error("Username already taken please try with different username.")
                     } else {
                         // Username not found..
 
                         try {
-                            await axios.patch(`/accounts/${accId}`, {
-                                "individualAccount": {
-                                    "accountCustomFields": [
-                                        {
-                                            "id": "86",
-                                            "name": "Mobile App Username",
-                                            "value": username
-                                        },
-                                        {
-                                            "id": "87",
-                                            "name": "Mobile App Password",
-                                            "value": password
-                                        },
-                                        {
-                                            "id": "85",
-                                            "name": "Mobile App Account Claimed",
-                                            "value": true
-                                        },
-                                        {
-                                            "id": "89",
-                                            "name": "Mobile App Firebase UID",
-                                            "value": uid
-                                        }
-                                    ]
-                                }
-                            })
+
+                            // handling api with server error message
+                            try {
+                                await axios.patch(`/accounts/${accId}`, {
+                                    "individualAccount": {
+                                        "accountCustomFields": [
+                                            {
+                                                "id": "86",
+                                                "name": "Mobile App Username",
+                                                "value": username
+                                            },
+                                            {
+                                                "id": "87",
+                                                "name": "Mobile App Password",
+                                                "value": password
+                                            },
+                                            {
+                                                "id": "99",
+                                                "name": "Mobile App Account Claimed",
+                                                "value": true
+                                            },
+                                            {
+                                                "id": "94",
+                                                "name": "Mobile App Firebase UID",
+                                                "value": uid
+                                            }
+                                        ]
+                                    }
+                                })
+                            } catch (err: any) {
+                                throw new Error(
+                                    err?.response?.data &&
+                                        Array.isArray(err?.response?.data) &&
+                                        err?.response?.data?.length &&
+                                        err?.response?.data[0]?.message
+                                        ?
+                                        err?.response?.data[0]?.message
+                                        : err?.message ?? appConstants.SOMETHING_WENT_WRONG
+                                )
+                            }
 
                             const currFirebaseTimeStamp = getCurrFirestoreTimeStamp()
-            
+
                             await usersCollection.doc(uid).set({
                                 crmAccId: accId,
                                 uid,
@@ -131,7 +145,7 @@ const useFirebase = () => {
                             toggleLoader(false)
                             return true
                         } catch (err: any) {
-                            throw new Error(appConstants.SOMETHING_WENT_WRONG)
+                            throw new Error(err?.message ?? appConstants.SOMETHING_WENT_WRONG)
                         }
                     }
                 }

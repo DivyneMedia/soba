@@ -27,7 +27,9 @@ import { LoaderContext } from "../context/LoaderContextProvider";
 let userBasicInfo: UserRespose | undefined = undefined
 
 const FetchMatriculationDetailsScreen = (props: any) => {
-    const { navigation } = props
+    const { navigation, route } = props
+    const chapterId = useMemo(() => route?.params?.chapterId, [route])
+
     const { isLoading, getUserByAccountId } = useAccount()
 
     const [matriculationNumber, setMatriculationNumber] = useState('')
@@ -94,7 +96,7 @@ const FetchMatriculationDetailsScreen = (props: any) => {
                 ErrorToast("Enter valid Matriculation Number to continue.")
                 return
             }
-            const data: UserRespose | undefined = await getUserByAccountId(+matriculationNumber.trim())
+            const data: UserRespose | undefined = await getUserByAccountId(+matriculationNumber.trim(), chapterId)
             if (data && typeof data !== "undefined") {
                 userBasicInfo = data
 

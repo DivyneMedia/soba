@@ -51,6 +51,8 @@ export default (state = initialState, action: ActionType) => {
                     'Mobile App Password': payload
                 }
             }
+        case 'FLUSH':
+            return initialState;
         default:
             return state
     }

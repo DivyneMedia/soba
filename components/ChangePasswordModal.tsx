@@ -1,14 +1,11 @@
 import React, { forwardRef, Ref, useCallback, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Keyboard, StyleSheet, TextInput, View }  from 'react-native';
+import { ActivityIndicator, Keyboard, StyleSheet, TextInput, View } from 'react-native';
 import {
     BottomSheetBackdropProps,
     BottomSheetModal,
 } from '@gorhom/bottom-sheet';
-import QRCode from 'react-native-qrcode-svg';
 
 import BoldText from "../components/BoldText";
-import images from "../assets/images";
-import MembershipSymbol from "../components/MembershipPlanSymbol";
 
 import CustomBackdrop from "../components/CustomBackdrop";
 import { useDispatch, useSelector } from "react-redux";
@@ -69,7 +66,6 @@ const ChangePasswordModal = forwardRef((_props: ChangePasswordModalProps, ref: a
     }, []);
 
     const handleSheetChanges = useCallback((index: number) => {
-        // console.log('handleSheetChanges', index);
         bottomSheetOpenStatusRef.current = index !== -1
     }, []);
 
@@ -230,10 +226,10 @@ const ChangePasswordModal = forwardRef((_props: ChangePasswordModalProps, ref: a
                 <BoldText>{'Change Password'}</BoldText>
                 {
                     isLoading
-                    ? <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        <ActivityIndicator size={"large"} color={colors.primary} />
-                    </View>
-                    : passwordFields
+                        ? <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                            <ActivityIndicator size={"large"} color={colors.primary} />
+                        </View>
+                        : passwordFields
                 }
             </Root>
             <RoundedButton

@@ -1,5 +1,5 @@
 import React, { forwardRef, Ref, useCallback, useImperativeHandle, useMemo, useRef } from "react";
-import { StyleSheet, View }  from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {
     BottomSheetBackdropProps,
     BottomSheetModal,
@@ -43,7 +43,6 @@ const QrCodeModal = forwardRef((_props: QrCodeModalProps, ref: any) => {
     }, []);
 
     const handleSheetChanges = useCallback((index: number) => {
-        // console.log('handleSheetChanges', index);
         bottomSheetOpenStatusRef.current = index !== -1
     }, []);
 

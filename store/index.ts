@@ -4,17 +4,20 @@ import { persistStore, persistReducer } from 'redux-persist'
 import thunk from 'redux-thunk'
 
 import authReducer from './reducers/AuthReducer'
+import outputFieldsReducer from './reducers/outputFieldsReducer'
 
 const rootReducer = combineReducers({
-  auth: authReducer
+  auth: authReducer,
+  outputFields: outputFieldsReducer
 })
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
 }
- 
+
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export let store: any = createStore(persistedReducer, applyMiddleware(thunk));
+
+export let store = createStore(persistedReducer, applyMiddleware(thunk));
 export let persistor = persistStore(store);

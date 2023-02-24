@@ -62,7 +62,7 @@ const SelectChapterModal = React.forwardRef((props: SelectChapterModalProps, ref
                 </Pressable>
             )
         } catch (err: any) {
-            console.log('Error : ', err?.message)
+            console.log('[renderChapterHandler] Error : ', err?.message)
             return null
         }
     }, [onSelect])

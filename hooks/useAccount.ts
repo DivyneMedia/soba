@@ -1,16 +1,20 @@
 import { AxiosError, AxiosResponse } from 'axios'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import firestore from '@react-native-firebase/firestore'
+import { useSelector } from 'react-redux'
+import { OutputFieldsType } from '../store/actions/outputFieldsActions'
 
 import axios from '../axios.auth'
 import appConstants from '../constants/appConstants'
-import { UPDATE_USER_PAYLOAD, UPDATE_USER_PROFILE, userPayload } from '../model/UserData'
+import { UPDATE_USER_PAYLOAD, UPDATE_USER_PROFILE, userPayload, userPayloadOutputFieldsOptions } from '../model/UserData'
 import { BASE_CUSTOM_FIELD_RESPONSE, OPTION_VALUES, UserRespose } from '../types/UserResponse'
 import { ErrorToast } from '../utils/ToastUtils'
 
 const useAccount = (chatChannelId?: string) => {
     const [isLoading, setLoading] = useState(false)
     const mountedRef = useRef(false)
+
+    const outputFields: OutputFieldsType = useSelector((state: any) => state.outputFields)
 
     useEffect(() => {
         mountedRef.current = true
@@ -29,7 +33,7 @@ const useAccount = (chatChannelId?: string) => {
             let availableChaptersRes: AxiosResponse<BASE_CUSTOM_FIELD_RESPONSE<OPTION_VALUES>>
             try {
                 availableChaptersRes = await axios.get('/customFields/75')
-            } catch(err: unknown | AxiosError<any, any> | any) {
+            } catch (err: unknown | AxiosError<any, any> | any) {
                 // throw new Error(err.response)
                 throw new Error(err?.response?.data ?? err?.message ?? appConstants.SOMETHING_WENT_WRONG)
             }
@@ -47,29 +51,45 @@ const useAccount = (chatChannelId?: string) => {
         }
     }, [])
 
-    const getUserByAccountId = useCallback(async (accountId: number) => {
+    const getUserByAccountId = useCallback(async (accountId: number, chapterId?: number) => {
         try {
+            const searchFields = [
+                {
+                    "field": "Admission Number",
+                    "operator": "EQUAL",
+                    "value": accountId
+                },
+                {
+                    "field": "Mobile App Account Claimed",
+                    "operator": "NOT_EQUAL",
+                    "value": "true"
+                }
+            ];
+
+            if (chapterId) {
+                searchFields.push({
+                    "field": "Chapter Affiliate",
+                    "operator": "EQUAL",
+                    "value": chapterId // advance check for search acc in specific chapter affiliate
+                })
+            }
+
             toggleLoader(true)
             let accDetailsRes: AxiosResponse<UserRespose>
             try {
                 accDetailsRes = await axios.post('/accounts/search', {
                     ...userPayload,
-                    searchFields: [
-                        {
-                            "field": "Admission Number",
-                            "operator": "EQUAL",
-                            "value": accountId
-                        },
-                        {
-                            "field": "Mobile App Account Claimed",
-                            "operator": "NOT_EQUAL",
-                            "value": "true"
-                        }
-                    ]
+                    searchFields
                 })
-            } catch(err: any | unknown | AxiosError<any, any>) {
+            } catch (err: any | unknown | AxiosError<any, any>) {
                 // throw new Error(err.response)
-                throw new Error(err?.response?.data ?? err?.message ?? appConstants.SOMETHING_WENT_WRONG)
+                console.log(JSON.stringify(err?.response?.data))
+                throw new Error(
+                    err?.response?.data &&
+                        Array.isArray(err?.response?.data) &&
+                        err?.response?.data?.length
+                        ? err?.response?.data[0]?.message : err?.message ?? appConstants.SOMETHING_WENT_WRONG
+                )
             }
 
             if (!accDetailsRes.data.searchResults.length) {
@@ -82,7 +102,7 @@ const useAccount = (chatChannelId?: string) => {
         } finally {
             toggleLoader(false)
         }
-    }, [])
+    }, [outputFields])
 
     const approveUserAcc = useCallback(async (accountId: number, userFirestoreId: string) => {
         try {
@@ -94,19 +114,19 @@ const useAccount = (chatChannelId?: string) => {
 
             console.log('chatChannelId : ', chatChannelId)
             await firestore()
-            .collection(appConstants.privateChannel)
-            .doc(chatChannelId)
-            .update({
-                isApproved: true
-            })
+                .collection(appConstants.privateChannel)
+                .doc(chatChannelId)
+                .update({
+                    isApproved: true
+                })
 
             console.log('userFirestoreId : ', userFirestoreId)
             await firestore()
-            .collection(appConstants.users)
-            .doc(userFirestoreId)
-            .update({
-                isAccountApproved: true
-            })
+                .collection(appConstants.users)
+                .doc(userFirestoreId)
+                .update({
+                    isAccountApproved: true
+                })
 
             // await firestore()
             // .collection(appConstants.users)
@@ -120,28 +140,17 @@ const useAccount = (chatChannelId?: string) => {
             try {
                 accUpdateRes =
                     await axios.patch(`/accounts/${accountId}`, {
-                    "individualAccount": {
-                        "accountCustomFields": [
-                            {
-                                "id": "88",
-                                "name": "Mobile App Account Approved",
-                                "status": "ACTIVE",
-                                "optionValues": [
-                                    {
-                                        "id": "46",
-                                        "name": "false"
-                                    },
-                                    {
-                                        "id": "47",
-                                        "name": "true"
-                                    }
-                                ],
-                                "value": "true"
-                            }
-                        ]
-                    }
-                })
-            } catch(err: unknown | AxiosError<any, any>) {
+                        individualAccount: {
+                            accountCustomFields: [
+                                {
+                                    "id": "96",
+                                    "name": "Mobile App Account Approved",
+                                    "value": "true"
+                                }
+                            ]
+                        }
+                    })
+            } catch (err: unknown | AxiosError<any, any>) {
                 // throw new Error(err.response)
                 throw new Error(appConstants.SOMETHING_WENT_WRONG)
             }
@@ -164,7 +173,7 @@ const useAccount = (chatChannelId?: string) => {
             let userAccountDetails: AxiosResponse<any>
             try {
                 userAccountDetails = await axios.get('/accounts/' + crmId)
-            } catch(err: unknown | AxiosError<any, any>) {
+            } catch (err: unknown | AxiosError<any, any>) {
                 // throw new Error(err.response)
                 throw new Error(appConstants.SOMETHING_WENT_WRONG)
             }
@@ -189,7 +198,7 @@ const useAccount = (chatChannelId?: string) => {
             try {
                 console.log('userPayload : ', userPayload)
 
-                updateUserAccountDetailsRes = await axios.patch('/accounts/' + crmId,  {
+                updateUserAccountDetailsRes = await axios.patch('/accounts/' + crmId, {
                     "individualAccount": {
                         "primaryContact": {
                             "dob": {
@@ -218,9 +227,9 @@ const useAccount = (chatChannelId?: string) => {
                 }
 
                 console.log('updateUserAccountDetailsRes.data : ', updateUserAccountDetailsRes.data)
-    
+
                 return updateUserAccountDetailsRes.data
-            } catch(err: unknown | AxiosError<any, any>) {
+            } catch (err: unknown | AxiosError<any, any>) {
                 // throw new Error(err.response)
                 console.log('[updateUserAccountDetails] Error : ', err?.response?.data ?? err?.message ?? appConstants.SOMETHING_WENT_WRONG)
                 throw new Error(appConstants.SOMETHING_WENT_WRONG)
@@ -260,7 +269,7 @@ const useAccount = (chatChannelId?: string) => {
             toggleLoader(true)
             let updateUserAccountDetailsRes: AxiosResponse<any>
             try {
-                updateUserAccountDetailsRes = await axios.patch('/accounts/' + crmId,  {
+                updateUserAccountDetailsRes = await axios.patch('/accounts/' + crmId, {
                     "individualAccount": {
                         "primaryContact": {
                             "dob": {
@@ -288,9 +297,9 @@ const useAccount = (chatChannelId?: string) => {
                 }
 
                 console.log('updateUserAccountDetailsRes.data : ', updateUserAccountDetailsRes.data)
-    
+
                 return updateUserAccountDetailsRes.data
-            } catch(err: unknown | AxiosError<any, any>) {
+            } catch (err: unknown | AxiosError<any, any>) {
                 // throw new Error(err.response)
                 console.log('[updateUserAccountDetails] Error : ', err?.response?.data ?? err?.message ?? appConstants.SOMETHING_WENT_WRONG)
                 throw new Error(appConstants.SOMETHING_WENT_WRONG)
