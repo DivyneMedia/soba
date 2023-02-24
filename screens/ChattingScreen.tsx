@@ -1,13 +1,17 @@
+import { useHeaderHeight } from "@react-navigation/elements";
 import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, Image, Platform, Pressable, StyleSheet, TextInput, View }  from 'react-native';
+import { ActivityIndicator, FlatList, Image, Platform, Pressable, ScrollView, StyleSheet, TextInput, View }  from 'react-native';
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import images from "../assets/images";
 import ChatMessageItem from "../components/ChatMessageItem";
 import RegularText from "../components/RegularText";
+import Root from "../components/RootComponent";
 import appConstants from "../constants/appConstants";
 import colors from "../constants/colors";
 import { LoaderContext } from "../context/LoaderContextProvider";
 import useAccount from "../hooks/useAccount";
 import useChatHistory from "../hooks/useChatHistory";
+import { height, isIos } from "../utils/MiscUtils";
 import { ErrorToast, SuccessToast } from "../utils/ToastUtils";
 
 type ChatItem = {
@@ -27,6 +31,7 @@ type ChattingScreenProps = {
 
 const ChattingScreen = (props: ChattingScreenProps) => {
     const { navigation, route } = useMemo(() => props, [props]) 
+   
     const { params } = useMemo(() => route, [route])
     const showApproveBtn = useMemo(() => params?.showApproveBtn, [params])
     const chatName = useMemo(() => params?.chatName, [params])
@@ -142,11 +147,24 @@ const ChattingScreen = (props: ChattingScreenProps) => {
         loaderContext.toggleLoader(isLoading || accountLoading)
     }, [isLoading, accountLoading, loaderContext])
 
+    const safeArea = useSafeAreaInsets()
+
+    // const combinedRootStyle = useMemo(() => { 
+    //     return StyleSheet.compose(styles.root, { paddingBottom: isIos ? safeArea.bottom : 0})
+    //  }, [safeArea])
+
+     const headerHeight = useHeaderHeight()
+
     return (
-        <View style={styles.root}>
+        <ScrollView style={styles.root} contentContainerStyle={{ minHeight: height - headerHeight - (isIos ? safeArea.bottom : 0)}}>
+            
             <FlatList
                 ref={flatListRef}
-                style={{flex: 1}}
+                style={{flexGrow: 1}}
+                contentContainerStyle={{
+                    flex: 1,
+                    minHeight: "100%"
+                }}
                 keyExtractor={(item, index) => index.toString()}
                 inverted={true}
                 data={messages}
@@ -228,7 +246,7 @@ const ChattingScreen = (props: ChattingScreenProps) => {
                     </Pressable>
                 </View>
             </View>
-        </View>
+        </ScrollView>
     )
 }
 
